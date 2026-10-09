@@ -15,7 +15,6 @@ export const navItems: NavItem[] = [
     { label: 'Kepengurusan', page: 'management' },
     { label: 'Bidang', page: 'division' },
     { label: 'Berita', page: 'news' },
-    { label: 'Ekowir', page: 'ekowir' },
     { label: 'Alumni', page: 'alumni' },
     { label: 'Kontak', page: 'contact' },
 ]
@@ -33,85 +32,65 @@ export interface NewsItem {
     status: 'published' | 'draft'
 }
 
-export const newsData: NewsItem[] = [
+export const newsData = [
     {
         id: 1,
-        title: 'Pelantikan Pengurus IMM Kaizen Periode 2024–2025',
-        excerpt: 'Ikatan Mahasiswa Muhammadiyah Komisariat Kaizen resmi melantik pengurus baru untuk periode 2024–2025 dalam rangkaian acara yang berlangsung khidmat.',
-        content: `Ikatan Mahasiswa Muhammadiyah (IMM) Komisariat Kaizen telah resmi melantik jajaran pengurus baru untuk periode kepengurusan 2024–2025. Acara pelantikan berlangsung pada 15 Maret 2024 di Aula Universitas, dihadiri oleh pimpinan pusat, alumni, dan seluruh anggota aktif.\n\nDalam sambutannya, Ketua Umum yang baru dilantik menyampaikan visi besar untuk membawa IMM Kaizen ke level yang lebih tinggi dalam bidang akademik, sosial, dan kewirausahaan. Program-program strategis telah disiapkan untuk satu tahun ke depan.\n\nAcara pelantikan ini juga diisi dengan berbagai penampilan seni dari anggota, seremonial serah terima jabatan, dan doa bersama. Seluruh pengurus yang hadir berkomitmen untuk menjalankan amanah dengan sebaik-baiknya.`,
-        date: '15 Maret 2024',
-        publishDate: '16 Maret 2024',
-        cover: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=500&fit=crop&auto=format',
+        title: 'Kajian September Hitam PK IMM Kaizen Bahas Sejarah, HAM, dan Peran Mahasiswa',
+        excerpt: 'Pimpinan Komisariat (PK) Ikatan Mahasiswa Muhammadiyah (IMM) Kaizen menggelar Kajian September Hitam 2026 pada Rabu (30/9/2026) pukul 15.00 WIB.',
+        content: 'Kegiatan diawali pembukaan oleh Moh. Faiz Haikal selaku Master of Ceremony (MC) sekaligus Sekretaris Bidang HPKP PK IMM Kaizen. Kajian kemudian dilanjutkan dengan penyampaian materi oleh Syarif Hidayat dengan Febri Dimas Ferdiansyah sebagai moderator....',
+        date: '30 September 2026',
+        publishDate: '01 Oktober 2026',
+        cover: 'https://pwmu.co/wp-content/uploads/2026/10/konsep-otomatis-Zizw.jpeg',
         gallery: [
             'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&h=400&fit=crop&auto=format',
             'https://images.unsplash.com/photo-1511578314322-379afb476865?w=600&h=400&fit=crop&auto=format',
         ],
-        category: 'Organisasi',
+        category: 'Bidang HPKP',
         status: 'published',
+        pwmuUrl: 'https://pwmu.co/kajian-september-hitam-pk-imm-kaizen-bahas-sejarah-ham-dan-peran-mahasiswa/'
     },
     {
         id: 2,
-        title: 'Workshop Kewirausahaan Muda: Membangun Bisnis dari Nol',
-        excerpt: 'Bidang Ekowir IMM Kaizen mengadakan workshop kewirausahaan yang diikuti lebih dari 80 peserta dari berbagai komisariat se-kota.',
-        content: `Workshop Kewirausahaan Muda yang diselenggarakan oleh Bidang Ekonomi dan Kewirausahaan (Ekowir) IMM Kaizen berlangsung sukses pada 22 April 2024. Acara ini menghadirkan tiga pembicara berpengalaman dari dunia bisnis dan startup.\n\nSebanyak 85 peserta hadir dari berbagai komisariat IMM se-kota, antusias mengikuti materi tentang ideasi bisnis, validasi pasar, dan strategi pemasaran digital. Sesi praktik langsung menjadi daya tarik tersendiri, di mana peserta dibagi ke dalam kelompok untuk mengembangkan ide bisnis mereka.\n\nPanitia juga menyediakan mentoring one-on-one bagi peserta yang ingin mengembangkan ide bisnis lebih lanjut. Workshop ini diharapkan menjadi pemantik semangat wirausaha di kalangan mahasiswa.`,
-        date: '22 April 2024',
-        publishDate: '24 April 2024',
-        cover: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=800&h=500&fit=crop&auto=format',
+        title: 'Mastakom PK IMM Kaizen Umsura Kenalkan Perkaderan melalui Simulasi Aksi',
+        excerpt: 'Pimpinan Komisariat (PK) Ikatan Mahasiswa Muhammadiyah (IMM) Kaizen Fakultas Teknik Universitas Muhammadiyah Surabaya (UMSurabaya) menggelar Masa Ta’aruf Komisariat (Mastakom) 2026 di Gedung At-Ta’awun Umsura Lantai 21, Rabu (16/9/2026)',
+        content: 'Kegiatan tersebut menjadi pengenalan awal bagi peserta terhadap IMM, Muhammadiyah, dan PK IMM Kaizen. Mastakom mengusung tema “Manifestasi Nilai Trilogi IMM: Mengukir Kader Autentik, Melahirkan The Next Champion yang Berintegritas.”...',
+        date: '16 September 2026',
+        publishDate: '18 September 2026',
+        cover: 'https://pwmu.co/wp-content/uploads/2026/09/mastakom-pk-imm-kaizen-umsura-kenalkan-perkaderan-melalui-simulasi-aksi-mAoj.jpeg',
         gallery: [
             'https://images.unsplash.com/photo-1556761175-4b46a572b786?w=600&h=400&fit=crop&auto=format',
         ],
-        category: 'Ekowir',
+        category: 'Bidang Kader',
         status: 'published',
+        pwmuUrl: 'https://pwmu.co/mastakom-pk-imm-kaizen-umsura-kenalkan-perkaderan-melalui-simulasi-aksi/'
     },
     {
         id: 3,
-        title: 'Bakti Sosial IMM Kaizen di Kelurahan Sumber Jaya',
-        excerpt: 'Dalam rangka Dies Natalis ke-7, IMM Kaizen menggelar bakti sosial berupa pembagian sembako dan pengobatan gratis bagi warga kurang mampu.',
-        content: `Dalam rangka memperingati Dies Natalis ke-7, IMM Kaizen menggelar kegiatan Bakti Sosial di Kelurahan Sumber Jaya pada 5 Mei 2024. Kegiatan ini melibatkan lebih dari 60 anggota aktif yang bersama-sama memberikan kontribusi nyata bagi masyarakat sekitar.\n\nBentuk kegiatan meliputi pembagian 200 paket sembako kepada warga kurang mampu, layanan pengobatan gratis yang ditangani oleh mahasiswa kesehatan, dan perbaikan fasilitas umum berupa pengecatan pos ronda dan pembersihan lingkungan.\n\nKegiatan ini mendapat sambutan positif dari aparat kelurahan dan warga setempat. Lurah Sumber Jaya menyampaikan apresiasi atas kontribusi nyata mahasiswa dalam membantu masyarakat.`,
-        date: '5 Mei 2024',
-        publishDate: '7 Mei 2024',
-        cover: 'https://images.unsplash.com/photo-1593113598332-cd288d649433?w=800&h=500&fit=crop&auto=format',
+        title: 'Raker PK IMM Kaizen Susun Program Kerja untuk Satu Periode Kepengurusan',
+        excerpt: 'Pimpinan Komisariat Ikatan Mahasiswa Muhammadiyah (PK IMM) Kaizen melaksanakan Rapat Kerja (Raker) pada Sabtu (5/9/2026). Kegiatan tersebut berlangsung di Gedung F, Ruang F-203, Universitas Muhammadiyah Surabaya (Umsura), mulai pukul 08.00 WIB hingga selesai.',
+        content: 'Raker dihadiri oleh seluruh pengurus PK IMM Kaizen. Kegiatan ini menjadi forum bagi pengurus untuk membahas dan menyusun program kerja yang akan dilaksanakan selama satu periode kepengurusan....',
+        date: '8 September 2026',
+        publishDate: '5 September 2026',
+        cover: 'https://pwmu.co/wp-content/uploads/2026/09/konsep-otomatis-V9a3.jpeg',
         gallery: [],
-        category: 'Sosial',
+        category: 'BPH',
         status: 'published',
+        pwmuUrl: 'https://pwmu.co/raker-pk-imm-kaizen-susun-program-kerja-untuk-satu-periode-kepengurusan/'
     },
     {
         id: 4,
-        title: 'Pelatihan Desain Grafis untuk Kader IMM',
-        excerpt: 'Bidang Media dan Komunikasi IMM Kaizen menyelenggarakan pelatihan desain grafis intensif bagi kader untuk meningkatkan kualitas visual konten organisasi.',
-        content: `Bidang Media dan Komunikasi (Medkom) IMM Kaizen menggelar pelatihan desain grafis intensif pada 10–12 Juni 2024. Pelatihan ini ditujukan bagi kader yang ingin meningkatkan kemampuan visual mereka dalam mendukung kegiatan organisasi.\n\nMateri yang diajarkan mencakup dasar-dasar desain, penggunaan aplikasi Canva dan Adobe Photoshop, hingga pembuatan konten media sosial yang menarik dan informatif. Trainer adalah alumni IMM Kaizen yang kini bekerja sebagai desainer profesional.\n\nHasil karya peserta langsung diaplikasikan untuk kebutuhan konten IMM Kaizen, menjadikan pelatihan ini produktif sekaligus langsung berdampak pada kualitas komunikasi visual organisasi.`,
-        date: '10 Juni 2024',
-        publishDate: '13 Juni 2024',
-        cover: 'https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=800&h=500&fit=crop&auto=format',
+        title: 'PK IMM Kaizen Lantik Pengurus 2026/2027, Resmi Launching Website Kaizen Company',
+        excerpt: 'Pimpinan Komisariat Ikatan Mahasiswa Muhammadiyah (PK IMM) Kaizen Universitas Muhammadiyah Surabaya (Umsura) resmi memulai kepengurusan periode 2026/2027. Momentum tersebut ditandai dengan pelantikan pengurus baru sekaligus peluncuran website Kaizen Company sebagai platform digital resmi organisasi..',
+        content: 'Kegiatan yang berlangsung di Gedung At-Tauhid Umsura lantai 13 pada Senin (24/8/2026) itu mengusung tema “Ilmi Amaliah, Amal Ilmiah, Transformasi Digital, dan Perbaikan Tiada Henti.”...',
+        date: '24 Agustus 2026',
+        publishDate: '26 Agustus 2026',
+        cover: 'https://pwmu.co/wp-content/uploads/2026/08/pk-imm-kaizen-lantik-pengurus-2026-2027-resmi-launching-website-kaizen-company-k4VS.jpeg',
         gallery: [],
-        category: 'Medkom',
+        category: 'Pelantikan',
         status: 'published',
+        pwmuUrl: 'https://pwmu.co/pk-imm-kaizen-lantik-pengurus-2026-2027-resmi-launching-website-kaizen-company/'
     },
-    {
-        id: 5,
-        title: 'Studi Banding ke IMM Komisariat Al-Kindi',
-        excerpt: 'Delegasi IMM Kaizen melaksanakan studi banding ke Komisariat Al-Kindi untuk mempelajari sistem kaderisasi dan pengelolaan organisasi.',
-        content: `Delegasi IMM Kaizen yang terdiri dari 15 pengurus inti melaksanakan kunjungan studi banding ke IMM Komisariat Al-Kindi pada 20 Juli 2024. Kunjungan ini bertujuan untuk mempelajari best practice dalam sistem kaderisasi dan pengelolaan organisasi.\n\nSelama kunjungan, kedua komisariat bertukar pengalaman dalam bidang pengembangan SDM, pengelolaan keuangan organisasi yang transparan, dan strategi membangun loyalitas kader. Diskusi berlangsung hangat dan produktif, menghasilkan beberapa poin kesepakatan kerja sama ke depan.\n\nKetua Umum IMM Kaizen menyatakan bahwa kunjungan ini membuka wawasan baru dan akan menjadi referensi penting dalam menyusun program kaderisasi yang lebih baik di masa mendatang.`,
-        date: '20 Juli 2024',
-        publishDate: '22 Juli 2024',
-        cover: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800&h=500&fit=crop&auto=format',
-        gallery: [],
-        category: 'Organisasi',
-        status: 'published',
-    },
-    {
-        id: 6,
-        title: 'Launching Produk Baru Ekowir: Kaizen Merch Collection',
-        date: '1 Agustus 2024',
-        publishDate: '3 Agustus 2024',
-        excerpt: 'Setelah melalui proses desain dan produksi selama dua bulan, Bidang Ekowir IMM Kaizen resmi meluncurkan Kaizen Merch Collection.',
-        content: `Setelah melalui proses desain dan produksi yang panjang selama dua bulan, Bidang Ekonomi dan Kewirausahaan IMM Kaizen resmi meluncurkan Kaizen Merch Collection pada 1 Agustus 2024. Koleksi ini mencakup kaos, hoodie, totebag, dan berbagai aksesori berdesain eksklusif.\n\nSeluruh produk dirancang oleh tim desainer internal dengan mengedepankan identitas visual IMM Kaizen yang kuat. Material dipilih dengan standar kualitas tinggi untuk memastikan kepuasan konsumen.\n\nMerchandise ini tersedia untuk dipesan oleh seluruh anggota, alumni, dan simpatisan IMM Kaizen. Hasil penjualan akan digunakan untuk mendukung kegiatan organisasi dan program beasiswa kader berprestasi.`,
-        cover: 'https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=800&h=500&fit=crop&auto=format',
-        gallery: [],
-        category: 'Ekowir',
-        status: 'draft',
-    },
-]
+];
 
 export interface Product {
     id: number
@@ -189,20 +168,31 @@ export interface Management {
     isLeader: boolean
 }
 
-export const managementData: Management[] = [
-    { id: 1, name: 'Ahmad Fauzi Ramadhan', position: 'Ketua Umum', division: 'Pimpinan', photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&auto=format', isLeader: true },
-    { id: 2, name: 'Siti Nurhayati', position: 'Ketua I', division: 'Pimpinan', photo: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop&auto=format', isLeader: true },
-    { id: 3, name: 'Rizky Pratama', position: 'Ketua II', division: 'Pimpinan', photo: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop&auto=format', isLeader: true },
-    { id: 4, name: 'Dewi Rahmawati', position: 'Sekretaris Umum', division: 'Pimpinan', photo: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop&auto=format', isLeader: true },
-    { id: 5, name: 'Muhammad Haikal', position: 'Bendahara Umum', division: 'Pimpinan', photo: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&auto=format', isLeader: true },
-    { id: 6, name: 'Fajar Nugroho', position: 'Ketua Bidang BPI', division: 'BPI', photo: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=200&h=200&fit=crop&auto=format', isLeader: false },
-    { id: 7, name: 'Annisa Fitri', position: 'Sekretaris Bidang BPI', division: 'BPI', photo: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&h=200&fit=crop&auto=format', isLeader: false },
-    { id: 8, name: 'Bagas Aditya', position: 'Ketua Bidang Medkom', division: 'Medkom', photo: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop&auto=format', isLeader: false },
-    { id: 9, name: 'Rahma Indah', position: 'Sekretaris Bidang Medkom', division: 'Medkom', photo: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=200&h=200&fit=crop&auto=format', isLeader: false },
-    { id: 10, name: 'Dicky Firmansyah', position: 'Ketua Bidang Ekowir', division: 'Ekowir', photo: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&h=200&fit=crop&auto=format', isLeader: false },
-    { id: 11, name: 'Yuli Astuti', position: 'Sekretaris Bidang Ekowir', division: 'Ekowir', photo: 'https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=200&h=200&fit=crop&auto=format', isLeader: false },
-    { id: 12, name: 'Andi Saputra', position: 'Ketua Bidang Hikmah', division: 'Hikmah', photo: 'https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?w=200&h=200&fit=crop&auto=format', isLeader: false },
-]
+export const managementData = [
+    { id: 1, name: 'Abdul Baari\' Al Fakhri ', position: 'Ketua Umum', division: 'BPH', photo: '/img/profile/ketum.png' },
+    { id: 2, name: 'Muhammad Zakky Arifina ', position: 'Sekretaris Umum', division: 'BPH', photo: '/img/profile/sekum.jpg' },
+    { id: 3, name: 'Muhammad Zidan Al Farezel ', position: 'Bendahara Umum', division: 'BPH', photo: '/img/profile/bendum.png' },
+
+    { id: 4, name: 'Rafa Alexyz Virginanda', position: 'Ketua Bidang', division: 'Organisasi', photo: '/img/profile/imm.jpeg' },
+    { id: 5, name: 'Rafi Ilham Syamsudin', position: 'Sekretaris Bidang', division: 'Organisasi', photo: '/img/profile/imm.jpeg' },
+    { id: 6, name: 'Zaenal Abidin', position: 'Anggota', division: 'Organisasi', photo: '/img/profile/imm.jpeg' },
+    { id: 7, name: 'Muhammad Reno Setiawa', position: 'Anggota', division: 'Organisasi', photo: '/img/profile/imm.jpeg' },
+
+    { id: 8, name: 'Nobel Danial Muhammad ', position: 'Ketua Bidang', division: 'Kader', photo: '/img/profile/imm.jpeg' },
+    { id: 9, name: 'Abdullah Azzam Arif Firmansyah', position: 'Sekretaris Bidang', division: 'Kader', photo: '/img/profile/imm.jpeg' },
+    { id: 10, name: 'Maulidia Dliyaun N', position: 'Anggota', division: 'Kader', photo: '/img/profile/imm.jpeg' },
+    { id: 11, name: 'Hamas Fatih Izzudin', position: 'Anggota', division: 'Kader', photo: '/img/profile/imm.jpeg' },
+
+    { id: 12, name: 'M Lutfi Zaka Firdaus ', position: 'Ketua Bidang', division: 'Hikmah Politik Kebijakan Publik', photo: '/img/profile/imm.jpeg' },
+    { id: 13, name: 'Moh Faiz Haikal', position: 'Sekretaris Bidang', division: 'Hikmah Politik Kebijakan Publik', photo: '/img/profile/imm.jpeg' },
+    { id: 14, name: 'Febri Dimas Ferdiansyah', position: 'Anggota', division: 'Hikmah Politik Kebijakan Publik', photo: '/img/profile/imm.jpeg' },
+    { id: 15, name: 'Mochammad Faiq Naabih', position: 'Anggota', division: 'Hikmah Politik Kebijakan Publik', photo: '/img/profile/imm.jpeg' },
+
+    { id: 16, name: 'Abidzar Dzakwan Sahudi', position: 'Ketua Bidang', division: 'Riset Pengembangan Keilmuan', photo: '/img/profile/imm.jpeg' },
+    { id: 17, name: 'Rifqah Nur Izzah', position: 'Sekretaris Bidang', division: 'Riset Pengembangan Keilmuan', photo: '/img/profile/imm.jpeg' },
+    { id: 18, name: 'Syafiih', position: 'Anggota', division: 'Riset Pengembangan Keilmuan', photo: '/img/profile/imm.jpeg' },
+    { id: 19, name: 'Moh. Syahrul Gunawan', position: 'Anggota', division: 'Riset Pengembangan Keilmuan', photo: '/img/profile/imm.jpeg' }
+];
 
 export interface Division {
     id: number

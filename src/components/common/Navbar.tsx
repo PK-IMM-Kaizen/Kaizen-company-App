@@ -19,6 +19,17 @@ export default function Navbar({ currentPage, onNavigate }: NavbarProps) {
         return () => window.removeEventListener('scroll', onScroll)
     }, [])
 
+    useEffect(() => {
+        if (mobileOpen) {
+            document.body.style.overflow = 'hidden'
+        } else {
+            document.body.style.overflow = 'unset'
+        }
+        return () => {
+            document.body.style.overflow = 'unset'
+        }
+    }, [mobileOpen])
+
     const handleNav = (page: Page) => {
         onNavigate(page)
         setMobileOpen(false)
@@ -32,7 +43,7 @@ export default function Navbar({ currentPage, onNavigate }: NavbarProps) {
     return (
         <>
             <nav
-                className={`fixed z-50 transition-all duration-300 ease-out left-1/2 -translate-x-1/2 ${
+                className={`fixed z-40 transition-all duration-300 ease-out left-1/2 -translate-x-1/2 ${
                     scrolled
                         ? 'top-4 w-[calc(100%-2rem)] max-w-5xl bg-white/90 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-200/60 rounded-full'
                         : 'top-0 w-full bg-transparent border-transparent rounded-none py-2'
@@ -66,76 +77,114 @@ export default function Navbar({ currentPage, onNavigate }: NavbarProps) {
                             })}
                         </div>
 
-                        <div className="hidden lg:flex items-center pr-2">
+                        <div className="hidden lg:flex items-center gap-2 pr-2">
                             <button
                                 onClick={() => handleNav('admin-login')}
-                                className={`text-xs px-5 py-2 rounded-full font-medium transition-all hover:scale-105 ${
+                                className={`text-xs px-4 py-2 rounded-full font-semibold transition-all hover:scale-105 ${
                                     scrolled
-                                        ? 'bg-[#C8102E] text-white hover:bg-[#9b0d23]'
-                                        : 'bg-white text-[#C8102E] hover:bg-gray-100'
+                                        ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        : 'bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm'
                                 }`}
                             >
-                                Admin
+                                Kaizen Company
+                            </button>
+
+                            <button
+                                onClick={() => alert('Arahkan ke Link Pendaftaran DAD')}
+                                className={`text-xs px-5 py-2 rounded-full font-bold transition-all shadow-sm hover:scale-105 ${
+                                    scrolled
+                                        ? 'bg-[#C8102E] text-white hover:bg-[#9b0d23]'
+                                        : 'bg-[#F5C400] text-gray-900 hover:bg-[#e6b800]'
+                                }`}
+                            >
+                                Daftar DAD
                             </button>
                         </div>
 
                         <button
-                            className="lg:hidden p-2 mr-1 rounded-full transition-colors"
+                            className="lg:hidden p-2 mr-1 rounded-full transition-colors relative z-50"
                             onClick={() => setMobileOpen(!mobileOpen)}
                             aria-label="Menu"
                         >
                             <div className="w-5 flex flex-col gap-1.5">
-                                <span className={`block h-0.5 transition-transform origin-center ${mobileOpen ? 'rotate-45 translate-y-2' : ''}`} style={{ background: textColor }} />
-                                <span className={`block h-0.5 transition-opacity ${mobileOpen ? 'opacity-0' : ''}`} style={{ background: textColor }} />
-                                <span className={`block h-0.5 transition-transform origin-center ${mobileOpen ? '-rotate-45 -translate-y-2' : ''}`} style={{ background: textColor }} />
+                                <span className="block h-0.5 transition-transform origin-center" style={{ background: textColor }} />
+                                <span className="block h-0.5 transition-opacity" style={{ background: textColor }} />
+                                <span className="block h-0.5 transition-transform origin-center" style={{ background: textColor }} />
                             </div>
                         </button>
                     </div>
                 </div>
             </nav>
 
-            {mobileOpen && (
-                <div className="fixed inset-0 z-40 lg:hidden">
-                    <div
-                        className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
-                        onClick={() => setMobileOpen(false)}
-                    />
+            <div
+                className={`fixed inset-0 z-50 lg:hidden pointer-events-none ${
+                    mobileOpen ? 'pointer-events-auto' : ''
+                }`}
+            >
+                <div
+                    className={`absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300 ease-in-out ${
+                        mobileOpen ? 'opacity-100' : 'opacity-0'
+                    }`}
+                    onClick={() => setMobileOpen(false)}
+                />
 
-                    <div
-                        className={`absolute left-4 right-4 bg-white border border-gray-100 shadow-2xl rounded-2xl overflow-hidden transition-all duration-300 ${
-                            scrolled ? 'top-24' : 'top-20'
-                        }`}
-                    >
-                        <div className="px-3 py-3 space-y-1">
-                            {navItems.map((item) => {
-                                const isActive = currentPage === item.page
-                                return (
-                                    <button
-                                        key={item.page}
-                                        onClick={() => handleNav(item.page)}
-                                        className="w-full text-left px-4 py-3 rounded-xl text-sm font-semibold transition-colors font-montserrat"
-                                        style={{
-                                            color: isActive ? '#C8102E' : '#333',
-                                            background: isActive ? '#FEF2F4' : 'transparent',
-                                        }}
-                                    >
-                                        {item.label}
-                                    </button>
-                                )
-                            })}
-                            <div className="pt-2 pb-1 px-1">
+                <div
+                    className={`absolute top-0 right-0 h-full w-[280px] sm:w-[320px] bg-white shadow-2xl flex flex-col transition-transform duration-300 ease-in-out ${
+                        mobileOpen ? 'translate-x-0' : 'translate-x-full'
+                    }`}
+                >
+                    <div className="flex items-center justify-between p-5 border-b border-gray-100">
+                        <Logo size="sm" variant="default" />
+                        <button
+                            onClick={() => setMobileOpen(false)}
+                            className="p-2 -mr-2 text-gray-400 hover:text-primary transition-colors rounded-full hover:bg-gray-50"
+                        >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto p-4 space-y-1">
+                        {navItems.map((item) => {
+                            const isActive = currentPage === item.page
+                            return (
                                 <button
-                                    onClick={() => handleNav('admin-login')}
-                                    className="w-full py-3 rounded-xl shadow-sm text-white font-semibold text-sm transition-colors hover:bg-[#9b0d23]"
-                                    style={{ background: '#C8102E' }}
+                                    key={item.page}
+                                    onClick={() => handleNav(item.page)}
+                                    className="w-full text-left px-4 py-3.5 rounded-xl text-sm font-semibold transition-all font-montserrat flex items-center justify-between group"
+                                    style={{
+                                        color: isActive ? '#C8102E' : '#4B5563',
+                                        background: isActive ? '#FEF2F4' : 'transparent',
+                                    }}
                                 >
-                                    Kaizen Company
+                                    {item.label}
+                                    <span className={`text-[10px] transition-transform ${isActive ? 'translate-x-0 opacity-100' : '-translate-x-2 opacity-0 group-hover:translate-x-0 group-hover:opacity-100'}`}>
+                                        ❯
+                                    </span>
                                 </button>
-                            </div>
-                        </div>
+                            )
+                        })}
+                    </div>
+
+                    <div className="p-5 border-t border-gray-100 bg-gray-50/50 flex flex-col gap-3">
+                        <button
+                            onClick={() => alert('Arahkan ke Link Pendaftaran DAD')}
+                            className="w-full py-3.5 rounded-xl shadow-md shadow-red-900/10 text-white font-bold text-sm transition-all hover:bg-[#9b0d23] hover:shadow-lg active:scale-[0.98]"
+                            style={{ background: '#C8102E' }}
+                        >
+                            Daftar DAD
+                        </button>
+
+                        <button
+                            onClick={() => handleNav('admin-login')}
+                            className="w-full py-3.5 rounded-xl border-2 border-gray-200 text-gray-700 font-semibold text-sm transition-all hover:bg-gray-100 active:scale-[0.98]"
+                        >
+                            Kaizen Company
+                        </button>
                     </div>
                 </div>
-            )}
+            </div>
         </>
     )
 }

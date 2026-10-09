@@ -12,7 +12,6 @@ import Management from './Management'
 import Division from './Division'
 import News from './News'
 import NewsDetail from './NewsDetail'
-import Ekowir from './Ekowir'
 import Alumni from './Alumni'
 import Contact from './Contact'
 
@@ -89,12 +88,10 @@ export default function App() {
         )
     }
 
-    // If somehow on admin page without role, redirect to login
     if (isAdmin && !role) {
         return <Login onLogin={handleLogin} onNavigate={navigate} />
     }
 
-    // Public website — navbar + content + footer
     const renderPublicContent = () => {
         switch (page) {
             case 'home': return <Home onNavigate={navigate} onNewsDetail={handleNewsDetail} />
@@ -103,7 +100,6 @@ export default function App() {
             case 'division': return <Division />
             case 'news': return <News onNavigate={navigate} onNewsDetail={handleNewsDetail} />
             case 'news-detail': return <NewsDetail newsId={newsDetailId} onNavigate={navigate} onNewsDetail={handleNewsDetail} />
-            case 'ekowir': return <Ekowir />
             case 'alumni': return <Alumni />
             case 'contact': return <Contact />
             default: return <Home onNavigate={navigate} onNewsDetail={handleNewsDetail} />

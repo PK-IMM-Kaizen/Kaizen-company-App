@@ -1,7 +1,7 @@
 'use client'
 
-import { newsData, products, alumniData, divisions, type Page } from '../../app/(public)/data'
-import heroBg from '../../../public/img/bg-hero.webp'
+import { useState } from 'react'
+import { newsData, type Page } from '../../app/(public)/data'
 
 interface HomeProps {
     onNavigate: (page: Page) => void
@@ -9,58 +9,101 @@ interface HomeProps {
 }
 
 export default function Home({ onNavigate, onNewsDetail }: HomeProps) {
+    const [openFaq, setOpenFaq] = useState<number | null>(null)
+
     const latestNews = newsData.filter(n => n.status === 'published').slice(0, 3)
-    const featuredProducts = products.filter(p => p.available).slice(0, 4)
+
+    const upcomingAgendas = [
+        {
+            id: 1,
+            date: '31',
+            month: 'Okt',
+            title: 'Sharing Session Dikti & Study Club',
+            location: 'Universitas Muhammadiyah Surabaya',
+            time: '08:00 WIB - Selesai'
+        },
+        {
+            id: 2,
+            date: 'COMING SOON',
+            month: '',
+            title: 'Darul Arqam Dasar',
+            location: '',
+            time: ''
+        },
+        {
+            id: 3,
+            date: 'COMING SOON',
+            month: '',
+            title: 'Serawung Kader',
+            location: '',
+            time: ''
+        }
+    ]
+
+    const bphData = [
+        { id: 1, name: "Abdul Baari' Al Fakhri", role: 'Ketua Umum', photo: '/img/profile/ketum.png' },
+        { id: 2, name: 'Muhammad Zakky Arifina', role: 'Sekretaris Umum', photo: '/img/profile/sekum.jpg' },
+        { id: 3, name: 'Muhammad Zidan Al Farezel', role: 'Bendahara Umum', photo: '/img/profile/bendum.png' },
+    ]
+
+    const faqData = [
+        { id: 1, question: 'Bagaimana cara bergabung dengan IMM Kaizen?', answer: 'Mahasiswa Universitas Muhammadiyah Surabaya dapat bergabung melalui kegiatan Darul Arqam Dasar (DAD) yang rutin kami selenggarakan di awal semester.' },
+        { id: 2, question: 'Apa saja fokus kegiatan di IMM?', answer: 'Kami bergerak di tiga ranah utama (Tri Kompetensi Dasar): Keagamaan, Kemahasiswaan, dan Kemasyarakatan. Mulai dari kajian, diskusi publik, hingga aksi sosial.' },
+        { id: 3, question: 'Apakah mahasiswa non-Muhammadiyah bisa bergabung?', answer: 'Tentu. Ikatan Mahasiswa Muhammadiyah sangat inklusif. Kami menerima siapapun yang memiliki visi selaras untuk belajar dan berproses bersama.' },
+    ]
+
+    const toggleFaq = (index: number) => {
+        setOpenFaq(openFaq === index ? null : index)
+    }
 
     return (
-        <div className="w-full">
-            <section className="relative w-full min-h-[100dvh] flex flex-col items-center justify-center overflow-hidden bg-[#111] pt-20 pb-16">
+        <div className="w-full bg-[var(--surface)]">
+            <section className="relative w-full min-h-[100dvh] flex flex-col items-center justify-center overflow-hidden bg-[#111111] pt-20 pb-16">
                 <div
-                    className="absolute inset-0 z-0"
+                    className="absolute inset-0 z-0 bg-cover bg-center opacity-90"
                     style={{
-                        backgroundImage: `url(${heroBg.src})`,
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center',
-                        opacity: 0.90,
+                        backgroundImage: `url('/img/bg-hero.webp')`,
                     }}
                 />
-                <div className="absolute inset-0 z-0 bg-gradient-to-b from-[#CC1021]/80 via-[#111]/80 to-[#111] opacity-90" />
+                <div
+                    className="absolute inset-0 z-0 opacity-90"
+                    style={{
+                        background: `linear-gradient(to bottom, rgba(204, 16, 33, 0.8), rgba(17, 17, 17, 0.85), #111111)`
+                    }}
+                />
 
                 <div className="relative z-10 max-w-4xl mx-auto px-4 flex flex-col items-center text-center w-full mt-8">
                     <div className="flex items-center justify-center gap-4 mb-4">
-                        <div className="h-[1px] w-6 sm:w-12 bg-[#F5C400]" />
-                        <span className="text-xs sm:text-sm font-bold tracking-[0.2em] uppercase text-[#F5C400]"
-                              style={{ fontFamily: 'Montserrat, sans-serif' }}>
+                        <div className="h-[1px] w-6 sm:w-12 bg-[var(--accent-light)]" />
+                        <span className="text-xs sm:text-sm font-bold tracking-[0.2em] uppercase text-[var(--accent-light)] font-display">
                             Pimpinan Komisariat
                         </span>
-                        <div className="h-[1px] w-6 sm:w-12 bg-[#F5C400]" />
+                        <div className="h-[1px] w-6 sm:w-12 bg-[var(--accent-light)]" />
                     </div>
 
-                    <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-white leading-[1.2] mb-4 tracking-tight"
-                        style={{ fontFamily: 'Montserrat, sans-serif' }}>
+                    <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-white leading-[1.2] mb-4 tracking-tight font-display">
                         IKATAN MAHASISWA MUHAMMADIYAH <br />
-                        <span className="text-[#E07B1A]">KAIZEN</span>
+                        <span className="text-[var(--accent)]">KAIZEN</span>
                     </h1>
 
                     <p className="text-sm sm:text-lg font-bold text-white/90 mb-8 tracking-widest uppercase">
                         Universitas Muhammadiyah Surabaya
                     </p>
 
-                    <p className="text-sm sm:text-base leading-relaxed text-white/80 max-w-2xl mb-10"
-                       style={{ fontFamily: 'Inter, sans-serif' }}>
+                    <p className="text-sm sm:text-base leading-relaxed text-white/80 max-w-2xl mb-10">
                         Platform digital resmi IMM Komisariat Kaizen. Bergerak bersama dalam ilmu, iman, dan amal nyata untuk membangun peradaban masyarakat.
                     </p>
 
                     <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
                         <button
                             onClick={() => onNavigate('profile')}
-                            className="w-full sm:w-auto px-8 py-3.5 bg-[#E07B1A] text-white font-bold rounded-full transition-all hover:bg-[#c96c15] hover:scale-105 shadow-lg shadow-[#E07B1A]/20"
+                            className="w-full sm:w-auto px-8 py-3.5 bg-[var(--accent)] text-white font-bold rounded-full transition-all hover:bg-[#c96c15] hover:scale-105 shadow-lg shadow-[var(--accent)]/20 font-display"
                         >
                             Profil Organisasi
                         </button>
                         <button
                             onClick={() => onNavigate('news')}
-                            className="w-full sm:w-auto px-8 py-3.5 bg-transparent border border-white/40 text-white font-bold rounded-full transition-all hover:bg-white/10"
+                            className="w-full sm:w-auto px-8 py-3.5 bg-transparent border border-white/40 text-white font-bold rounded-full transition-all hover:bg-white/10 font-display"
                         >
                             Lihat Berita
                         </button>
@@ -74,10 +117,10 @@ export default function Home({ onNavigate, onNewsDetail }: HomeProps) {
                             { label: 'Alumni', value: '300+' },
                         ].map(s => (
                             <div key={s.label} className="flex flex-col items-center">
-                                <div className="text-3xl font-black text-white" style={{ fontFamily: 'Montserrat, sans-serif' }}>
+                                <div className="text-3xl font-black text-white font-display">
                                     {s.value}
                                 </div>
-                                <div className="text-xs mt-1 text-white/50 uppercase tracking-wider font-semibold" style={{ fontFamily: 'Inter, sans-serif' }}>
+                                <div className="text-xs mt-1 text-white/50 uppercase tracking-wider font-semibold">
                                     {s.label}
                                 </div>
                             </div>
@@ -86,129 +129,212 @@ export default function Home({ onNavigate, onNewsDetail }: HomeProps) {
                 </div>
             </section>
 
-            {/* SISA KODE DI BAWAH INI SAMA DENGAN SEBELUMNYA */}
-            <section className="py-24 bg-white">
+            <section className="py-24 bg-[var(--background)] border-b border-[var(--border)]">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6">
-                    <div className="flex flex-col items-center text-center mb-16">
-                        <span className="text-xs font-bold text-[#CC1021] tracking-widest uppercase mb-3">Tentang Kami</span>
-                        <h2 className="text-3xl sm:text-4xl font-black text-gray-900" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-                            Melahirkan Pemimpin Masa Depan
-                        </h2>
-                        <p className="mt-6 text-gray-600 max-w-2xl leading-relaxed">
-                            IMM Komisariat Kaizen adalah organisasi mahasiswa Islam di bawah Ikatan Mahasiswa Muhammadiyah. Dengan semangat <em>Kaizen</em> (perbaikan terus-menerus), kami mendorong setiap kader untuk berinovasi dan berkontribusi.
-                        </p>
-                    </div>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center mb-24">
+                        <div className="relative aspect-[4/3] lg:aspect-square bg-[#111111] overflow-hidden group rounded-[var(--radius)] border border-[var(--border)]">
+                            <img
+                                src="https://pwmu.co/wp-content/uploads/2026/09/konsep-otomatis-V9a3.jpeg"
+                                alt="Profil IMM Kaizen"
+                                className="w-full h-full object-cover grayscale opacity-80 transition-all duration-700 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105"
+                            />
+                            <div className="absolute inset-0 border-[8px] border-white/10 mix-blend-overlay"></div>
+                        </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        {divisions.slice(0, 4).map((div) => (
-                            <div key={div.id}
-                                 className="group relative rounded-2xl overflow-hidden cursor-pointer aspect-[4/5] bg-gray-100"
-                                 onClick={() => onNavigate('division')}>
-                                <img src={div.photo} alt={div.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                                <div className="absolute bottom-5 left-5 right-5 text-left">
-                                    <h3 className="text-white font-bold text-lg leading-tight" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-                                        {div.name.split('(')[0].trim()}
-                                    </h3>
-                                </div>
+                        <div className="flex flex-col justify-center">
+                            <span className="section-label mb-4 block">Tentang Kami</span>
+                            <h2 className="text-4xl sm:text-5xl font-black text-[var(--text-primary)] leading-[1.1] mb-6 tracking-tight font-display">
+                                Melahirkan Pemimpin Masa Depan.
+                            </h2>
+                            <p className="text-[var(--text-secondary)] text-lg leading-relaxed mb-8">
+                                IMM Komisariat Kaizen adalah organisasi mahasiswa Islam di bawah Ikatan Mahasiswa Muhammadiyah. Dengan semangat <em className="font-semibold text-[var(--text-primary)]">Kaizen</em> (perbaikan terus-menerus), kami mendorong setiap kader untuk berinovasi, mandiri, dan berkontribusi nyata bagi masyarakat.
+                            </p>
+                            <div>
+                                <button
+                                    onClick={() => onNavigate('profile')}
+                                    className="px-8 py-4 bg-[#111111] text-white text-sm font-bold tracking-widest uppercase hover:bg-[var(--primary)] transition-all flex items-center justify-center gap-3 group w-fit rounded-[var(--radius)] font-display"
+                                >
+                                    Profil Selengkapnya
+                                    <span className="transition-transform group-hover:translate-x-1">→</span>
+                                </button>
                             </div>
-                        ))}
+                        </div>
                     </div>
 
-                    <div className="mt-12 text-center">
-                        <button onClick={() => onNavigate('profile')} className="text-sm font-bold text-[#C8102E] hover:text-[#9B0D1A] transition-colors inline-flex items-center gap-2">
-                            Pelajari Selengkapnya <span>→</span>
-                        </button>
+                    <div className="w-full flex flex-col items-center border-t border-[var(--border)] pt-16">
+                        <div className="flex items-center gap-3 mb-8">
+                            <div className="h-[1px] w-8 sm:w-12 bg-[var(--border-strong)]"></div>
+                            <span className="text-xs sm:text-sm font-bold text-[var(--text-muted)] tracking-[0.2em] uppercase text-center font-display">
+                                Profil Organisasi
+                            </span>
+                            <div className="h-[1px] w-8 sm:w-12 bg-[var(--border-strong)]"></div>
+                        </div>
+
+                        <div className="w-full max-w-5xl bg-black border border-[var(--border)] overflow-hidden shadow-2xl aspect-[4/5] md:aspect-video relative rounded-[var(--radius)]">
+                            <video
+                                src="/video/profile.mp4"
+                                className="absolute inset-0 w-full h-full object-cover"
+                                controls
+                                autoPlay
+                                muted
+                                loop
+                                playsInline
+                                title="Video Profil IMM Kaizen"
+                            >
+                                Maaf, browser Anda tidak mendukung pemutaran video.
+                            </video>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <section className="py-24 bg-gray-50/50">
+            <section className="py-24 bg-[var(--surface)]">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6">
-                    <div className="flex flex-col sm:flex-row items-center justify-between mb-12 gap-4">
-                        <div className="text-center sm:text-left">
-                            <span className="text-xs font-bold text-[#E07B1A] tracking-widest uppercase mb-2 block">Kabar Terkini</span>
-                            <h2 className="text-3xl font-black text-gray-900" style={{ fontFamily: 'Montserrat, sans-serif' }}>Berita & Dokumentasi</h2>
-                        </div>
-                        <button onClick={() => onNavigate('news')} className="hidden sm:inline-flex px-5 py-2 rounded-full border border-gray-300 text-sm font-semibold hover:bg-gray-100 transition-colors">
-                            Semua Berita
-                        </button>
+                    <div className="flex flex-col items-center text-center mb-16">
+                        <span className="text-xs font-bold text-[var(--accent)] tracking-[0.2em] uppercase mb-3 block font-display">Kabar Terkini</span>
+                        <h2 className="text-3xl sm:text-4xl font-black text-[var(--text-primary)] font-display">
+                            Berita & Dokumentasi
+                        </h2>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {latestNews.map((item) => (
-                            <article key={item.id}
-                                     className="group bg-white rounded-2xl overflow-hidden cursor-pointer border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col"
-                                     onClick={() => onNewsDetail(item.id)}>
-                                <div className="relative aspect-video overflow-hidden bg-gray-100">
-                                    <img src={item.cover} alt={item.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                                    <div className="absolute top-3 left-3 bg-white/90 backdrop-blur px-3 py-1 rounded-full">
-                                        <span className="text-[10px] font-bold uppercase tracking-wide text-[#C8102E]">{item.category}</span>
+                            <article
+                                key={item.id}
+                                className="group bg-[var(--card)] border border-[var(--border)] hover:border-[var(--text-primary)] transition-colors flex flex-col h-full rounded-[var(--radius)] overflow-hidden"
+                            >
+                                <div
+                                    className="relative aspect-[4/3] overflow-hidden bg-[var(--surface-2)] cursor-pointer"
+                                    onClick={() => onNewsDetail(item.id)}
+                                >
+                                    <img
+                                        src={item.cover}
+                                        alt={item.title}
+                                        className="w-full h-full object-cover grayscale opacity-90 transition-all duration-700 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105"
+                                    />
+                                    <div className="absolute top-4 left-4 bg-[#111111] text-white px-3 py-1.5 rounded-[calc(var(--radius)-2px)]">
+                                        <span className="text-[10px] font-bold uppercase tracking-widest font-display">{item.category}</span>
                                     </div>
                                 </div>
-                                <div className="p-6 flex-1 flex flex-col">
-                                    <span className="text-xs text-gray-400 mb-3">{item.publishDate}</span>
-                                    <h3 className="font-bold text-lg leading-snug mb-3 text-gray-900 line-clamp-2" style={{ fontFamily: 'Montserrat, sans-serif' }}>
+
+                                <div className="p-6 sm:p-8 flex flex-col flex-1">
+                                    <span className="text-xs text-[var(--text-muted)] font-bold tracking-wider uppercase mb-3 block">
+                                        {item.publishDate}
+                                    </span>
+                                    <h3
+                                        className="font-black text-xl leading-tight mb-4 text-[var(--text-primary)] group-hover:text-[var(--primary)] transition-colors cursor-pointer font-display"
+                                        onClick={() => onNewsDetail(item.id)}
+                                    >
                                         {item.title}
                                     </h3>
-                                    <p className="text-sm text-gray-500 leading-relaxed line-clamp-2 mt-auto">{item.excerpt}</p>
+                                    <p className="text-sm text-[var(--text-secondary)] leading-relaxed line-clamp-3 mb-6">
+                                        {item.excerpt}
+                                    </p>
+
+                                    <div className="mt-auto pt-4">
+                                        <a
+                                            href={item.pwmuUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-widest border-b-2 border-[var(--text-primary)] pb-1 hover:text-[var(--primary)] hover:border-[var(--primary)] transition-colors inline-flex items-center gap-2 font-display"
+                                        >
+                                            Baca Selengkapnya di PWMU <span>→</span>
+                                        </a>
+                                    </div>
                                 </div>
                             </article>
                         ))}
                     </div>
-
-                    <div className="mt-8 text-center sm:hidden">
-                        <button onClick={() => onNavigate('news')} className="w-full px-5 py-3 rounded-xl border border-gray-200 text-sm font-semibold">
-                            Semua Berita
-                        </button>
-                    </div>
                 </div>
             </section>
 
-            <section className="py-24 bg-white">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6">
+            <section className="py-24 bg-[var(--background)] border-y border-[var(--border)]">
+                <div className="max-w-4xl mx-auto px-4 sm:px-6">
                     <div className="flex flex-col items-center text-center mb-16">
-                        <span className="text-xs font-bold text-[#E07B1A] tracking-widest uppercase mb-3">Katalog</span>
-                        <h2 className="text-3xl font-black text-gray-900" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-                            Produk Ekowir Kaizen
+                        <span className="section-label mb-3 block">Kalender Kegiatan</span>
+                        <h2 className="text-3xl sm:text-4xl font-black text-[var(--text-primary)] font-display">
+                            Agenda Yang Akan Datang.
                         </h2>
                     </div>
 
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-                        {featuredProducts.map(product => (
-                            <div key={product.id} className="group cursor-pointer" onClick={() => onNavigate('ekowir')}>
-                                <div className="relative aspect-square rounded-2xl overflow-hidden bg-gray-50 mb-4">
-                                    <img src={product.image} alt={product.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                    <div className="flex flex-col gap-4">
+                        {upcomingAgendas.map((agenda) => {
+                            const isComingSoon = !agenda.month || agenda.date.toLowerCase().includes('soon');
+
+                            return (
+                                <div
+                                    key={agenda.id}
+                                    className="group flex flex-col md:flex-row items-start md:items-center p-6 sm:p-8 bg-[var(--surface)] border border-[var(--border)] hover:border-[var(--primary)] transition-colors gap-6 sm:gap-8 rounded-[var(--radius)]"
+                                >
+                                    <div className="flex flex-col items-center justify-center min-w-[80px] text-center border-b md:border-b-0 md:border-r border-[var(--border-strong)] pb-4 md:pb-0 md:pr-8 w-full md:w-auto">
+                                        <span
+                                            className={`${isComingSoon ? 'text-xl sm:text-2xl' : 'text-4xl'} font-black text-[var(--primary)] uppercase font-display`}
+                                        >
+                                            {agenda.date}
+                                        </span>
+                                        {agenda.month && (
+                                            <span className="text-sm font-bold text-[var(--text-muted)] uppercase tracking-widest mt-1 font-display">
+                                                {agenda.month}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div className="flex-1">
+                                        <h3 className="text-xl font-bold text-[var(--text-primary)] group-hover:text-[var(--primary)] transition-colors font-display">
+                                            {agenda.title}
+                                        </h3>
+                                        {(agenda.location || agenda.time) && (
+                                            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-[var(--text-secondary)] font-medium mt-2">
+                                                {agenda.location && (
+                                                    <span className="flex items-center gap-2">
+                                                        <span className="w-1.5 h-1.5 bg-[var(--text-muted)] rounded-full"></span>
+                                                        {agenda.location}
+                                                    </span>
+                                                )}
+                                                {agenda.time && (
+                                                    <span className="flex items-center gap-2">
+                                                        <span className="w-1.5 h-1.5 bg-[var(--text-muted)] rounded-full"></span>
+                                                        {agenda.time}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
-                                <div className="text-center px-2">
-                                    <p className="text-xs text-gray-400 mb-1 font-medium">{product.category}</p>
-                                    <h4 className="font-bold text-sm text-gray-800 leading-snug mb-2 line-clamp-1">{product.name}</h4>
-                                    <p className="font-black text-base text-[#C8102E]">
-                                        Rp {product.price.toLocaleString('id-ID')}
-                                    </p>
-                                </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
             </section>
 
-            <section className="py-24 bg-gray-900 text-white">
+            <section className="py-24 bg-[#0a0a0a] text-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6">
-                    <div className="text-center mb-16">
-                        <span className="text-xs font-bold text-[#F5C400] tracking-widest uppercase mb-3 block">Mereka yang Menginspirasi</span>
-                        <h2 className="text-3xl font-black" style={{ fontFamily: 'Montserrat, sans-serif' }}>Alumni Inspiratif</h2>
+                    <div className="mb-16 flex flex-col items-center text-center">
+                        <span className="text-xs font-bold text-[var(--accent-light)] tracking-[0.2em] uppercase mb-3 block font-display">Pimpinan Komisariat</span>
+                        <h2 className="text-3xl sm:text-4xl font-black font-display">Badan Pengurus Harian</h2>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {alumniData.map(a => (
-                            <div key={a.id} className="bg-white/5 border border-white/10 rounded-2xl p-6 text-center backdrop-blur-sm transition-colors hover:bg-white/10">
-                                <img src={a.photo} alt={a.name} className="w-20 h-20 rounded-full object-cover mx-auto mb-4 border-2 border-[#E07B1A]" />
-                                <h4 className="font-bold text-base mb-1" style={{ fontFamily: 'Montserrat, sans-serif' }}>{a.name}</h4>
-                                <p className="text-xs text-[#F5C400] font-semibold mb-3 tracking-wide">Angkatan {a.batch}</p>
-                                <p className="text-sm text-gray-400 leading-relaxed mb-4 line-clamp-3">{a.achievement}</p>
-                                <span className="inline-block px-3 py-1 rounded-full bg-white/10 text-xs font-semibold text-white">
-                                    {a.role}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        {bphData.map(bph => (
+                            <div
+                                key={bph.id}
+                                className="group bg-[#111111] border border-white/10 hover:border-[var(--accent)] transition-colors p-8 flex flex-col items-center text-center rounded-[var(--radius)]"
+                            >
+                                <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full overflow-hidden mb-6 border-2 border-white/10 group-hover:border-[var(--accent)] transition-colors bg-gray-800 flex items-center justify-center">
+                                    {bph.photo ? (
+                                        <img
+                                            src={bph.photo}
+                                            alt={bph.name}
+                                            className="w-full h-full object-cover grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500"
+                                        />
+                                    ) : (
+                                        <span className="text-xs text-white/40 font-bold uppercase font-display">No Photo</span>
+                                    )}
+                                </div>
+                                <h4 className="font-bold text-xl sm:text-2xl text-white mb-2 group-hover:text-[var(--accent)] transition-colors font-display">
+                                    {bph.name}
+                                </h4>
+                                <span className="text-xs font-bold tracking-widest uppercase text-[var(--accent-light)] font-display">
+                                    {bph.role}
                                 </span>
                             </div>
                         ))}
@@ -216,26 +342,72 @@ export default function Home({ onNavigate, onNewsDetail }: HomeProps) {
                 </div>
             </section>
 
-            <section className="py-20 bg-[#CC1021]">
-                <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-                    <h2 className="text-3xl sm:text-4xl font-black text-white mb-6" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-                        Mari Berkolaborasi Bersama Kami
-                    </h2>
-                    <p className="text-base text-white/80 mb-10 max-w-2xl mx-auto">
-                        Pelajari struktur organisasi, kepengurusan, dan berbagai program unggulan kami untuk menciptakan dampak positif bagi masyarakat.
-                    </p>
-                    <div className="flex flex-col sm:flex-row justify-center gap-4">
-                        <button onClick={() => onNavigate('management')}
-                                className="px-8 py-3.5 bg-white text-[#CC1021] font-bold rounded-full transition-transform hover:scale-105 shadow-lg">
-                            Lihat Kepengurusan
-                        </button>
-                        <button onClick={() => onNavigate('contact')}
-                                className="px-8 py-3.5 border border-white/50 text-white font-bold rounded-full transition-colors hover:bg-white/10">
-                            Hubungi Kami
-                        </button>
+            <section className="py-24 bg-[var(--background)] border-y border-[var(--border)]">
+                <div className="max-w-3xl mx-auto px-4 sm:px-6">
+                    <div className="flex flex-col items-center text-center mb-16">
+                        <span className="section-label mb-3 block">Pusat Informasi</span>
+                        <h2 className="text-3xl sm:text-4xl font-black text-[var(--text-primary)] font-display">
+                            Pertanyaan Seputar IMM Kaizen.
+                        </h2>
+                    </div>
+
+                    <div className="flex flex-col border-t border-[var(--border)]">
+                        {faqData.map((faq, index) => {
+                            const isOpen = openFaq === index;
+                            return (
+                                <div key={faq.id} className="border-b border-[var(--border)]">
+                                    <button
+                                        onClick={() => toggleFaq(index)}
+                                        className="w-full flex items-center justify-between py-6 text-left focus:outline-none group"
+                                    >
+                                        <h4 className="text-base sm:text-lg font-bold text-[var(--text-primary)] group-hover:text-[var(--primary)] transition-colors pr-8 font-display">
+                                            {faq.question}
+                                        </h4>
+                                        <div className={`flex-shrink-0 w-8 h-8 flex items-center justify-center border border-[var(--border-strong)] rounded-full transition-transform duration-300 ${isOpen ? 'rotate-180 bg-[var(--text-primary)] border-[var(--text-primary)] text-white' : 'text-[var(--text-muted)] group-hover:border-[var(--text-primary)] group-hover:text-[var(--text-primary)]'}`}>
+                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                        </div>
+                                    </button>
+
+                                    <div
+                                        className={`grid transition-all duration-300 ease-in-out ${isOpen ? 'grid-rows-[1fr] opacity-100 pb-6' : 'grid-rows-[0fr] opacity-0'}`}
+                                    >
+                                        <div className="overflow-hidden">
+                                            <p className="text-[var(--text-secondary)] text-sm sm:text-base leading-relaxed pr-12">
+                                                {faq.answer}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )
+                        })}
                     </div>
                 </div>
             </section>
+
+            <section className="bg-[var(--primary)] py-12 sm:py-16">
+                <div className="max-w-4xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+                    <div className="max-w-xl">
+                        <span className="text-[10px] font-bold text-[var(--accent-light)] tracking-[0.2em] uppercase mb-1 block font-display">
+                            Suara Mahasiswa
+                        </span>
+                        <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight font-display">
+                            SAMPAIKAN ASPIRASIMU!
+                        </h3>
+                        <p className="text-white/80 text-xs sm:text-sm mt-1">
+                            Punya ide, kritik, atau saran untuk komisariat? Suaramu sangat berarti untuk perubahan yang lebih baik.
+                        </p>
+                    </div>
+                    <button
+                        onClick={() => onNavigate('aspirasi' as any)}
+                        className="whitespace-nowrap px-6 py-3 bg-white text-[var(--primary)] text-xs font-black tracking-widest uppercase hover:bg-[#111111] hover:text-white transition-all shadow-md hover:scale-105 shrink-0 rounded-[var(--radius)] font-display"
+                    >
+                        Kirim Aspirasi
+                    </button>
+                </div>
+            </section>
+
         </div>
     )
 }

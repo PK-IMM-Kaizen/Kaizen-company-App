@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import Logo from '../../components/common/Logo'
-import logoImg from '../../../public/img/logo/logo.jpg'
 import { type Role, type Page } from '../../app/(public)/data'
+import { Lock, Mail, ArrowLeft, ShieldCheck } from 'lucide-react'
 
 interface LoginProps {
     onLogin: (role: Role) => void
@@ -11,10 +11,7 @@ interface LoginProps {
 }
 
 const demoAccounts: { label: string; role: Role; email: string }[] = [
-    { label: 'Super Admin', role: 'superadmin', email: 'superadmin@kaizen.id' },
-    { label: 'BPI', role: 'bpi', email: 'bpi@kaizen.id' },
-    { label: 'Medkom', role: 'medkom', email: 'medkom@kaizen.id' },
-    { label: 'Ekowir', role: 'ekowir', email: 'ekowir@kaizen.id' },
+    { label: 'Super Admin', role: 'superadmin', email: 'superadmin@kaizen.id' }
 ]
 
 export default function Login({ onLogin, onNavigate }: LoginProps) {
@@ -39,91 +36,129 @@ export default function Login({ onLogin, onNavigate }: LoginProps) {
     }
 
     return (
-        <div className="min-h-screen flex" style={{ background: '#F7F6F5' }}>
-            <div className="hidden lg:flex flex-col justify-between p-12 w-96 flex-shrink-0"
-                 style={{ background: '#C8102E', backgroundImage: 'linear-gradient(135deg, #C8102E 0%, #9B0D22 100%)' }}>
-                <Logo variant="white" size="md" />
-                <div className="flex justify-center">
-                    <img
-                        src={logoImg.src}
-                        alt="IMM Kaizen"
-                        style={{
-                            width: 160,
-                            height: 160,
-                            objectFit: 'contain',
-                            mixBlendMode: 'screen',
-                            filter: 'brightness(1.1) drop-shadow(0 0 24px rgba(245,196,0,0.3))',
-                        }}
-                    />
+        <div className="min-h-screen flex bg-[var(--surface)]">
+            <div
+                className="hidden lg:flex flex-col justify-between p-12 w-96 flex-shrink-0 relative overflow-hidden"
+                style={{
+                    background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)'
+                }}
+            >
+                <div className="relative z-10">
+                    <Logo variant="white" size="md" />
                 </div>
-                <div>
-                    <h2 className="text-2xl font-black text-white mb-3" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-                        Panel Admin<br />IMM Kaizen
-                    </h2>
-                    <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.7)' }}>
-                        Masuk untuk mengelola konten, kepengurusan, produk Ekowir, dan data organisasi IMM Komisariat Kaizen.
-                    </p>
+
+                <div className="relative z-10 flex flex-col items-center justify-center my-auto">
+                    <div className="w-36 h-36 rounded-full bg-black/20 border-2 border-white/10 flex items-center justify-center p-4 mb-6 shadow-2xl backdrop-blur-sm">
+                        <img
+                            src="/img/logo/logo.jpg"
+                            alt="IMM Kaizen"
+                            className="w-full h-full object-contain rounded-full mix-blend-screen drop-shadow-[0_0_15px_rgba(245,196,0,0.3)]"
+                        />
+                    </div>
+                    <div className="text-center">
+                        <h2 className="text-2xl font-black text-white mb-2 font-display">
+                            Panel Admin <br />
+                            <span className="text-[var(--accent-light)]">IMM KAIZEN</span>
+                        </h2>
+                        <p className="text-xs leading-relaxed text-white/70 max-w-xs font-sans">
+                            Masuk untuk mengelola konten, kepengurusan, produk Ekowir, dan data organisasi IMM Komisariat Kaizen.
+                        </p>
+                    </div>
                 </div>
-                <div className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                    © 2024 IMM Kaizen · Kaizen Company V1
+
+                <div className="relative z-10 text-[10px] text-white/40 font-display uppercase tracking-widest text-center">
+                    © 2026 IMM Kaizen · Kaizen Company V1
                 </div>
+
+                <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-white/5 rounded-full blur-2xl pointer-events-none" />
             </div>
 
-            <div className="flex-1 flex flex-col items-center justify-center p-6">
-                <div className="w-full max-w-sm">
+            <div className="flex-1 flex flex-col items-center justify-center p-6 sm:p-12">
+                <div className="w-full max-w-sm space-y-6">
                     <div className="lg:hidden mb-8 flex justify-center">
                         <Logo size="md" />
                     </div>
 
-                    <h1 className="text-xl font-black mb-1" style={{ fontFamily: 'Montserrat, sans-serif' }}>Masuk ke Dashboard</h1>
-                    <p className="text-sm mb-8" style={{ color: '#888' }}>Gunakan akun yang telah diberikan oleh administrator.</p>
+                    <div>
+                        <div className="flex items-center gap-2 text-[var(--primary)] text-xs font-bold tracking-widest uppercase mb-1 font-display">
+                            <ShieldCheck className="w-4 h-4" /> Autentikasi Pengurus
+                        </div>
+                        <h1 className="text-2xl font-black text-[var(--text-primary)] font-display">
+                            Masuk ke Dashboard
+                        </h1>
+                        <p className="text-xs text-[var(--text-muted)] mt-1">
+                            Gunakan akun yang telah terdaftar untuk mengelola sistem.
+                        </p>
+                    </div>
 
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
-                            <label className="form-label">Email</label>
-                            <input type="email" className="form-input" value={email}
-                                   onChange={e => setEmail(e.target.value)} placeholder="nama@kaizen.id" required />
+                            <label className="form-label flex items-center gap-1.5">
+                                <Mail className="w-3.5 h-3.5 text-[var(--text-muted)]" /> Email
+                            </label>
+                            <input
+                                type="email"
+                                className="form-input"
+                                value={email}
+                                onChange={e => setEmail(e.target.value)}
+                                placeholder="nama@kaizen.id"
+                                required
+                            />
                         </div>
                         <div>
-                            <label className="form-label">Kata Sandi</label>
-                            <input type="password" className="form-input" value={password}
-                                   onChange={e => setPassword(e.target.value)} placeholder="••••••••" required />
+                            <label className="form-label flex items-center gap-1.5">
+                                <Lock className="w-3.5 h-3.5 text-[var(--text-muted)]" /> Kata Sandi
+                            </label>
+                            <input
+                                type="password"
+                                className="form-input"
+                                value={password}
+                                onChange={e => setPassword(e.target.value)}
+                                placeholder="••••••••"
+                                required
+                            />
                         </div>
+
                         {error && (
-                            <div className="p-3 rounded text-xs" style={{ background: '#FEF2F4', color: '#C8102E', border: '1px solid #FECDD3' }}>
+                            <div className="p-3 rounded-[var(--radius)] text-xs bg-[#FEF2F4] text-[var(--error)] border border-[#FECDD3] font-medium">
                                 {error}
                             </div>
                         )}
-                        <button type="submit" className="btn-primary w-full justify-center"
-                                style={{ opacity: loading ? 0.7 : 1 }} disabled={loading}>
-                            {loading ? 'Memverifikasi...' : 'Masuk'}
+
+                        <button
+                            type="submit"
+                            className="btn-primary w-full justify-center py-3 text-xs tracking-widest uppercase shadow-md hover:scale-[1.01] transition-all"
+                            style={{ opacity: loading ? 0.7 : 1 }}
+                            disabled={loading}
+                        >
+                            {loading ? 'Memverifikasi...' : 'Masuk Dashboard'}
                         </button>
                     </form>
 
-                    <div className="mt-8 p-4 rounded" style={{ background: '#F7F6F5', border: '1px solid #E0DEDC' }}>
-                        <p className="text-xs font-bold mb-3" style={{ fontFamily: 'Montserrat, sans-serif', color: '#555' }}>
+                    <div className="p-4 rounded-[var(--radius)] bg-[var(--card)] border border-[var(--border)] shadow-sm">
+                        <p className="text-xs font-bold text-[var(--text-secondary)] mb-3 font-display text-center">
                             Demo — Klik untuk isi otomatis (password: admin123)
                         </p>
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid grid-cols-1 gap-2">
                             {demoAccounts.map(acc => (
-                                <button key={acc.role}
-                                        onClick={() => { setEmail(acc.email); setPassword('admin123') }}
-                                        className="text-xs px-3 py-1.5 rounded font-semibold transition-colors text-left"
-                                        style={{
-                                            fontFamily: 'Montserrat, sans-serif',
-                                            background: '#fff',
-                                            border: '1px solid #E0DEDC',
-                                            color: '#333',
-                                        }}>
-                                    {acc.label}
+                                <button
+                                    key={acc.role}
+                                    type="button"
+                                    onClick={() => { setEmail(acc.email); setPassword('admin123') }}
+                                    className="text-xs px-3 py-2.5 rounded-[var(--radius)] font-bold transition-all text-center bg-[var(--surface)] hover:bg-[var(--surface-2)] text-[var(--text-primary)] border border-[var(--border)] font-display"
+                                >
+                                    Isi Otomatis sebagai {acc.label}
                                 </button>
                             ))}
                         </div>
                     </div>
 
-                    <button onClick={() => onNavigate('home')} className="mt-6 text-xs w-full text-center transition-colors"
-                            style={{ color: '#888', fontFamily: 'Montserrat, sans-serif' }}>
-                        ← Kembali ke Website
+                    <button
+                        type="button"
+                        onClick={() => onNavigate('home')}
+                        className="mt-4 text-xs font-bold text-[var(--text-muted)] hover:text-[var(--primary)] w-full text-center transition-colors flex items-center justify-center gap-2 font-display"
+                    >
+                        <ArrowLeft className="w-3.5 h-3.5" /> Kembali ke Website Utama
                     </button>
                 </div>
             </div>
