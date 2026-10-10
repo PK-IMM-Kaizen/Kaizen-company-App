@@ -13,6 +13,12 @@ export default function Navbar() {
     const pathname = usePathname()
 
     useEffect(() => {
+        setMobileOpen(false);
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [pathname])
+
+    useEffect(() => {
         const onScroll = () => setScrolled(window.scrollY > 20)
         window.addEventListener('scroll', onScroll)
         return () => window.removeEventListener('scroll', onScroll)
@@ -57,7 +63,7 @@ export default function Navbar() {
             >
                 <div className="max-w-7xl mx-auto px-4 sm:px-6">
                     <div className="flex items-center justify-between h-16">
-                        <Link href="/" onClick={closeMobile} className="flex items-center ml-2 lg:ml-0">
+                        <Link href="/" className="flex items-center ml-2 lg:ml-0">
                             <Logo size="sm" variant={logoVariant} />
                         </Link>
 
@@ -97,7 +103,7 @@ export default function Navbar() {
                                 Kaizen Company
                             </Link>
 
-                            <a
+                            <Link
                                 href="/daftar-dad"
                                 className={`text-xs px-5 py-2 rounded-full font-bold transition-all shadow-sm hover:scale-105 flex items-center ${
                                     scrolled
@@ -106,7 +112,7 @@ export default function Navbar() {
                                 }`}
                             >
                                 Daftar DAD
-                            </a>
+                            </Link>
                         </div>
 
                         <button
@@ -125,8 +131,8 @@ export default function Navbar() {
             </nav>
 
             <div
-                className={`fixed inset-0 z-50 lg:hidden pointer-events-none ${
-                    mobileOpen ? 'pointer-events-auto' : ''
+                className={`fixed inset-0 z-50 lg:hidden ${
+                    mobileOpen ? 'visible' : 'invisible transition-all delay-300'
                 }`}
             >
                 <div
@@ -153,7 +159,7 @@ export default function Navbar() {
                         </button>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto p-4 space-y-1">
+                    <div className="flex-1 overflow-y-auto p-4 space-y-1 relative z-10">
                         {navItems.map((item) => {
                             const itemPath = getPath(item.page)
                             const isActive = pathname === itemPath || (pathname.startsWith(itemPath) && itemPath !== '/')
@@ -162,8 +168,7 @@ export default function Navbar() {
                                 <Link
                                     key={item.page}
                                     href={itemPath}
-                                    onClick={closeMobile}
-                                    className="w-full text-left px-4 py-3.5 rounded-xl text-sm font-semibold transition-all font-montserrat flex items-center justify-between group"
+                                    className="w-full text-left px-4 py-3.5 rounded-xl text-sm font-semibold transition-all font-montserrat flex items-center justify-between group cursor-pointer"
                                     style={{
                                         color: isActive ? '#C8102E' : '#4B5563',
                                         background: isActive ? '#FEF2F4' : 'transparent',
@@ -178,19 +183,18 @@ export default function Navbar() {
                         })}
                     </div>
 
-                    <div className="p-5 border-t border-gray-100 bg-gray-50/50 flex flex-col gap-3">
-                        <a
-                            href="#/daftar-dad"
-                            className="w-full py-3.5 rounded-xl shadow-md shadow-red-900/10 text-white font-bold text-sm transition-all hover:bg-[#9b0d23] hover:shadow-lg active:scale-[0.98] flex justify-center items-center"
+                    <div className="p-5 border-t border-gray-100 bg-gray-50/50 flex flex-col gap-3 relative z-10">
+                        <Link
+                            href="/daftar-dad"
+                            className="w-full py-3.5 rounded-xl shadow-md shadow-red-900/10 text-white font-bold text-sm transition-all hover:bg-[#9b0d23] hover:shadow-lg active:scale-[0.98] flex justify-center items-center cursor-pointer"
                             style={{ background: '#C8102E' }}
                         >
                             Daftar DAD
-                        </a>
+                        </Link>
 
                         <Link
                             href="/kaizen-company"
-                            onClick={closeMobile}
-                            className="w-full py-3.5 rounded-xl border-2 border-gray-200 text-gray-700 font-semibold text-sm transition-all hover:bg-gray-100 active:scale-[0.98] flex justify-center items-center"
+                            className="w-full py-3.5 rounded-xl border-2 border-gray-200 text-gray-700 font-semibold text-sm transition-all hover:bg-gray-100 active:scale-[0.98] flex justify-center items-center cursor-pointer"
                         >
                             Kaizen Company
                         </Link>
