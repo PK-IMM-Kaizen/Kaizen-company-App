@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { roleLabels, type Role } from '../../(public)/data'
+import { UserPlus, Edit2, Trash2, ArrowLeft, AlertTriangle, UserCheck, UserX } from 'lucide-react'
 
 interface User {
     id: number
@@ -58,41 +59,84 @@ export default function AdminUsers() {
     }
 
     const roles: Role[] = ['superadmin', 'bpi', 'medkom', 'ekowir']
+
     const roleColors: Record<Role, string> = {
-        superadmin: '#C8102E',
-        bpi: '#1A6FA8',
+        superadmin: 'var(--primary)',
+        bpi: 'var(--info)',
         medkom: '#6B46C1',
-        ekowir: '#D4A017',
+        ekowir: 'var(--accent-dark)',
     }
 
     if (view === 'create' || view === 'edit') {
         return (
             <div>
                 <div className="flex items-center gap-3 mb-6">
-                    <button onClick={() => setView('list')} className="text-xs font-semibold" style={{ color: '#888' }}>← Kembali</button>
-                    <span style={{ color: '#ddd' }}>/</span>
-                    <h2 className="text-sm font-black" style={{ fontFamily: 'Montserrat, sans-serif' }}>
+                    <button
+                        onClick={() => setView('list')}
+                        className="text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--primary)] flex items-center gap-1 font-display transition-colors"
+                    >
+                        <ArrowLeft className="w-3.5 h-3.5" /> Kembali
+                    </button>
+                    <span className="text-[var(--border-strong)]">/</span>
+                    <h2 className="text-sm font-black text-[var(--text-primary)] font-display">
                         {view === 'create' ? 'Tambah Pengguna' : 'Edit Pengguna'}
                     </h2>
                 </div>
-                <div className="bg-white rounded p-6" style={{ border: '1px solid #E0DEDC', maxWidth: '420px' }}>
+
+                <div className="bg-[var(--card)] rounded-[var(--radius)] p-6 border border-[var(--border)] max-w-md shadow-sm">
                     <div className="space-y-4">
-                        <div><label className="form-label">Nama Lengkap</label><input className="form-input" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} /></div>
-                        <div><label className="form-label">Email</label><input type="email" className="form-input" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} /></div>
                         <div>
-                            <label className="form-label">Role</label>
-                            <select className="form-input" value={form.role} onChange={e => setForm(f => ({ ...f, role: e.target.value as Role }))}>
+                            <label className="form-label">Nama Lengkap</label>
+                            <input
+                                className="form-input"
+                                value={form.name}
+                                onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                                placeholder="Masukkan nama akun..."
+                            />
+                        </div>
+
+                        <div>
+                            <label className="form-label">Email Organisasi</label>
+                            <input
+                                type="email"
+                                className="form-input"
+                                value={form.email}
+                                onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+                                placeholder="nama@kaizen.id"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="form-label">Peran / Role</label>
+                            <select
+                                className="form-input"
+                                value={form.role}
+                                onChange={e => setForm(f => ({ ...f, role: e.target.value as Role }))}
+                            >
                                 {roles.map(r => <option key={r} value={r}>{roleLabels[r]}</option>)}
                             </select>
                         </div>
-                        <div className="flex items-center gap-3">
-                            <input type="checkbox" id="active" checked={form.active} onChange={e => setForm(f => ({ ...f, active: e.target.checked }))}
-                                   className="w-4 h-4" style={{ accentColor: '#C8102E' }} />
-                            <label htmlFor="active" className="form-label mb-0 cursor-pointer">Akun aktif</label>
+
+                        <div className="flex items-center gap-3 pt-1">
+                            <input
+                                type="checkbox"
+                                id="active"
+                                checked={form.active}
+                                onChange={e => setForm(f => ({ ...f, active: e.target.checked }))}
+                                className="w-4 h-4 rounded border-[var(--border)] accent-[var(--primary)] cursor-pointer"
+                            />
+                            <label htmlFor="active" className="form-label mb-0 cursor-pointer font-medium text-[var(--text-primary)]">
+                                Akun aktif (Dapat Login)
+                            </label>
                         </div>
+
                         <div className="flex gap-3 pt-2">
-                            <button onClick={handleSave} className="btn-primary">{view === 'create' ? 'Buat Akun' : 'Perbarui'}</button>
-                            <button onClick={() => setView('list')} className="btn-outline">Batal</button>
+                            <button onClick={handleSave} className="btn-primary">
+                                {view === 'create' ? 'Buat Akun' : 'Perbarui'}
+                            </button>
+                            <button onClick={() => setView('list')} className="btn-outline">
+                                Batal
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -103,30 +147,45 @@ export default function AdminUsers() {
     return (
         <div>
             <div className="flex items-center justify-between mb-6">
-                <h2 className="text-sm font-black" style={{ fontFamily: 'Montserrat, sans-serif' }}>Manajemen Pengguna</h2>
-                <button onClick={startCreate} className="btn-primary text-xs">+ Tambah Pengguna</button>
+                <h2 className="text-sm font-black text-[var(--text-primary)] font-display">
+                    Manajemen Pengguna & Akses
+                </h2>
+                <button onClick={startCreate} className="btn-primary text-xs flex items-center gap-1.5">
+                    <UserPlus className="w-3.5 h-3.5" /> Tambah Pengguna
+                </button>
             </div>
 
             {deleteId !== null && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-                    <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
-                        <h3 className="font-black text-sm mb-2" style={{ fontFamily: 'Montserrat, sans-serif' }}>Hapus Pengguna?</h3>
-                        <p className="text-xs mb-5" style={{ color: '#666' }}>Akun pengguna ini akan dihapus secara permanen.</p>
-                        <div className="flex gap-3">
-                            <button onClick={() => handleDelete(deleteId)} className="btn-primary flex-1 justify-center">Hapus</button>
-                            <button onClick={() => setDeleteId(null)} className="btn-outline flex-1 justify-center">Batal</button>
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                    <div className="bg-[var(--card)] rounded-[var(--radius)] p-6 max-w-sm w-full mx-4 border border-[var(--border)] shadow-xl">
+                        <div className="flex items-center gap-2 text-[var(--error)] mb-2">
+                            <AlertTriangle className="w-5 h-5" />
+                            <h3 className="font-black text-sm font-display text-[var(--text-primary)]">
+                                Hapus Pengguna?
+                            </h3>
+                        </div>
+                        <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                            Akun pengguna ini akan dihapus secara permanen dari sistem administrasi.
+                        </p>
+                        <div className="flex gap-3 mt-6">
+                            <button onClick={() => handleDelete(deleteId)} className="btn-primary flex-1 justify-center bg-[var(--error)] hover:bg-[var(--primary-dark)]">
+                                Hapus
+                            </button>
+                            <button onClick={() => setDeleteId(null)} className="btn-outline flex-1 justify-center">
+                                Batal
+                            </button>
                         </div>
                     </div>
                 </div>
             )}
 
-            <div className="bg-white rounded" style={{ border: '1px solid #E0DEDC' }}>
+            <div className="bg-[var(--card)] rounded-[var(--radius)] border border-[var(--border)] overflow-hidden shadow-sm">
                 <table className="admin-table">
                     <thead>
                     <tr>
                         <th>Pengguna</th>
-                        <th>Role</th>
-                        <th>Status</th>
+                        <th>Peran / Role</th>
+                        <th>Status Akun</th>
                         <th>Aksi</th>
                     </tr>
                     </thead>
@@ -135,33 +194,57 @@ export default function AdminUsers() {
                         <tr key={u.id}>
                             <td>
                                 <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-black flex-shrink-0"
-                                         style={{ background: roleColors[u.role], fontFamily: 'Montserrat, sans-serif' }}>
+                                    <div
+                                        className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-black flex-shrink-0 shadow-sm font-display"
+                                        style={{ background: roleColors[u.role] }}
+                                    >
                                         {u.name.charAt(0)}
                                     </div>
                                     <div>
-                                        <p className="font-semibold text-xs" style={{ fontFamily: 'Montserrat, sans-serif' }}>{u.name}</p>
-                                        <p className="text-xs" style={{ color: '#888' }}>{u.email}</p>
+                                        <p className="font-semibold text-xs text-[var(--text-primary)] font-display">
+                                            {u.name}
+                                        </p>
+                                        <p className="text-xs text-[var(--text-muted)]">
+                                            {u.email}
+                                        </p>
                                     </div>
                                 </div>
                             </td>
                             <td>
-                  <span className="text-xs font-bold px-2 py-0.5 rounded-full"
-                        style={{ background: `${roleColors[u.role]}20`, color: roleColors[u.role], fontFamily: 'Montserrat, sans-serif' }}>
-                    {roleLabels[u.role]}
-                  </span>
+                                    <span
+                                        className="text-xs font-bold px-2.5 py-1 rounded-full font-display border border-transparent inline-block"
+                                        style={{
+                                            background: `rgba(${u.role === 'superadmin' ? '200, 16, 46' : u.role === 'bpi' ? '26, 111, 168' : u.role === 'medkom' ? '107, 70, 193' : '212, 160, 23'}, 0.12)`,
+                                            color: roleColors[u.role]
+                                        }}
+                                    >
+                                        {roleLabels[u.role]}
+                                    </span>
                             </td>
                             <td>
-                                <button onClick={() => toggleActive(u.id)}
-                                        className={u.active ? 'badge-available' : 'badge-unavailable'}
-                                        style={{ cursor: 'pointer' }}>
+                                <button
+                                    onClick={() => toggleActive(u.id)}
+                                    className={`${u.active ? 'badge-available' : 'badge-unavailable'} flex items-center gap-1 cursor-pointer transition-all hover:scale-105`}
+                                    title="Klik untuk mengubah status akun"
+                                >
+                                    {u.active ? <UserCheck className="w-3 h-3" /> : <UserX className="w-3 h-3" />}
                                     {u.active ? 'Aktif' : 'Nonaktif'}
                                 </button>
                             </td>
                             <td>
-                                <div className="flex gap-2">
-                                    <button onClick={() => startEdit(u)} className="text-xs font-semibold" style={{ color: '#1A6FA8', fontFamily: 'Montserrat, sans-serif' }}>Edit</button>
-                                    <button onClick={() => setDeleteId(u.id)} className="text-xs font-semibold" style={{ color: '#C8102E', fontFamily: 'Montserrat, sans-serif' }}>Hapus</button>
+                                <div className="flex gap-3 items-center">
+                                    <button
+                                        onClick={() => startEdit(u)}
+                                        className="text-xs font-semibold text-[var(--info)] hover:underline flex items-center gap-1 font-display"
+                                    >
+                                        <Edit2 className="w-3 h-3" /> Edit
+                                    </button>
+                                    <button
+                                        onClick={() => setDeleteId(u.id)}
+                                        className="text-xs font-semibold text-[var(--primary)] hover:underline flex items-center gap-1 font-display"
+                                    >
+                                        <Trash2 className="w-3 h-3" /> Hapus
+                                    </button>
                                 </div>
                             </td>
                         </tr>

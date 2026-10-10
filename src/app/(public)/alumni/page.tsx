@@ -1,6 +1,6 @@
 'use client'
 
-export default function Alumni() {
+export default function Page() {
     return (
         <div className="bg-[var(--background)] min-h-screen">
             <div className="relative bg-[var(--primary-dark)] pt-32 pb-20 overflow-hidden">
@@ -103,7 +103,7 @@ export default function Alumni() {
                 {/*                    Data alumni sedang dalam tahap pendataan & pembaruan database.*/}
                 {/*                </p>*/}
                 {/*                <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)] font-display">*/}
-                {/*                    Alumni Kaizen #{i}*/}
+                {/*                    Page Kaizen #{i}*/}
                 {/*                </span>*/}
                 {/*            </div>*/}
                 {/*        ))}*/}

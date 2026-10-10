@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { products, type Product } from '../../(public)/data'
+import { Plus, Edit2, Trash2, ArrowLeft, AlertTriangle, Search } from 'lucide-react'
 
 type ViewMode = 'list' | 'create' | 'edit'
 
@@ -50,42 +51,84 @@ export default function AdminEkowir() {
         return (
             <div>
                 <div className="flex items-center gap-3 mb-6">
-                    <button onClick={() => setView('list')} className="text-xs font-semibold" style={{ color: '#888' }}>← Kembali</button>
-                    <span style={{ color: '#ddd' }}>/</span>
-                    <h2 className="text-sm font-black" style={{ fontFamily: 'Montserrat, sans-serif' }}>
+                    <button
+                        onClick={() => setView('list')}
+                        className="text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--primary)] flex items-center gap-1 font-display transition-colors"
+                    >
+                        <ArrowLeft className="w-3.5 h-3.5" /> Kembali
+                    </button>
+                    <span className="text-[var(--border-strong)]">/</span>
+                    <h2 className="text-sm font-black text-[var(--text-primary)] font-display">
                         {view === 'create' ? 'Tambah Produk' : 'Edit Produk'}
                     </h2>
                 </div>
-                <div className="bg-white rounded p-6" style={{ border: '1px solid #E0DEDC', maxWidth: '600px' }}>
+
+                <div className="bg-[var(--card)] rounded-[var(--radius)] p-6 border border-[var(--border)] max-w-xl shadow-sm">
                     <div className="space-y-4">
                         <div>
                             <label className="form-label">Nama Produk</label>
-                            <input className="form-input" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="Nama produk..." />
+                            <input
+                                className="form-input"
+                                value={form.name}
+                                onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                                placeholder="Nama produk..."
+                            />
                         </div>
+
                         <div>
                             <label className="form-label">Deskripsi</label>
-                            <textarea className="form-input" rows={3} value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} placeholder="Deskripsi produk..." style={{ resize: 'vertical' }} />
+                            <textarea
+                                className="form-input"
+                                rows={3}
+                                value={form.description}
+                                onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+                                placeholder="Deskripsi produk..."
+                                style={{ resize: 'vertical' }}
+                            />
                         </div>
+
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <label className="form-label">Harga (Rp)</label>
-                                <input type="number" className="form-input" value={form.price} onChange={e => setForm(f => ({ ...f, price: Number(e.target.value) }))} />
+                                <input
+                                    type="number"
+                                    className="form-input"
+                                    value={form.price}
+                                    onChange={e => setForm(f => ({ ...f, price: Number(e.target.value) }))}
+                                />
                             </div>
                             <div>
                                 <label className="form-label">Kategori</label>
-                                <select className="form-input" value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}>
+                                <select
+                                    className="form-input"
+                                    value={form.category}
+                                    onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
+                                >
                                     {['Pakaian', 'Aksesori', 'Stationery', 'Lainnya'].map(c => <option key={c}>{c}</option>)}
                                 </select>
                             </div>
                         </div>
-                        <div className="flex items-center gap-3">
-                            <input type="checkbox" id="available" checked={form.available} onChange={e => setForm(f => ({ ...f, available: e.target.checked }))}
-                                   className="w-4 h-4" style={{ accentColor: '#C8102E' }} />
-                            <label htmlFor="available" className="form-label mb-0 cursor-pointer">Produk tersedia</label>
+
+                        <div className="flex items-center gap-3 pt-1">
+                            <input
+                                type="checkbox"
+                                id="available"
+                                checked={form.available}
+                                onChange={e => setForm(f => ({ ...f, available: e.target.checked }))}
+                                className="w-4 h-4 rounded border-[var(--border)] accent-[var(--primary)] cursor-pointer"
+                            />
+                            <label htmlFor="available" className="form-label mb-0 cursor-pointer font-medium text-[var(--text-primary)]">
+                                Produk tersedia
+                            </label>
                         </div>
+
                         <div className="flex gap-3 pt-2">
-                            <button onClick={handleSave} className="btn-primary">{view === 'create' ? 'Simpan Produk' : 'Perbarui'}</button>
-                            <button onClick={() => setView('list')} className="btn-outline">Batal</button>
+                            <button onClick={handleSave} className="btn-primary">
+                                {view === 'create' ? 'Simpan Produk' : 'Perbarui'}
+                            </button>
+                            <button onClick={() => setView('list')} className="btn-outline">
+                                Batal
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -96,29 +139,56 @@ export default function AdminEkowir() {
     return (
         <div>
             <div className="flex items-center justify-between mb-6">
-                <h2 className="text-sm font-black" style={{ fontFamily: 'Montserrat, sans-serif' }}>Kelola Produk Ekowir</h2>
-                <button onClick={startCreate} className="btn-primary text-xs">+ Tambah Produk</button>
+                <h2 className="text-sm font-black text-[var(--text-primary)] font-display">
+                    Kelola Produk Ekowir
+                </h2>
+                <button onClick={startCreate} className="btn-primary text-xs flex items-center gap-1.5">
+                    <Plus className="w-3.5 h-3.5" /> Tambah Produk
+                </button>
             </div>
 
             {deleteId !== null && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-                    <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
-                        <h3 className="font-black text-sm mb-2" style={{ fontFamily: 'Montserrat, sans-serif' }}>Hapus Produk?</h3>
-                        <p className="text-xs mb-5" style={{ color: '#666' }}>Produk ini akan dihapus secara permanen.</p>
-                        <div className="flex gap-3">
-                            <button onClick={() => handleDelete(deleteId)} className="btn-primary flex-1 justify-center">Hapus</button>
-                            <button onClick={() => setDeleteId(null)} className="btn-outline flex-1 justify-center">Batal</button>
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                    <div className="bg-[var(--card)] rounded-[var(--radius)] p-6 max-w-sm w-full mx-4 border border-[var(--border)] shadow-xl">
+                        <div className="flex items-center gap-2 text-[var(--error)] mb-2">
+                            <AlertTriangle className="w-5 h-5" />
+                            <h3 className="font-black text-sm font-display text-[var(--text-primary)]">
+                                Hapus Produk?
+                            </h3>
+                        </div>
+                        <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                            Produk ini akan dihapus secara permanen dari etalase Ekowir.
+                        </p>
+                        <div className="flex gap-3 mt-6">
+                            <button onClick={() => handleDelete(deleteId)} className="btn-primary flex-1 justify-center bg-[var(--error)] hover:bg-[var(--primary-dark)]">
+                                Hapus
+                            </button>
+                            <button onClick={() => setDeleteId(null)} className="btn-outline flex-1 justify-center">
+                                Batal
+                            </button>
                         </div>
                     </div>
                 </div>
             )}
 
-            <div className="bg-white rounded" style={{ border: '1px solid #E0DEDC' }}>
-                <div className="px-5 py-4 border-b flex items-center justify-between gap-4" style={{ borderColor: '#E0DEDC' }}>
-                    <input type="text" placeholder="Cari produk..." value={search} onChange={e => setSearch(e.target.value)}
-                           className="form-input text-xs" style={{ width: '220px' }} />
-                    <span className="text-xs" style={{ color: '#888' }}>{filtered.length} produk</span>
+            <div className="bg-[var(--card)] rounded-[var(--radius)] border border-[var(--border)] overflow-hidden shadow-sm">
+                <div className="px-5 py-4 border-b border-[var(--border)] flex items-center justify-between gap-4 bg-[var(--surface)]">
+                    <div className="relative">
+                        <Search className="w-3.5 h-3.5 text-[var(--text-muted)] absolute left-3 top-1/2 -translate-y-1/2" />
+                        <input
+                            type="text"
+                            placeholder="Cari produk..."
+                            value={search}
+                            onChange={e => setSearch(e.target.value)}
+                            className="form-input text-xs pl-8 py-1.5"
+                            style={{ width: '220px' }}
+                        />
+                    </div>
+                    <span className="text-xs text-[var(--text-muted)] font-display font-medium">
+                        {filtered.length} produk
+                    </span>
                 </div>
+
                 <table className="admin-table">
                     <thead>
                     <tr>
@@ -130,31 +200,62 @@ export default function AdminEkowir() {
                     </tr>
                     </thead>
                     <tbody>
-                    {filtered.map(p => (
-                        <tr key={p.id}>
-                            <td>
-                                <div className="flex items-center gap-3">
-                                    <img src={p.image} alt={p.name} className="w-10 h-10 rounded object-cover flex-shrink-0"
-                                         style={{ border: '1px solid #E0DEDC' }} />
-                                    <div>
-                                        <p className="font-semibold text-xs line-clamp-1" style={{ fontFamily: 'Montserrat, sans-serif' }}>{p.name}</p>
-                                        <p className="text-xs mt-0.5 line-clamp-1" style={{ color: '#888' }}>{p.description}</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td className="text-xs" style={{ color: '#666' }}>{p.category}</td>
-                            <td className="text-xs font-bold" style={{ color: '#C8102E', fontFamily: 'Montserrat, sans-serif', whiteSpace: 'nowrap' }}>
-                                Rp {p.price.toLocaleString('id-ID')}
-                            </td>
-                            <td><span className={p.available ? 'badge-available' : 'badge-unavailable'}>{p.available ? 'Tersedia' : 'Habis'}</span></td>
-                            <td>
-                                <div className="flex gap-2">
-                                    <button onClick={() => startEdit(p)} className="text-xs font-semibold" style={{ color: '#1A6FA8', fontFamily: 'Montserrat, sans-serif' }}>Edit</button>
-                                    <button onClick={() => setDeleteId(p.id)} className="text-xs font-semibold" style={{ color: '#C8102E', fontFamily: 'Montserrat, sans-serif' }}>Hapus</button>
-                                </div>
+                    {filtered.length === 0 ? (
+                        <tr>
+                            <td colSpan={5} className="text-center py-8 text-[var(--text-muted)] text-xs">
+                                Tidak ada produk yang ditemukan.
                             </td>
                         </tr>
-                    ))}
+                    ) : (
+                        filtered.map(p => (
+                            <tr key={p.id}>
+                                <td>
+                                    <div className="flex items-center gap-3">
+                                        <img
+                                            src={p.image}
+                                            alt={p.name}
+                                            className="w-10 h-10 rounded-[var(--radius)] object-cover flex-shrink-0 border border-[var(--border)] bg-[#111111]"
+                                        />
+                                        <div>
+                                            <p className="font-semibold text-xs line-clamp-1 text-[var(--text-primary)] font-display">
+                                                {p.name}
+                                            </p>
+                                            <p className="text-xs mt-0.5 line-clamp-1 text-[var(--text-muted)]">
+                                                {p.description}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td className="text-xs text-[var(--text-secondary)]">
+                                    {p.category}
+                                </td>
+                                <td className="text-xs font-bold text-[var(--primary)] whitespace-nowrap font-display">
+                                    Rp {p.price.toLocaleString('id-ID')}
+                                </td>
+                                <td>
+                                        <span className={p.available ? 'badge-available' : 'badge-unavailable'}>
+                                            {p.available ? 'Tersedia' : 'Habis'}
+                                        </span>
+                                </td>
+                                <td>
+                                    <div className="flex gap-3 items-center">
+                                        <button
+                                            onClick={() => startEdit(p)}
+                                            className="text-xs font-semibold text-[var(--info)] hover:underline flex items-center gap-1 font-display"
+                                        >
+                                            <Edit2 className="w-3 h-3" /> Edit
+                                        </button>
+                                        <button
+                                            onClick={() => setDeleteId(p.id)}
+                                            className="text-xs font-semibold text-[var(--primary)] hover:underline flex items-center gap-1 font-display"
+                                        >
+                                            <Trash2 className="w-3 h-3" /> Hapus
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        ))
+                    )}
                     </tbody>
                 </table>
             </div>

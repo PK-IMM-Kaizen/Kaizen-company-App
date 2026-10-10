@@ -75,7 +75,7 @@ const divisionsData = [
     }
 ]
 
-export default function Division() {
+export default function Page() {
     const [selectedDivision, setSelectedDivision] = useState<number | 'ALL'>('ALL')
 
     const filteredDivisions = selectedDivision === 'ALL'

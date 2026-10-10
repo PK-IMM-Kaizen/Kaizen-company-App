@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Logo from '../../components/common/Logo'
-import { type Role, type Page } from '../../app/(public)/data'
+import { type Role, type Page } from '../(public)/data'
 import { Lock, Mail, ArrowLeft, ShieldCheck } from 'lucide-react'
 
 interface LoginProps {
@@ -14,7 +14,7 @@ const demoAccounts: { label: string; role: Role; email: string }[] = [
     { label: 'Super Admin', role: 'superadmin', email: 'superadmin@kaizen.id' }
 ]
 
-export default function Login({ onLogin, onNavigate }: LoginProps) {
+export default function Page({ onLogin, onNavigate }: LoginProps) {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [error, setError] = useState('')

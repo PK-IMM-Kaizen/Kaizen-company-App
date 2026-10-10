@@ -1,19 +1,10 @@
 'use client'
 
+import Link from 'next/link'
 import Logo from './Logo'
-import { type Page } from '../../app/(public)/data'
 import { FaInstagram, FaWhatsapp, FaEnvelope } from 'react-icons/fa'
 
-interface FooterProps {
-    onNavigate: (page: Page) => void
-}
-
-export default function Footer({ onNavigate }: FooterProps) {
-    const nav = (page: Page) => {
-        onNavigate(page)
-        window.scrollTo({ top: 0, behavior: 'smooth' })
-    }
-
+export default function Footer() {
     return (
         <footer className="bg-[#0a0a0a] text-white relative overflow-hidden">
             <div className="h-1 w-full bg-gradient-to-r from-[#CC1021] via-[#E07B1A] to-[#F5C400]" />
@@ -52,20 +43,20 @@ export default function Footer({ onNavigate }: FooterProps) {
                         </h4>
                         <ul className="space-y-4">
                             {[
-                                { label: 'Beranda', page: 'home' as Page },
-                                { label: 'Profil Organisasi', page: 'profile' as Page },
-                                { label: 'Kepengurusan', page: 'management' as Page },
-                                { label: 'Profil Bidang', page: 'division' as Page },
+                                { label: 'Beranda', path: '/' },
+                                { label: 'Profil Organisasi', path: '/profil' },
+                                { label: 'Kepengurusan', path: '/kepengurusan' },
+                                { label: 'Profil Bidang', path: '/bidang' },
                             ].map(item => (
-                                <li key={item.page}>
-                                    <button
-                                        onClick={() => nav(item.page)}
+                                <li key={item.path}>
+                                    <Link
+                                        href={item.path}
                                         className="text-sm text-gray-400 transition-colors hover:text-[#E07B1A] flex items-center gap-2 group"
                                         style={{ fontFamily: 'Inter, sans-serif' }}
                                     >
                                         <span className="w-0 h-[1px] bg-[#E07B1A] transition-all group-hover:w-3"></span>
                                         {item.label}
-                                    </button>
+                                    </Link>
                                 </li>
                             ))}
                         </ul>
@@ -78,20 +69,20 @@ export default function Footer({ onNavigate }: FooterProps) {
                         </h4>
                         <ul className="space-y-4">
                             {[
-                                { label: 'Berita & Dokumentasi', page: 'news' as Page },
-                                { label: 'Produk Ekowir', page: 'ekowir' as Page },
-                                { label: 'Alumni Inspiratif', page: 'alumni' as Page },
-                                { label: 'Hubungi Kami', page: 'contact' as Page },
+                                { label: 'Berita & Dokumentasi', path: '/berita' },
+                                { label: 'Produk Ekowir', path: '/ekowir' },
+                                { label: 'Page Inspiratif', path: '/alumni' },
+                                { label: 'Hubungi Kami', path: '/kontak' },
                             ].map(item => (
-                                <li key={item.page}>
-                                    <button
-                                        onClick={() => nav(item.page)}
+                                <li key={item.path}>
+                                    <Link
+                                        href={item.path}
                                         className="text-sm text-gray-400 transition-colors hover:text-[#E07B1A] flex items-center gap-2 group"
                                         style={{ fontFamily: 'Inter, sans-serif' }}
                                     >
                                         <span className="w-0 h-[1px] bg-[#E07B1A] transition-all group-hover:w-3"></span>
                                         {item.label}
-                                    </button>
+                                    </Link>
                                 </li>
                             ))}
                         </ul>

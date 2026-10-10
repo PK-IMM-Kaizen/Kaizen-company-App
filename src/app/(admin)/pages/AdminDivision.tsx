@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { divisions, type Division } from '../../(public)/data'
+import { Plus, Edit2, Trash2, ArrowLeft, AlertTriangle } from 'lucide-react'
 
 type ViewMode = 'list' | 'create' | 'edit'
 
@@ -20,7 +21,7 @@ export default function AdminDivision() {
 
     const startEdit = (item: Division) => {
         setEditItem(item)
-        setForm({ name: item.name, description: item.description, color: item.color })
+        setForm({ name: item.name, description: item.description, color: item.color || '#C8102E' })
         setView('edit')
     }
 
@@ -45,33 +46,66 @@ export default function AdminDivision() {
         return (
             <div>
                 <div className="flex items-center gap-3 mb-6">
-                    <button onClick={() => setView('list')} className="text-xs font-semibold" style={{ color: '#888' }}>← Kembali</button>
-                    <span style={{ color: '#ddd' }}>/</span>
-                    <h2 className="text-sm font-black" style={{ fontFamily: 'Montserrat, sans-serif' }}>
+                    <button
+                        onClick={() => setView('list')}
+                        className="text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--primary)] flex items-center gap-1 font-display transition-colors"
+                    >
+                        <ArrowLeft className="w-3.5 h-3.5" /> Kembali
+                    </button>
+                    <span className="text-[var(--border-strong)]">/</span>
+                    <h2 className="text-sm font-black text-[var(--text-primary)] font-display">
                         {view === 'create' ? 'Tambah Bidang' : 'Edit Bidang'}
                     </h2>
                 </div>
-                <div className="bg-white rounded p-6" style={{ border: '1px solid #E0DEDC', maxWidth: '480px' }}>
+
+                <div className="bg-[var(--card)] rounded-[var(--radius)] p-6 border border-[var(--border)] max-w-md shadow-sm">
                     <div className="space-y-4">
                         <div>
                             <label className="form-label">Nama Bidang</label>
-                            <input className="form-input" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="Nama bidang..." />
+                            <input
+                                className="form-input"
+                                value={form.name}
+                                onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                                placeholder="Nama bidang..."
+                            />
                         </div>
+
                         <div>
                             <label className="form-label">Deskripsi</label>
-                            <textarea className="form-input" rows={4} value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} style={{ resize: 'vertical' }} />
+                            <textarea
+                                className="form-input"
+                                rows={4}
+                                value={form.description}
+                                onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+                                style={{ resize: 'vertical' }}
+                                placeholder="Tuliskan gambaran dan cakupan kerja bidang..."
+                            />
                         </div>
+
                         <div>
                             <label className="form-label">Warna Aksen</label>
                             <div className="flex items-center gap-3">
-                                <input type="color" value={form.color} onChange={e => setForm(f => ({ ...f, color: e.target.value }))}
-                                       className="w-10 h-10 rounded cursor-pointer border" style={{ borderColor: '#E0DEDC' }} />
-                                <input className="form-input flex-1" value={form.color} onChange={e => setForm(f => ({ ...f, color: e.target.value }))} />
+                                <input
+                                    type="color"
+                                    value={form.color}
+                                    onChange={e => setForm(f => ({ ...f, color: e.target.value }))}
+                                    className="w-10 h-10 rounded cursor-pointer border border-[var(--border)] p-1 bg-[var(--surface)]"
+                                />
+                                <input
+                                    className="form-input flex-1 font-mono uppercase"
+                                    value={form.color}
+                                    onChange={e => setForm(f => ({ ...f, color: e.target.value }))}
+                                />
                             </div>
                         </div>
+
                         <div className="flex gap-3 pt-2">
-                            <button onClick={handleSave} className="btn-primary">{view === 'create' ? 'Simpan' : 'Perbarui'}</button>
-                            <button onClick={() => setView('list')} className="btn-outline">Batal</button>
+                            <button onClick={handleSave} className="btn-primary">
+                                {view === 'create' ? 'Simpan' : 'Perbarui'}
+                            </button>
+                            <button onClick={() => setView('list')} className="btn-outline">
+                                Batal
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -82,24 +116,39 @@ export default function AdminDivision() {
     return (
         <div>
             <div className="flex items-center justify-between mb-6">
-                <h2 className="text-sm font-black" style={{ fontFamily: 'Montserrat, sans-serif' }}>Kelola Bidang</h2>
-                <button onClick={startCreate} className="btn-primary text-xs">+ Tambah Bidang</button>
+                <h2 className="text-sm font-black text-[var(--text-primary)] font-display">
+                    Kelola Bidang
+                </h2>
+                <button onClick={startCreate} className="btn-primary text-xs flex items-center gap-1.5">
+                    <Plus className="w-3.5 h-3.5" /> Tambah Bidang
+                </button>
             </div>
 
             {deleteId !== null && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-                    <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
-                        <h3 className="font-black text-sm mb-2" style={{ fontFamily: 'Montserrat, sans-serif' }}>Hapus Bidang?</h3>
-                        <p className="text-xs mb-5" style={{ color: '#666' }}>Data bidang ini akan dihapus secara permanen.</p>
-                        <div className="flex gap-3">
-                            <button onClick={() => handleDelete(deleteId)} className="btn-primary flex-1 justify-center">Hapus</button>
-                            <button onClick={() => setDeleteId(null)} className="btn-outline flex-1 justify-center">Batal</button>
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                    <div className="bg-[var(--card)] rounded-[var(--radius)] p-6 max-w-sm w-full mx-4 border border-[var(--border)] shadow-xl">
+                        <div className="flex items-center gap-2 text-[var(--error)] mb-2">
+                            <AlertTriangle className="w-5 h-5" />
+                            <h3 className="font-black text-sm font-display text-[var(--text-primary)]">
+                                Hapus Bidang?
+                            </h3>
+                        </div>
+                        <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                            Data bidang ini akan dihapus secara permanen dari sistem.
+                        </p>
+                        <div className="flex gap-3 mt-6">
+                            <button onClick={() => handleDelete(deleteId)} className="btn-primary flex-1 justify-center bg-[var(--error)] hover:bg-[var(--primary-dark)]">
+                                Hapus
+                            </button>
+                            <button onClick={() => setDeleteId(null)} className="btn-outline flex-1 justify-center">
+                                Batal
+                            </button>
                         </div>
                     </div>
                 </div>
             )}
 
-            <div className="bg-white rounded" style={{ border: '1px solid #E0DEDC' }}>
+            <div className="bg-[var(--card)] rounded-[var(--radius)] border border-[var(--border)] overflow-hidden shadow-sm">
                 <table className="admin-table">
                     <thead>
                     <tr>
@@ -109,23 +158,48 @@ export default function AdminDivision() {
                     </tr>
                     </thead>
                     <tbody>
-                    {items.map(d => (
-                        <tr key={d.id}>
-                            <td>
-                                <div className="flex items-center gap-3">
-                                    <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ background: d.color }} />
-                                    <span className="font-semibold text-xs" style={{ fontFamily: 'Montserrat, sans-serif' }}>{d.name}</span>
-                                </div>
-                            </td>
-                            <td className="text-xs line-clamp-2" style={{ color: '#666', maxWidth: '360px' }}>{d.description}</td>
-                            <td>
-                                <div className="flex gap-2">
-                                    <button onClick={() => startEdit(d)} className="text-xs font-semibold" style={{ color: '#1A6FA8', fontFamily: 'Montserrat, sans-serif' }}>Edit</button>
-                                    <button onClick={() => setDeleteId(d.id)} className="text-xs font-semibold" style={{ color: '#C8102E', fontFamily: 'Montserrat, sans-serif' }}>Hapus</button>
-                                </div>
+                    {items.length === 0 ? (
+                        <tr>
+                            <td colSpan={3} className="text-center py-8 text-[var(--text-muted)] text-xs">
+                                Belum ada data bidang. Klik tombol Tambah Bidang di atas untuk menambahkan data baru.
                             </td>
                         </tr>
-                    ))}
+                    ) : (
+                        items.map(d => (
+                            <tr key={d.id}>
+                                <td>
+                                    <div className="flex items-center gap-3">
+                                        <div
+                                            className="w-3.5 h-3.5 rounded-full flex-shrink-0 shadow-sm border border-black/10"
+                                            style={{ background: d.color || 'var(--primary)' }}
+                                        />
+                                        <span className="font-semibold text-xs text-[var(--text-primary)] font-display">
+                                                {d.name}
+                                            </span>
+                                    </div>
+                                </td>
+                                <td className="text-xs text-[var(--text-secondary)] line-clamp-2 max-w-[360px]">
+                                    {d.description}
+                                </td>
+                                <td>
+                                    <div className="flex gap-3 items-center">
+                                        <button
+                                            onClick={() => startEdit(d)}
+                                            className="text-xs font-semibold text-[var(--info)] hover:underline flex items-center gap-1 font-display"
+                                        >
+                                            <Edit2 className="w-3 h-3" /> Edit
+                                        </button>
+                                        <button
+                                            onClick={() => setDeleteId(d.id)}
+                                            className="text-xs font-semibold text-[var(--primary)] hover:underline flex items-center gap-1 font-display"
+                                        >
+                                            <Trash2 className="w-3 h-3" /> Hapus
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        ))
+                    )}
                     </tbody>
                 </table>
             </div>

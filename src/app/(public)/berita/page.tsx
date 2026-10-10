@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { newsData, type Page } from '../(public)/data'
+import { newsData, type Page } from '../data'
 import { Search, ArrowRight, Calendar } from 'lucide-react'
 
 interface NewsProps {
@@ -11,7 +11,7 @@ interface NewsProps {
 
 const categories = ['Semua', 'Bidang HPKP', 'Bidang Kader']
 
-export default function News({ onNavigate, onNewsDetail }: NewsProps) {
+export default function Page({ onNavigate, onNewsDetail }: NewsProps) {
     const [activeCategory, setActiveCategory] = useState('Semua')
     const [search, setSearch] = useState('')
 

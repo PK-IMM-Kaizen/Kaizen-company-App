@@ -1,10 +1,10 @@
 'use client'
 
-import { type Page } from '../../app/(public)/data'
+import { type Page } from '../data'
 
 interface ProfileProps { onNavigate: (page: Page) => void }
 
-export default function Profile({ onNavigate }: ProfileProps) {
+export default function Page({ onNavigate }: ProfileProps) {
     return (
         <div className="w-full bg-[var(--background)]">
             <div className="relative bg-[var(--primary-dark)] pt-32 pb-20 overflow-hidden">

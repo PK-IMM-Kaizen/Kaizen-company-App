@@ -27,7 +27,7 @@ const TikTokIcon = ({ className }: { className?: string }) => (
     </svg>
 )
 
-export default function Contact() {
+export default function Page() {
     const contactChannels = [
         {
             icon: <InstagramIcon className="w-5 h-5 text-[#E1306C]" />,

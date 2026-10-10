@@ -30,9 +30,10 @@ export interface NewsItem {
     gallery: string[]
     category: string
     status: 'published' | 'draft'
+    pwmuUrl?: string
 }
 
-export const newsData = [
+export const newsData: NewsItem[] = [
     {
         id: 1,
         title: 'Kajian September Hitam PK IMM Kaizen Bahas Sejarah, HAM, dan Peran Mahasiswa',
@@ -90,7 +91,7 @@ export const newsData = [
         status: 'published',
         pwmuUrl: 'https://pwmu.co/pk-imm-kaizen-lantik-pengurus-2026-2027-resmi-launching-website-kaizen-company/'
     },
-];
+]
 
 export interface Product {
     id: number
@@ -165,30 +166,30 @@ export interface Management {
     position: string
     division: string
     photo: string
-    isLeader: boolean
+    isLeader?: boolean // Menjadi opsional (?) agar tidak error bila belum diisi
 }
 
-export const managementData = [
-    { id: 1, name: 'Abdul Baari\' Al Fakhri ', position: 'Ketua Umum', division: 'BPH', photo: '/img/profile/ketum.png' },
-    { id: 2, name: 'Muhammad Zakky Arifina ', position: 'Sekretaris Umum', division: 'BPH', photo: '/img/profile/sekum.jpg' },
-    { id: 3, name: 'Muhammad Zidan Al Farezel ', position: 'Bendahara Umum', division: 'BPH', photo: '/img/profile/bendum.png' },
+export const managementData: Management[] = [
+    { id: 1, name: 'Abdul Baari\' Al Fakhri', position: 'Ketua Umum', division: 'BPH', photo: '/img/profile/ketum.png', isLeader: true },
+    { id: 2, name: 'Muhammad Zakky Arifina', position: 'Sekretaris Umum', division: 'BPH', photo: '/img/profile/sekum.jpg', isLeader: true },
+    { id: 3, name: 'Muhammad Zidan Al Farezel', position: 'Bendahara Umum', division: 'BPH', photo: '/img/profile/bendum.png', isLeader: true },
 
-    { id: 4, name: 'Rafa Alexyz Virginanda', position: 'Ketua Bidang', division: 'Organisasi', photo: '/img/profile/imm.jpeg' },
+    { id: 4, name: 'Rafa Alexyz Virginanda', position: 'Ketua Bidang', division: 'Organisasi', photo: '/img/profile/imm.jpeg', isLeader: true },
     { id: 5, name: 'Rafi Ilham Syamsudin', position: 'Sekretaris Bidang', division: 'Organisasi', photo: '/img/profile/imm.jpeg' },
     { id: 6, name: 'Zaenal Abidin', position: 'Anggota', division: 'Organisasi', photo: '/img/profile/imm.jpeg' },
     { id: 7, name: 'Muhammad Reno Setiawa', position: 'Anggota', division: 'Organisasi', photo: '/img/profile/imm.jpeg' },
 
-    { id: 8, name: 'Nobel Danial Muhammad ', position: 'Ketua Bidang', division: 'Kader', photo: '/img/profile/imm.jpeg' },
+    { id: 8, name: 'Nobel Danial Muhammad', position: 'Ketua Bidang', division: 'Kader', photo: '/img/profile/imm.jpeg', isLeader: true },
     { id: 9, name: 'Abdullah Azzam Arif Firmansyah', position: 'Sekretaris Bidang', division: 'Kader', photo: '/img/profile/imm.jpeg' },
     { id: 10, name: 'Maulidia Dliyaun N', position: 'Anggota', division: 'Kader', photo: '/img/profile/imm.jpeg' },
     { id: 11, name: 'Hamas Fatih Izzudin', position: 'Anggota', division: 'Kader', photo: '/img/profile/imm.jpeg' },
 
-    { id: 12, name: 'M Lutfi Zaka Firdaus ', position: 'Ketua Bidang', division: 'Hikmah Politik Kebijakan Publik', photo: '/img/profile/imm.jpeg' },
+    { id: 12, name: 'M Lutfi Zaka Firdaus', position: 'Ketua Bidang', division: 'Hikmah Politik Kebijakan Publik', photo: '/img/profile/imm.jpeg', isLeader: true },
     { id: 13, name: 'Moh Faiz Haikal', position: 'Sekretaris Bidang', division: 'Hikmah Politik Kebijakan Publik', photo: '/img/profile/imm.jpeg' },
     { id: 14, name: 'Febri Dimas Ferdiansyah', position: 'Anggota', division: 'Hikmah Politik Kebijakan Publik', photo: '/img/profile/imm.jpeg' },
     { id: 15, name: 'Mochammad Faiq Naabih', position: 'Anggota', division: 'Hikmah Politik Kebijakan Publik', photo: '/img/profile/imm.jpeg' },
 
-    { id: 16, name: 'Abidzar Dzakwan Sahudi', position: 'Ketua Bidang', division: 'Riset Pengembangan Keilmuan', photo: '/img/profile/imm.jpeg' },
+    { id: 16, name: 'Abidzar Dzakwan Sahudi', position: 'Ketua Bidang', division: 'Riset Pengembangan Keilmuan', photo: '/img/profile/imm.jpeg', isLeader: true },
     { id: 17, name: 'Rifqah Nur Izzah', position: 'Sekretaris Bidang', division: 'Riset Pengembangan Keilmuan', photo: '/img/profile/imm.jpeg' },
     { id: 18, name: 'Syafiih', position: 'Anggota', division: 'Riset Pengembangan Keilmuan', photo: '/img/profile/imm.jpeg' },
     { id: 19, name: 'Moh. Syahrul Gunawan', position: 'Anggota', division: 'Riset Pengembangan Keilmuan', photo: '/img/profile/imm.jpeg' }
@@ -203,11 +204,16 @@ export interface Division {
 }
 
 export const divisions: Division[] = [
-    { id: 1, name: 'Bidang Pembinaan Kader (BPI)', description: 'Bertanggung jawab dalam pembinaan dan pengembangan kader IMM Kaizen melalui program pelatihan dan kaderisasi yang sistematis.', photo: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&h=400&fit=crop&auto=format', color: '#C8102E' },
-    { id: 2, name: 'Bidang Media dan Komunikasi (Medkom)', description: 'Mengelola strategi komunikasi, media sosial, dokumentasi, dan penyebaran informasi organisasi kepada publik.', photo: 'https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=600&h=400&fit=crop&auto=format', color: '#1A6FA8' },
-    { id: 3, name: 'Bidang Ekonomi dan Kewirausahaan (Ekowir)', description: 'Mengembangkan jiwa wirausaha anggota melalui program usaha, pelatihan bisnis, dan pengelolaan produk organisasi.', photo: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&h=400&fit=crop&auto=format', color: '#D4A017' },
-    { id: 4, name: 'Bidang Hikmah', description: 'Berfokus pada pengembangan nilai-nilai keislaman, kajian keagamaan, dan dakwah di lingkungan kampus dan masyarakat.', photo: 'https://images.unsplash.com/photo-1609599006353-e629aaabfeae?w=600&h=400&fit=crop&auto=format', color: '#2D7D46' },
-    { id: 5, name: 'Bidang Sosial Pemberdayaan Masyarakat (SPM)', description: 'Menginisiasi program sosial kemasyarakatan, pengabdian masyarakat, dan pemberdayaan komunitas di sekitar kampus.', photo: 'https://images.unsplash.com/photo-1593113598332-cd288d649433?w=600&h=400&fit=crop&auto=format', color: '#6B46C1' },
+    { id: 1, name: 'Organisasi', description: 'Mewadahi pengelolaan administrasi, penataan struktur internal, serta koordinasi keorganisasian agar jalannya komisariat tetap solid, tertib, dan sistematis.', photo: '/img/divisions/organisasi.jpg', color: 'var(--primary)' },
+    { id: 2, name: 'Perkaderan', description: 'Jantung utama perkaderan yang bertanggung jawab atas proses rekruitasi, pembinaan ideologi, serta pengawalan jenjang kaderisasi berkesinambungan melalui DAD dan Teras Perkaderan.', photo: '/img/divisions/perkaderan.jpg', color: 'var(--accent)' },
+    { id: 3, name: 'Hikmah Politik & Kebijakan Publik', description: 'Mengasah kepekaan kritis kader terhadap isu-isu keumatan, kebangsaan, dan sosial kemasyarakatan melalui kajian politik, advokasi, dan perumusan kebijakan publik.', photo: '/img/divisions/hikmah.jpg', color: '#D4A017' },
+    { id: 4, name: 'Riset & Pengembangan Keilmuan', description: 'Mengembangkan budaya literasi, kajian akademik, ilmiah, serta riset teknologi khas mahasiswa teknik untuk mewujudkan intelektualitas kader yang unggul.', photo: '/img/divisions/rpk.jpg', color: '#1A6FA8' },
+    { id: 5, name: 'Tabligh & Kajian Keislaman', description: 'Menanamkan nilai-nilai religiusitas, memperdalam pemahaman al-Islam dan Kemuhammadiyahan (AIK), serta menyelenggarakan kajian keagamaan rutin untuk internal dan publik.', photo: '/img/divisions/tabligh.jpg', color: '#2E7D32' },
+    { id: 6, name: 'Sosial Pemberdayaan Masyarakat', description: 'Mengorganisir aksi-aksi kemanusiaan, bakti sosial (Baksos), serta pengabdian masyarakat secara nyata di berbagai wilayah pelosok Jawa Timur.', photo: '/img/divisions/spm.jpg', color: '#C8102E' },
+    { id: 7, name: 'Ekonomi & Kewirausahaan', description: 'Menumbuhkan jiwa kemandirian finansial komisariat dan kader melalui unit bisnis kreatif (Ekowir), penjualan merchandise, serta pelatihan wirausaha digital.', photo: '/img/divisions/ekowir.jpg', color: '#2D7D46' },
+    { id: 8, name: 'IMMawati', description: 'Fokus pada penguatan kapasitas, wawasan kesetaraan gender, isu kepemimpinan perempuan, serta ruang aktualisasi khusus bagi seluruh kader perempuan (Immawati) Kaizen.', photo: '/img/divisions/immawati.jpg', color: '#C71585' },
+    { id: 9, name: 'Seni Budaya & Olahraga', description: 'Wadah penyaluran bakat, minat, dan ekspresi kreatif kader di bidang seni, kebudayaan, serta menjaga kebugaran fisik dan keakraban melalui kegiatan olahraga bersama.', photo: '/img/divisions/sbo.jpg', color: '#E07B1A' },
+    { id: 10, name: 'Media Komunikasi & Informasi', description: 'Garda terdepan syiar digital yang mengelola publikasi, desain visual, dokumentasi kegiatan, serta branding #1ByteLebihDekat di berbagai platform media sosial.', photo: '/img/divisions/medkom.jpg', color: 'var(--primary-light)' },
 ]
 
 export interface Alumni {

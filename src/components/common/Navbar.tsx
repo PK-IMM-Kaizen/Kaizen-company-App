@@ -1,17 +1,16 @@
 'use client'
 
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import Logo from './Logo'
-import { navItems, type Page } from '../../app/(public)/data'
+import { navItems } from '../../app/(public)/data'
 
-interface NavbarProps {
-    currentPage: Page
-    onNavigate: (page: Page) => void
-}
-
-export default function Navbar({ currentPage, onNavigate }: NavbarProps) {
+export default function Navbar() {
     const [scrolled, setScrolled] = useState(false)
     const [mobileOpen, setMobileOpen] = useState(false)
+
+    const pathname = usePathname()
 
     useEffect(() => {
         const onScroll = () => setScrolled(window.scrollY > 20)
@@ -30,15 +29,22 @@ export default function Navbar({ currentPage, onNavigate }: NavbarProps) {
         }
     }, [mobileOpen])
 
-    const handleNav = (page: Page) => {
-        onNavigate(page)
-        setMobileOpen(false)
-        window.scrollTo({ top: 0, behavior: 'smooth' })
-    }
+    const closeMobile = () => setMobileOpen(false)
 
     const textColor = scrolled ? '#333' : '#fff'
     const activeColor = scrolled ? '#C8102E' : '#F5C400'
     const logoVariant = scrolled ? 'default' : 'white'
+
+    const getPath = (page: string) => {
+        if (page === 'home') return '/'
+        if (page === 'profile') return '/profil'
+        if (page === 'news') return '/berita'
+        if (page === 'management') return '/kepengurusan'
+        if (page === 'division') return '/bidang'
+        if (page === 'alumni') return '/alumni'
+        if (page === 'contact') return '/kontak'
+        return `/${page}`
+    }
 
     return (
         <>
@@ -51,17 +57,19 @@ export default function Navbar({ currentPage, onNavigate }: NavbarProps) {
             >
                 <div className="max-w-7xl mx-auto px-4 sm:px-6">
                     <div className="flex items-center justify-between h-16">
-                        <button onClick={() => handleNav('home')} className="flex items-center ml-2 lg:ml-0">
+                        <Link href="/" onClick={closeMobile} className="flex items-center ml-2 lg:ml-0">
                             <Logo size="sm" variant={logoVariant} />
-                        </button>
+                        </Link>
 
                         <div className="hidden lg:flex items-center gap-1">
                             {navItems.map((item) => {
-                                const isActive = currentPage === item.page
+                                const itemPath = getPath(item.page)
+                                const isActive = pathname === itemPath || (pathname.startsWith(itemPath) && itemPath !== '/')
+
                                 return (
-                                    <button
+                                    <Link
                                         key={item.page}
-                                        onClick={() => handleNav(item.page)}
+                                        href={itemPath}
                                         className="relative px-4 py-2 text-[13px] font-semibold rounded-full transition-colors font-montserrat tracking-wide"
                                         style={{ color: isActive ? activeColor : textColor }}
                                     >
@@ -72,33 +80,33 @@ export default function Navbar({ currentPage, onNavigate }: NavbarProps) {
                                                 style={{ background: activeColor }}
                                             />
                                         )}
-                                    </button>
+                                    </Link>
                                 )
                             })}
                         </div>
 
                         <div className="hidden lg:flex items-center gap-2 pr-2">
-                            <button
-                                onClick={() => handleNav('admin-login')}
-                                className={`text-xs px-4 py-2 rounded-full font-semibold transition-all hover:scale-105 ${
+                            <Link
+                                href="/admin-login"
+                                className={`text-xs px-4 py-2 rounded-full font-semibold transition-all hover:scale-105 flex items-center ${
                                     scrolled
                                         ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                         : 'bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm'
                                 }`}
                             >
                                 Kaizen Company
-                            </button>
+                            </Link>
 
-                            <button
-                                onClick={() => alert('Arahkan ke Link Pendaftaran DAD')}
-                                className={`text-xs px-5 py-2 rounded-full font-bold transition-all shadow-sm hover:scale-105 ${
+                            <a
+                                href="#"
+                                className={`text-xs px-5 py-2 rounded-full font-bold transition-all shadow-sm hover:scale-105 flex items-center ${
                                     scrolled
                                         ? 'bg-[#C8102E] text-white hover:bg-[#9b0d23]'
                                         : 'bg-[#F5C400] text-gray-900 hover:bg-[#e6b800]'
                                 }`}
                             >
                                 Daftar DAD
-                            </button>
+                            </a>
                         </div>
 
                         <button
@@ -125,7 +133,7 @@ export default function Navbar({ currentPage, onNavigate }: NavbarProps) {
                     className={`absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300 ease-in-out ${
                         mobileOpen ? 'opacity-100' : 'opacity-0'
                     }`}
-                    onClick={() => setMobileOpen(false)}
+                    onClick={closeMobile}
                 />
 
                 <div
@@ -136,7 +144,7 @@ export default function Navbar({ currentPage, onNavigate }: NavbarProps) {
                     <div className="flex items-center justify-between p-5 border-b border-gray-100">
                         <Logo size="sm" variant="default" />
                         <button
-                            onClick={() => setMobileOpen(false)}
+                            onClick={closeMobile}
                             className="p-2 -mr-2 text-gray-400 hover:text-primary transition-colors rounded-full hover:bg-gray-50"
                         >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -147,11 +155,14 @@ export default function Navbar({ currentPage, onNavigate }: NavbarProps) {
 
                     <div className="flex-1 overflow-y-auto p-4 space-y-1">
                         {navItems.map((item) => {
-                            const isActive = currentPage === item.page
+                            const itemPath = getPath(item.page)
+                            const isActive = pathname === itemPath || (pathname.startsWith(itemPath) && itemPath !== '/')
+
                             return (
-                                <button
+                                <Link
                                     key={item.page}
-                                    onClick={() => handleNav(item.page)}
+                                    href={itemPath}
+                                    onClick={closeMobile}
                                     className="w-full text-left px-4 py-3.5 rounded-xl text-sm font-semibold transition-all font-montserrat flex items-center justify-between group"
                                     style={{
                                         color: isActive ? '#C8102E' : '#4B5563',
@@ -162,26 +173,27 @@ export default function Navbar({ currentPage, onNavigate }: NavbarProps) {
                                     <span className={`text-[10px] transition-transform ${isActive ? 'translate-x-0 opacity-100' : '-translate-x-2 opacity-0 group-hover:translate-x-0 group-hover:opacity-100'}`}>
                                         ❯
                                     </span>
-                                </button>
+                                </Link>
                             )
                         })}
                     </div>
 
                     <div className="p-5 border-t border-gray-100 bg-gray-50/50 flex flex-col gap-3">
-                        <button
-                            onClick={() => alert('Arahkan ke Link Pendaftaran DAD')}
-                            className="w-full py-3.5 rounded-xl shadow-md shadow-red-900/10 text-white font-bold text-sm transition-all hover:bg-[#9b0d23] hover:shadow-lg active:scale-[0.98]"
+                        <a
+                            href="#"
+                            className="w-full py-3.5 rounded-xl shadow-md shadow-red-900/10 text-white font-bold text-sm transition-all hover:bg-[#9b0d23] hover:shadow-lg active:scale-[0.98] flex justify-center items-center"
                             style={{ background: '#C8102E' }}
                         >
                             Daftar DAD
-                        </button>
+                        </a>
 
-                        <button
-                            onClick={() => handleNav('admin-login')}
-                            className="w-full py-3.5 rounded-xl border-2 border-gray-200 text-gray-700 font-semibold text-sm transition-all hover:bg-gray-100 active:scale-[0.98]"
+                        <Link
+                            href="/admin-login"
+                            onClick={closeMobile}
+                            className="w-full py-3.5 rounded-xl border-2 border-gray-200 text-gray-700 font-semibold text-sm transition-all hover:bg-gray-100 active:scale-[0.98] flex justify-center items-center"
                         >
                             Kaizen Company
-                        </button>
+                        </Link>
                     </div>
                 </div>
             </div>

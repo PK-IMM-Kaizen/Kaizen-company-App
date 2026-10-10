@@ -1,11 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { managementData } from '../../app/(public)/data'
+import { managementData } from '../data'
 
 const divisionOrder = ['BPH', 'Organisasi', 'Kader', 'Hikmah Politik Kebijakan Publik', 'Riset Pengembangan Keilmuan']
 
-export default function Management() {
+export default function Page() {
     const [activeTab, setActiveTab] = useState<string>('ALL')
 
     const grouped: Record<string, typeof managementData> = {}

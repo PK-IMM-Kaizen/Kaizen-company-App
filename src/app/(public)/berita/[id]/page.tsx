@@ -1,6 +1,6 @@
 'use client'
 
-import { newsData, type Page } from '../../app/(public)/data'
+import { newsData, type Page } from '../../data'
 
 interface NewsDetailProps {
     newsId: number
@@ -8,7 +8,7 @@ interface NewsDetailProps {
     onNewsDetail: (id: number) => void
 }
 
-export default function NewsDetail({ newsId, onNavigate, onNewsDetail }: NewsDetailProps) {
+export default function Page({ newsId, onNavigate, onNewsDetail }: NewsDetailProps) {
     const item = newsData.find(n => n.id === newsId)
     const typedItem = item as any;
 
