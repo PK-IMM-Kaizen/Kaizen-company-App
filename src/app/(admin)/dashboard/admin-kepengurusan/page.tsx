@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { managementData, type Management } from '@/lib/data'
+import { managementData, type Management } from '../../../lib/data'
 import { Plus, Edit2, Trash2, ArrowLeft, AlertTriangle, Search, UserCheck } from 'lucide-react'
 
 type ViewMode = 'list' | 'create' | 'edit'

@@ -22,7 +22,7 @@ export default function AdminBeritaPage() {
     })
 
     const filtered = news.filter(n => n.title.toLowerCase().includes(search.toLowerCase()))
-    const canPublish = role === 'superadmin' || role === 'bpi'
+    const canPublish = (role as string) === 'superadmin'
 
     const startCreate = () => {
         setForm({ title: '', excerpt: '', content: '', category: 'Organisasi', date: '', status: 'draft' })
