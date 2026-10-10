@@ -17,6 +17,9 @@ const inter = Inter({
 export const metadata: Metadata = {
     title: "Website Resmi PK IMM Kaizen",
     description: "Pusat Informasi dan Media PK IMM Kaizen",
+    icons: {
+        icon: '/img/logo/logo.jpg'
+    }
 };
 
 export default function RootLayout({

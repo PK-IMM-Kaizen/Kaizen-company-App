@@ -98,7 +98,7 @@ export default function Navbar() {
                             </Link>
 
                             <a
-                                href="#"
+                                href="/daftar-dad"
                                 className={`text-xs px-5 py-2 rounded-full font-bold transition-all shadow-sm hover:scale-105 flex items-center ${
                                     scrolled
                                         ? 'bg-[#C8102E] text-white hover:bg-[#9b0d23]'
@@ -180,7 +180,7 @@ export default function Navbar() {
 
                     <div className="p-5 border-t border-gray-100 bg-gray-50/50 flex flex-col gap-3">
                         <a
-                            href="#"
+                            href="#/daftar-dad"
                             className="w-full py-3.5 rounded-xl shadow-md shadow-red-900/10 text-white font-bold text-sm transition-all hover:bg-[#9b0d23] hover:shadow-lg active:scale-[0.98] flex justify-center items-center"
                             style={{ background: '#C8102E' }}
                         >
