@@ -1,20 +1,22 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Logo from '../../components/common/Logo'
-import { type Role, type Page } from '../(public)/data'
 import { Lock, Mail, ArrowLeft, ShieldCheck } from 'lucide-react'
 
-interface LoginProps {
-    onLogin: (role: Role) => void
-    onNavigate: (page: Page) => void
+type Role = 'superadmin'
+
+const demoAccount = {
+    label: 'Super Admin',
+    role: 'superadmin' as Role,
+    email: 'superadmin@kaizen.id',
+    password: 'admin123'
 }
 
-const demoAccounts: { label: string; role: Role; email: string }[] = [
-    { label: 'Super Admin', role: 'superadmin', email: 'superadmin@kaizen.id' }
-]
+export default function LoginPage() {
+    const router = useRouter()
 
-export default function Page({ onLogin, onNavigate }: LoginProps) {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [error, setError] = useState('')
@@ -24,12 +26,17 @@ export default function Page({ onLogin, onNavigate }: LoginProps) {
         e.preventDefault()
         setLoading(true)
         setError('')
+
         setTimeout(() => {
-            const acc = demoAccounts.find(a => a.email === email)
-            if (acc && password === 'admin123') {
-                onLogin(acc.role)
+            const inputEmail = email.trim()
+
+            if (inputEmail === demoAccount.email && password === demoAccount.password) {
+                localStorage.setItem('isAuthenticated', 'true')
+                localStorage.setItem('userRole', demoAccount.role)
+
+                router.replace('/dashboard')
             } else {
-                setError('Email atau kata sandi tidak valid.')
+                setError('Email atau kata sandi tidak valid. Coba klik tombol Demo di bawah.')
             }
             setLoading(false)
         }, 600)
@@ -93,12 +100,12 @@ export default function Page({ onLogin, onNavigate }: LoginProps) {
 
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
-                            <label className="form-label flex items-center gap-1.5">
+                            <label className="form-label flex items-center gap-1.5 mb-1.5 text-sm font-medium">
                                 <Mail className="w-3.5 h-3.5 text-[var(--text-muted)]" /> Email
                             </label>
                             <input
                                 type="email"
-                                className="form-input"
+                                className="w-full px-4 py-2.5 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/50 transition-all text-sm"
                                 value={email}
                                 onChange={e => setEmail(e.target.value)}
                                 placeholder="nama@kaizen.id"
@@ -106,12 +113,12 @@ export default function Page({ onLogin, onNavigate }: LoginProps) {
                             />
                         </div>
                         <div>
-                            <label className="form-label flex items-center gap-1.5">
+                            <label className="form-label flex items-center gap-1.5 mb-1.5 text-sm font-medium">
                                 <Lock className="w-3.5 h-3.5 text-[var(--text-muted)]" /> Kata Sandi
                             </label>
                             <input
                                 type="password"
-                                className="form-input"
+                                className="w-full px-4 py-2.5 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/50 transition-all text-sm"
                                 value={password}
                                 onChange={e => setPassword(e.target.value)}
                                 placeholder="••••••••"
@@ -120,14 +127,14 @@ export default function Page({ onLogin, onNavigate }: LoginProps) {
                         </div>
 
                         {error && (
-                            <div className="p-3 rounded-[var(--radius)] text-xs bg-[#FEF2F4] text-[var(--error)] border border-[#FECDD3] font-medium">
+                            <div className="p-3 rounded-lg text-xs bg-red-50 text-red-600 border border-red-200 font-medium">
                                 {error}
                             </div>
                         )}
 
                         <button
                             type="submit"
-                            className="btn-primary w-full justify-center py-3 text-xs tracking-widest uppercase shadow-md hover:scale-[1.01] transition-all"
+                            className="w-full py-3 px-4 bg-[var(--primary)] text-white text-xs font-bold tracking-widest uppercase rounded-lg shadow-md hover:bg-[var(--primary-dark)] hover:scale-[1.01] transition-all flex items-center justify-center gap-2"
                             style={{ opacity: loading ? 0.7 : 1 }}
                             disabled={loading}
                         >
@@ -135,27 +142,26 @@ export default function Page({ onLogin, onNavigate }: LoginProps) {
                         </button>
                     </form>
 
-                    <div className="p-4 rounded-[var(--radius)] bg-[var(--card)] border border-[var(--border)] shadow-sm">
+                    <div className="p-4 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] shadow-sm">
                         <p className="text-xs font-bold text-[var(--text-secondary)] mb-3 font-display text-center">
-                            Demo — Klik untuk isi otomatis (password: admin123)
+                            Akses Cepat (Simulasi)
                         </p>
-                        <div className="grid grid-cols-1 gap-2">
-                            {demoAccounts.map(acc => (
-                                <button
-                                    key={acc.role}
-                                    type="button"
-                                    onClick={() => { setEmail(acc.email); setPassword('admin123') }}
-                                    className="text-xs px-3 py-2.5 rounded-[var(--radius)] font-bold transition-all text-center bg-[var(--surface)] hover:bg-[var(--surface-2)] text-[var(--text-primary)] border border-[var(--border)] font-display"
-                                >
-                                    Isi Otomatis sebagai {acc.label}
-                                </button>
-                            ))}
-                        </div>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setEmail(demoAccount.email);
+                                setPassword(demoAccount.password);
+                                setError('');
+                            }}
+                            className="w-full text-xs px-3 py-2.5 rounded-lg font-bold transition-all text-center bg-[var(--surface)] hover:bg-[var(--primary)] hover:text-white border border-[var(--border)] font-display"
+                        >
+                            Isi Otomatis sebagai {demoAccount.label}
+                        </button>
                     </div>
 
                     <button
                         type="button"
-                        onClick={() => onNavigate('home')}
+                        onClick={() => router.push('/')}
                         className="mt-4 text-xs font-bold text-[var(--text-muted)] hover:text-[var(--primary)] w-full text-center transition-colors flex items-center justify-center gap-2 font-display"
                     >
                         <ArrowLeft className="w-3.5 h-3.5" /> Kembali ke Website Utama

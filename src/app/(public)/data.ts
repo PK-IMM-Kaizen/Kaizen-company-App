@@ -1,6 +1,6 @@
 export type Page =
     | 'home' | 'profile' | 'management' | 'division' | 'news' | 'news-detail'
-    | 'ekowir' | 'alumni' | 'contact'
+    | 'ekowir' | 'alumni' | 'kontak'
     | 'admin-login' | 'admin-overview' | 'admin-organization' | 'admin-management'
     | 'admin-division' | 'admin-news' | 'admin-news-create' | 'admin-ekowir'
     | 'admin-ekowir-create' | 'admin-alumni' | 'admin-users'
@@ -16,7 +16,7 @@ export const navItems: NavItem[] = [
     { label: 'Bidang', page: 'division' },
     { label: 'Berita', page: 'news' },
     { label: 'Alumni', page: 'alumni' },
-    { label: 'Kontak', page: 'contact' },
+    { label: 'Kontak', page: 'kontak' },
 ]
 
 export interface NewsItem {
@@ -235,7 +235,7 @@ export const alumniData: Alumni[] = [
 
 export const adminMenuByRole: Record<Role, { label: string; page: Page; icon: string }[]> = {
     superadmin: [
-        { label: 'Overview', page: 'admin-overview', icon: '⊞' },
+        { label: 'Page', page: 'admin-overview', icon: '⊞' },
         { label: 'Organisasi', page: 'admin-organization', icon: '🏛' },
         { label: 'Kepengurusan', page: 'admin-management', icon: '👥' },
         { label: 'Bidang', page: 'admin-division', icon: '📋' },
@@ -245,7 +245,7 @@ export const adminMenuByRole: Record<Role, { label: string; page: Page; icon: st
         { label: 'Pengguna', page: 'admin-users', icon: '⚙' },
     ],
     bpi: [
-        { label: 'Overview', page: 'admin-overview', icon: '⊞' },
+        { label: 'Page', page: 'admin-overview', icon: '⊞' },
         { label: 'Organisasi', page: 'admin-organization', icon: '🏛' },
         { label: 'Kepengurusan', page: 'admin-management', icon: '👥' },
         { label: 'Bidang', page: 'admin-division', icon: '📋' },
@@ -253,11 +253,11 @@ export const adminMenuByRole: Record<Role, { label: string; page: Page; icon: st
         { label: 'Alumni', page: 'admin-alumni', icon: '🎓' },
     ],
     medkom: [
-        { label: 'Overview', page: 'admin-overview', icon: '⊞' },
+        { label: 'Page', page: 'admin-overview', icon: '⊞' },
         { label: 'Berita', page: 'admin-news', icon: '📰' },
     ],
     ekowir: [
-        { label: 'Overview', page: 'admin-overview', icon: '⊞' },
+        { label: 'Page', page: 'admin-overview', icon: '⊞' },
         { label: 'Ekowir', page: 'admin-ekowir', icon: '🛍' },
     ],
 }

@@ -1,12 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import { divisions, type Division } from '../../(public)/data'
+import { divisions, type Division } from '../../../(public)/data'
 import { Plus, Edit2, Trash2, ArrowLeft, AlertTriangle } from 'lucide-react'
 
 type ViewMode = 'list' | 'create' | 'edit'
 
-export default function AdminDivision() {
+export default function Page() {
     const [items, setItems] = useState<Division[]>(divisions)
     const [view, setView] = useState<ViewMode>('list')
     const [editItem, setEditItem] = useState<Division | null>(null)

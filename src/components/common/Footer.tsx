@@ -71,7 +71,7 @@ export default function Footer() {
                             {[
                                 { label: 'Berita & Dokumentasi', path: '/berita' },
                                 { label: 'Produk Ekowir', path: '/ekowir' },
-                                { label: 'Page Inspiratif', path: '/alumni' },
+                                { label: 'Page Inspiratif', path: '/admin-alumni' },
                                 { label: 'Hubungi Kami', path: '/kontak' },
                             ].map(item => (
                                 <li key={item.path}>

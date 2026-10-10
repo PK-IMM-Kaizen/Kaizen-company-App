@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { roleLabels, type Role } from '../../(public)/data'
+import { roleLabels, type Role } from '../../../(public)/data'
 import { UserPlus, Edit2, Trash2, ArrowLeft, AlertTriangle, UserCheck, UserX } from 'lucide-react'
 
 interface User {
@@ -21,7 +21,7 @@ const initialUsers: User[] = [
 
 type ViewMode = 'list' | 'create' | 'edit'
 
-export default function AdminUsers() {
+export default function Page() {
     const [users, setUsers] = useState<User[]>(initialUsers)
     const [view, setView] = useState<ViewMode>('list')
     const [editItem, setEditItem] = useState<User | null>(null)

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Building, Share2, CheckCircle2, Save } from 'lucide-react'
 
-export default function AdminOrganization() {
+export default function Page() {
     const [saved, setSaved] = useState(false)
     const [form, setForm] = useState({
         name: 'IMM Komisariat Kaizen',

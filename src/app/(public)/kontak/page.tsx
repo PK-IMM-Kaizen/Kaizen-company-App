@@ -28,7 +28,7 @@ const TikTokIcon = ({ className }: { className?: string }) => (
 )
 
 export default function Page() {
-    const contactChannels = [
+    const kontakChannels = [
         {
             icon: <InstagramIcon className="w-5 h-5 text-[#E1306C]" />,
             platform: 'Instagram',
@@ -104,7 +104,7 @@ export default function Page() {
                         </div>
 
                         <div className="space-y-4">
-                            {contactChannels.map((item) => (
+                            {kontakChannels.map((item) => (
                                 <a
                                     key={item.platform}
                                     href={item.link}

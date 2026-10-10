@@ -41,8 +41,8 @@ export default function Navbar() {
         if (page === 'news') return '/berita'
         if (page === 'management') return '/kepengurusan'
         if (page === 'division') return '/bidang'
-        if (page === 'alumni') return '/alumni'
-        if (page === 'contact') return '/kontak'
+        if (page === 'admin-alumni') return '/admin-alumni'
+        if (page === 'kontak') return '/kontak'
         return `/${page}`
     }
 
@@ -87,7 +87,7 @@ export default function Navbar() {
 
                         <div className="hidden lg:flex items-center gap-2 pr-2">
                             <Link
-                                href="/admin-login"
+                                href="/kaizen-company"
                                 className={`text-xs px-4 py-2 rounded-full font-semibold transition-all hover:scale-105 flex items-center ${
                                     scrolled
                                         ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -188,7 +188,7 @@ export default function Navbar() {
                         </a>
 
                         <Link
-                            href="/admin-login"
+                            href="/kaizen-company"
                             onClick={closeMobile}
                             className="w-full py-3.5 rounded-xl border-2 border-gray-200 text-gray-700 font-semibold text-sm transition-all hover:bg-gray-100 active:scale-[0.98] flex justify-center items-center"
                         >
