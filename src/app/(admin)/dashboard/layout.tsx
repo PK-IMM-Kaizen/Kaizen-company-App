@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Logo from '../../../components/common/Logo'
-import { adminMenuByRole, roleLabels, type Role } from '../../(public)/data'
+import { adminMenuByRole, roleLabels, type Role } from '../../lib/data'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
     const router = useRouter()

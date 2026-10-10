@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { newsData, products, managementData, alumniData } from '../../(public)/data'
+import { newsData, products, managementData, alumniData } from '../../lib/data'
 import {
     Newspaper,
     FileEdit,

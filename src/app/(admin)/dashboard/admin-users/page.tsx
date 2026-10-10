@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { roleLabels, type Role } from '../../../(public)/data'
+import { roleLabels, type Role } from '../../../lib/data'
 import { UserPlus, Edit2, Trash2, ArrowLeft, AlertTriangle, UserCheck, UserX } from 'lucide-react'
 
 interface User {

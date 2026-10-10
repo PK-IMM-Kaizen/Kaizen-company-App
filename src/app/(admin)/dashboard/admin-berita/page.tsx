@@ -1,20 +1,25 @@
 'use client'
 
 import { useState } from 'react'
-import { newsData, type NewsItem, type Role, type Page } from '../../../(public)/data'
+import { newsData, type NewsItem, type Role, type Page } from '../../../lib/data'
 import { Plus, Edit2, Trash2, ArrowLeft, AlertTriangle, Search, Calendar } from 'lucide-react'
 
-interface AdminBeritaProps { role: Role; onNavigate: (page: Page) => void }
+export default function AdminBeritaPage() {
+    const role: Role = 'bpi'
 
-type ViewMode = 'list' | 'create' | 'edit'
-
-export default function AdminBerita({ role, onNavigate }: AdminBeritaProps) {
     const [news, setNews] = useState<NewsItem[]>(newsData)
-    const [view, setView] = useState<ViewMode>('list')
+    const [view, setView] = useState<'list' | 'create' | 'edit'>('list')
     const [editItem, setEditItem] = useState<NewsItem | null>(null)
     const [search, setSearch] = useState('')
     const [deleteId, setDeleteId] = useState<number | null>(null)
-    const [form, setForm] = useState({ title: '', excerpt: '', content: '', category: 'Organisasi', date: '', status: 'draft' as 'draft' | 'published' })
+    const [form, setForm] = useState({
+        title: '',
+        excerpt: '',
+        content: '',
+        category: 'Organisasi',
+        date: '',
+        status: 'draft' as 'draft' | 'published'
+    })
 
     const filtered = news.filter(n => n.title.toLowerCase().includes(search.toLowerCase()))
     const canPublish = role === 'superadmin' || role === 'bpi'
@@ -27,7 +32,14 @@ export default function AdminBerita({ role, onNavigate }: AdminBeritaProps) {
 
     const startEdit = (item: NewsItem) => {
         setEditItem(item)
-        setForm({ title: item.title, excerpt: item.excerpt, content: item.content, category: item.category, date: item.date, status: item.status })
+        setForm({
+            title: item.title,
+            excerpt: item.excerpt,
+            content: item.content,
+            category: item.category,
+            date: item.date ?? '',
+            status: item.status
+        })
         setView('edit')
     }
 
@@ -54,7 +66,7 @@ export default function AdminBerita({ role, onNavigate }: AdminBeritaProps) {
 
     if (view === 'create' || view === 'edit') {
         return (
-            <div>
+            <div className="p-6">
                 <div className="flex items-center gap-3 mb-6">
                     <button
                         onClick={() => setView('list')}
@@ -160,7 +172,7 @@ export default function AdminBerita({ role, onNavigate }: AdminBeritaProps) {
     }
 
     return (
-        <div>
+        <div className="p-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
                 <h2 className="text-lg font-black text-[var(--text-primary)] font-display">
                     Kelola Berita

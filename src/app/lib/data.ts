@@ -166,7 +166,7 @@ export interface Management {
     position: string
     division: string
     photo: string
-    isLeader?: boolean // Menjadi opsional (?) agar tidak error bila belum diisi
+    isLeader?: boolean
 }
 
 export const managementData: Management[] = [

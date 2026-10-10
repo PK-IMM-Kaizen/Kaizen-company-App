@@ -1,6 +1,6 @@
 'use client'
 
-import { newsData, type Page } from '../../data'
+import { newsData, type Page } from '../../../lib/data'
 
 interface NewsDetailProps {
     newsId: number

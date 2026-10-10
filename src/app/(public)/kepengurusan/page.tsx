@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { managementData } from '../data'
+import { managementData } from '../../lib/data'
 
 const divisionOrder = ['BPH', 'Organisasi', 'Kader', 'Hikmah Politik Kebijakan Publik', 'Riset Pengembangan Keilmuan']
 

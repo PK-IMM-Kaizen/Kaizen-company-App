@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { newsData } from './data'
+import { newsData } from '../lib/data'
 
 export default function HomePage() {
     const [openFaq, setOpenFaq] = useState<number | null>(null)

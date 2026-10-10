@@ -1,6 +1,6 @@
 'use client'
 
-import { type Page } from '../data'
+import { type Page } from '../../lib/data'
 
 interface ProfileProps { onNavigate: (page: Page) => void }
 

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { divisions, type Division } from '../../../(public)/data'
+import { divisions, type Division } from '../../../lib/data'
 import { Plus, Edit2, Trash2, ArrowLeft, AlertTriangle } from 'lucide-react'
 
 type ViewMode = 'list' | 'create' | 'edit'

@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import Logo from './Logo'
-import { navItems } from '../../app/(public)/data'
+import { navItems } from '../../app/lib/data'
 
 export default function Navbar() {
     const [scrolled, setScrolled] = useState(false)

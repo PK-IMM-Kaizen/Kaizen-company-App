@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { managementData, type Management } from '../../../(public)/data'
-import { Plus, Edit2, Trash2, ArrowLeft, AlertTriangle, Search } from 'lucide-react'
+import { managementData, type Management } from '@/lib/data'
+import { Plus, Edit2, Trash2, ArrowLeft, AlertTriangle, Search, UserCheck } from 'lucide-react'
 
 type ViewMode = 'list' | 'create' | 'edit'
 
@@ -20,13 +20,18 @@ const divisionOptions = [
     'Media Komunikasi & Informasi'
 ]
 
-export default function Page() {
+export default function AdminKepengurusanPage() {
     const [items, setItems] = useState<Management[]>(managementData)
     const [view, setView] = useState<ViewMode>('list')
     const [editItem, setEditItem] = useState<Management | null>(null)
     const [deleteId, setDeleteId] = useState<number | null>(null)
     const [search, setSearch] = useState('')
-    const [form, setForm] = useState({ name: '', position: '', division: 'BPH', isLeader: false })
+    const [form, setForm] = useState({
+        name: '',
+        position: '',
+        division: 'BPH',
+        isLeader: false
+    })
 
     const filtered = items.filter(m =>
         m.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -42,7 +47,12 @@ export default function Page() {
 
     const startEdit = (item: Management) => {
         setEditItem(item)
-        setForm({ name: item.name, position: item.position, division: item.division, isLeader: item.isLeader })
+        setForm({
+            name: item.name,
+            position: item.position,
+            division: item.division,
+            isLeader: item.isLeader ?? false
+        })
         setView('edit')
     }
 
@@ -74,7 +84,7 @@ export default function Page() {
                     >
                         <ArrowLeft className="w-3.5 h-3.5" /> Kembali
                     </button>
-                    <span className="text-[var(--border-strong)]">/</span>
+                    <span className="text-[var(--border)]">/</span>
                     <h2 className="text-sm font-black text-[var(--text-primary)] font-display">
                         {view === 'create' ? 'Tambah Pengurus' : 'Edit Pengurus'}
                     </h2>
@@ -115,11 +125,28 @@ export default function Page() {
                             </select>
                         </div>
 
-                        <div className="flex gap-3 pt-2">
-                            <button onClick={handleSave} className="btn-primary">
+                        <div className="pt-2">
+                            <label className="flex items-center gap-2 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    checked={form.isLeader}
+                                    onChange={e => setForm(f => ({ ...f, isLeader: e.target.checked }))}
+                                    className="w-4 h-4 rounded border-[var(--border)] text-[var(--primary)] focus:ring-[var(--primary)] accent-[var(--primary)]"
+                                />
+                                <span className="text-xs font-semibold text-[var(--text-primary)] font-display">
+                                    Pimpinan Bidang / Ketua
+                                </span>
+                            </label>
+                            <p className="text-[10px] text-[var(--text-muted)] mt-1">
+                                Tandai jika pengurus merupakan Ketua Umum, Sekretaris Umum, atau Ketua Bidang.
+                            </p>
+                        </div>
+
+                        <div className="flex gap-3 pt-4 border-t border-[var(--border)]">
+                            <button onClick={handleSave} className="btn-primary flex-1 justify-center">
                                 {view === 'create' ? 'Simpan' : 'Perbarui'}
                             </button>
-                            <button onClick={() => setView('list')} className="btn-outline">
+                            <button onClick={() => setView('list')} className="btn-outline flex-1 justify-center">
                                 Batal
                             </button>
                         </div>
@@ -153,7 +180,7 @@ export default function Page() {
                             Data pengurus ini akan dihapus secara permanen dari struktur organisasi.
                         </p>
                         <div className="flex gap-3 mt-6">
-                            <button onClick={() => handleDelete(deleteId)} className="btn-primary flex-1 justify-center bg-[var(--error)] hover:bg-[var(--primary-dark)]">
+                            <button onClick={() => handleDelete(deleteId)} className="btn-primary flex-1 justify-center bg-[var(--error)] hover:bg-[var(--error)]/80">
                                 Hapus
                             </button>
                             <button onClick={() => setDeleteId(null)} className="btn-outline flex-1 justify-center">
@@ -182,66 +209,75 @@ export default function Page() {
                     </span>
                 </div>
 
-                <table className="admin-table">
-                    <thead>
-                    <tr>
-                        <th>Pengurus</th>
-                        <th>Jabatan</th>
-                        <th>Bidang</th>
-                        <th>Aksi</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {filtered.length === 0 ? (
-                        <tr>
-                            <td colSpan={4} className="text-center py-8 text-[var(--text-muted)] text-xs">
-                                Tidak ada data pengurus yang ditemukan.
-                            </td>
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                        <tr className="border-b border-[var(--border)] bg-[var(--surface-2)] text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider font-display">
+                            <th className="p-3.5">Pengurus</th>
+                            <th className="p-3.5">Jabatan</th>
+                            <th className="p-3.5">Bidang</th>
+                            <th className="p-3.5">Aksi</th>
                         </tr>
-                    ) : (
-                        filtered.map(m => (
-                            <tr key={m.id}>
-                                <td>
-                                    <div className="flex items-center gap-3">
-                                        <img
-                                            src={m.photo || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&auto=format'}
-                                            alt={m.name}
-                                            className="w-8 h-8 rounded-full object-cover flex-shrink-0 border border-[var(--border)] bg-[#111111]"
-                                        />
-                                        <span className="font-semibold text-xs text-[var(--text-primary)] font-display">
-                                                {m.name}
-                                            </span>
-                                    </div>
-                                </td>
-                                <td className="text-xs text-[var(--text-secondary)]">
-                                    {m.position}
-                                </td>
-                                <td>
-                                        <span className="text-xs font-semibold text-[var(--primary)] font-display">
-                                            {m.division}
-                                        </span>
-                                </td>
-                                <td>
-                                    <div className="flex gap-3 items-center">
-                                        <button
-                                            onClick={() => startEdit(m)}
-                                            className="text-xs font-semibold text-[var(--info)] hover:underline flex items-center gap-1 font-display"
-                                        >
-                                            <Edit2 className="w-3 h-3" /> Edit
-                                        </button>
-                                        <button
-                                            onClick={() => setDeleteId(m.id)}
-                                            className="text-xs font-semibold text-[var(--primary)] hover:underline flex items-center gap-1 font-display"
-                                        >
-                                            <Trash2 className="w-3 h-3" /> Hapus
-                                        </button>
-                                    </div>
+                        </thead>
+                        <tbody className="divide-y divide-[var(--border)]">
+                        {filtered.length === 0 ? (
+                            <tr>
+                                <td colSpan={4} className="text-center py-8 text-[var(--text-muted)] text-xs">
+                                    Tidak ada data pengurus yang ditemukan.
                                 </td>
                             </tr>
-                        ))
-                    )}
-                    </tbody>
-                </table>
+                        ) : (
+                            filtered.map(m => (
+                                <tr key={m.id} className="hover:bg-[var(--surface)] transition-colors">
+                                    <td className="p-3.5">
+                                        <div className="flex items-center gap-3">
+                                            <img
+                                                src={m.photo || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&auto=format'}
+                                                alt={m.name}
+                                                className="w-8 h-8 rounded-full object-cover flex-shrink-0 border border-[var(--border)] bg-[var(--surface-2)]"
+                                            />
+                                            <div className="flex flex-col">
+                                                    <span className="font-semibold text-xs text-[var(--text-primary)] font-display flex items-center gap-1.5">
+                                                        {m.name}
+                                                        {(m.isLeader ?? false) && (
+                                                            <span title="Pimpinan Bidang" className="text-[var(--accent)] flex items-center">
+                                                                <UserCheck className="w-3.5 h-3.5" />
+                                                            </span>
+                                                        )}
+                                                    </span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="p-3.5 text-xs text-[var(--text-secondary)]">
+                                        {m.position}
+                                    </td>
+                                    <td className="p-3.5">
+                                            <span className="text-xs font-semibold text-[var(--primary)] font-display">
+                                                {m.division}
+                                            </span>
+                                    </td>
+                                    <td className="p-3.5">
+                                        <div className="flex gap-3 items-center">
+                                            <button
+                                                onClick={() => startEdit(m)}
+                                                className="text-xs font-semibold text-[var(--info)] hover:underline flex items-center gap-1 font-display"
+                                            >
+                                                <Edit2 className="w-3 h-3" /> Edit
+                                            </button>
+                                            <button
+                                                onClick={() => setDeleteId(m.id)}
+                                                className="text-xs font-semibold text-[var(--primary)] hover:underline flex items-center gap-1 font-display"
+                                            >
+                                                <Trash2 className="w-3 h-3" /> Hapus
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     )

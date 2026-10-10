@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { alumniData, type Alumni } from '../../../(public)/data'
+import { alumniData, type Alumni } from '../../../lib/data'
 import { Plus, Edit2, Trash2, ArrowLeft, AlertTriangle } from 'lucide-react'
 
 type ViewMode = 'list' | 'create' | 'edit'

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { newsData, type Page } from '../data'
+import { newsData, type Page } from '../../lib/data'
 import { Search, ArrowRight, Calendar } from 'lucide-react'
 
 interface NewsProps {
