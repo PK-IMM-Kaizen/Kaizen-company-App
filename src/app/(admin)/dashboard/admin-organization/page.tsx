@@ -11,7 +11,7 @@ export default function Page() {
         founded: '2017',
         description: 'Ikatan Mahasiswa Muhammadiyah (IMM) Komisariat Kaizen merupakan organisasi mahasiswa Islam yang bergerak di lingkungan Fakultas Teknik Universitas Muhammadiyah Surabaya.',
         address: 'Kompleks Gedung PKM (Pusat Kegiatan Mahasiswa) Lt. 1, Fakultas Teknik, Universitas Muhammadiyah Surabaya. Jl. Sutorejo No. 59, Mulyorejo, Surabaya, Jawa Timur 60113.',
-        email: 'immkaizen.umsura@gmail.com',
+        email: 'pkimmkaizen.0@gmail.com',
         instagram: '@imm_kaizen',
         whatsapp: '+62 812-3456-7890',
     })

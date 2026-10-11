@@ -1,17 +1,13 @@
 'use client'
 
+import Link from 'next/link'
 import { useState } from 'react'
-import { newsData, type Page } from '../../lib/data'
+import { newsData } from '../../lib/data'
 import { Search, ArrowRight, Calendar } from 'lucide-react'
-
-interface NewsProps {
-    onNavigate: (page: Page) => void
-    onNewsDetail: (id: number) => void
-}
 
 const categories = ['Semua', 'Bidang HPKP', 'Bidang Kader']
 
-export default function Page({ onNavigate, onNewsDetail }: NewsProps) {
+export default function BeritaPage() {
     const [activeCategory, setActiveCategory] = useState('Semua')
     const [search, setSearch] = useState('')
 
@@ -53,7 +49,6 @@ export default function Page({ onNavigate, onNewsDetail }: NewsProps) {
             </div>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16">
-
                 <div className="flex flex-col lg:flex-row gap-6 mb-12 justify-between items-start lg:items-center">
                     <div className="flex gap-2 flex-wrap">
                         {categories.map(cat => (
@@ -92,10 +87,10 @@ export default function Page({ onNavigate, onNewsDetail }: NewsProps) {
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {filtered.map(item => (
-                            <article
+                            <Link
                                 key={item.id}
+                                href={`/berita/${item.id}`} // Menambahkan href untuk navigasi Next.js
                                 className="group cursor-pointer flex flex-col h-full border border-[var(--border)] hover:border-[var(--primary)] transition-all duration-300 bg-[var(--card)] rounded-[var(--radius)] overflow-hidden shadow-sm hover:shadow-md"
-                                onClick={() => onNewsDetail(item.id)}
                             >
                                 <div className="relative aspect-[16/9] overflow-hidden bg-[#111111]">
                                     <img
@@ -126,7 +121,7 @@ export default function Page({ onNavigate, onNewsDetail }: NewsProps) {
                                         </span>
                                     </div>
                                 </div>
-                            </article>
+                            </Link>
                         ))}
                     </div>
                 )}

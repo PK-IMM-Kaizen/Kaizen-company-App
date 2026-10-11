@@ -2,8 +2,11 @@ import './globals.css'
 import Navbar from '../components/common/Navbar'
 
 export const metadata = {
-    title: 'Nama Website Anda',
-    description: 'Deskripsi website Anda',
+    title: "Website Resmi PK IMM Kaizen",
+    description: "Pusat Informasi dan Media PK IMM Kaizen",
+    icons: {
+        icon: '/img/logo/logo.jpg'
+    }
 }
 
 export default function RootLayout({

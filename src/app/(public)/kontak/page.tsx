@@ -21,18 +21,18 @@ const WhatsAppIcon = ({ className }: { className?: string }) => (
     </svg>
 )
 
-const TikTokIcon = ({ className }: { className?: string }) => (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path>
-    </svg>
-)
+// const TikTokIcon = ({ className }: { className?: string }) => (
+//     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+//         <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path>
+//     </svg>
+// )
 
 export default function Page() {
     const kontakChannels = [
         {
             icon: <InstagramIcon className="w-5 h-5 text-[#E1306C]" />,
             platform: 'Instagram',
-            handle: '@immkaizen_official',
+            handle: 'pkimmkaizen.0@gmail.com',
             desc: 'Ikuti kami untuk update kegiatan & dokumentasi terbaru',
             link: 'https://www.instagram.com/imm_kaizen',
             placeholder: false,
@@ -53,14 +53,14 @@ export default function Page() {
             link: 'mailto:immkaizen.umsura@gmail.com',
             placeholder: false,
         },
-        {
-            icon: <TikTokIcon className="w-5 h-5 text-[var(--text-primary)]" />,
-            platform: 'TikTok',
-            handle: '@immkaizen',
-            desc: 'Konten kreatif, reels, dan sorotan kegiatan kader',
-            link: 'https://tiktok.com/@immkaizen',
-            placeholder: true,
-        },
+        // {
+        //     icon: <TikTokIcon className="w-5 h-5 text-[var(--text-primary)]" />,
+        //     platform: 'TikTok',
+        //     handle: '@immkaizen',
+        //     desc: 'Konten kreatif, reels, dan sorotan kegiatan kader',
+        //     link: 'https://tiktok.com/@immkaizen',
+        //     placeholder: true,
+        // },
     ]
 
     return (
