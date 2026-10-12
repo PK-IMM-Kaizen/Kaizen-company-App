@@ -47,7 +47,7 @@ export default function Navbar() {
         if (page === 'news') return '/berita'
         if (page === 'management') return '/kepengurusan'
         if (page === 'division') return '/bidang'
-        if (page === 'admin-alumni') return '/admin-alumni'
+        if (page === 'alumni') return '/alumni'
         if (page === 'kontak') return '/kontak'
         return `/${page}`
     }

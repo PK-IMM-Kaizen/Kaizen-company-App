@@ -5,7 +5,7 @@ export const metadata = {
     title: "Website Resmi PK IMM Kaizen",
     description: "Pusat Informasi dan Media PK IMM Kaizen",
     icons: {
-        icon: '/img/logo/logo.jpg'
+        icon: '/img/logo/logo.png'
     }
 }
 
@@ -17,7 +17,6 @@ export default function RootLayout({
     return (
         <html lang="id">
         <body>
-        <Navbar />
 
         {children}
         </body>

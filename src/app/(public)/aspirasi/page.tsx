@@ -30,7 +30,6 @@ export default function AspirasiPage() {
         e.preventDefault()
         setIsSubmitting(true)
 
-        // Simulasi pengiriman data ke database (delay 1.5 detik)
         await new Promise(resolve => setTimeout(resolve, 1500))
 
         setIsSubmitting(false)
@@ -38,11 +37,9 @@ export default function AspirasiPage() {
         window.scrollTo({ top: 0, behavior: 'smooth' })
     }
 
-    /* STATE SUCCESS SCREEN */
     if (isSuccess) {
         return (
             <div className="min-h-screen bg-[var(--background)] flex flex-col justify-between relative overflow-hidden font-sans">
-                {/* MINI HEADER / NAVBAR INDEPENDEN */}
                 <header className="p-6 relative z-10 max-w-7xl mx-auto w-full flex items-center justify-between">
                     <Logo size="md" />
                     <Link
@@ -73,7 +70,6 @@ export default function AspirasiPage() {
                     </div>
                 </main>
 
-                {/* MINI FOOTER */}
                 <footer className="py-6 border-t border-[var(--border)] text-center text-[10px] sm:text-xs text-[var(--text-muted)] font-display uppercase tracking-widest relative z-10">
                     © 2026 PK IMM Kaizen · Universitas Muhammadiyah Surabaya
                 </footer>
@@ -84,7 +80,6 @@ export default function AspirasiPage() {
     return (
         <div className="min-h-screen bg-[var(--background)] flex flex-col justify-between relative overflow-hidden font-sans">
 
-            {/* MINI HEADER / NAVBAR INDEPENDEN */}
             <header className="p-6 relative z-10 max-w-7xl mx-auto w-full flex items-center justify-between">
                 <Logo size="md" />
                 <Link
@@ -95,10 +90,8 @@ export default function AspirasiPage() {
                 </Link>
             </header>
 
-            {/* FORM CONTAINER */}
             <main className="flex-1 max-w-2xl w-full mx-auto px-4 py-8 relative z-10">
 
-                {/* HEADER TITLE */}
                 <div className="text-center mb-10">
                     <span className="text-xs sm:text-sm font-bold tracking-[0.2em] uppercase text-[var(--accent)] font-display block mb-2 flex items-center justify-center gap-1.5">
                         <Sparkles className="w-4 h-4 text-[var(--accent)]" /> Ruang Terbuka
@@ -111,10 +104,8 @@ export default function AspirasiPage() {
                     </p>
                 </div>
 
-                {/* FORM FIELD CARD */}
                 <form onSubmit={handleSubmit} className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--radius)] p-6 sm:p-8 shadow-xl space-y-6">
 
-                    {/* Nama (Opsional) */}
                     <div>
                         <div className="flex justify-between items-end mb-2">
                             <label htmlFor="nama" className="form-label mb-0">Nama</label>
@@ -133,7 +124,6 @@ export default function AspirasiPage() {
                         />
                     </div>
 
-                    {/* Kategori */}
                     <div>
                         <label htmlFor="kategori" className="form-label">Kategori Aspirasi</label>
                         <select

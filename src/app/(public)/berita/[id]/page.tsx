@@ -3,18 +3,14 @@ import { newsData, type NewsItem } from '../../../lib/data'
 import { ArrowLeft, Calendar, Newspaper, ExternalLink, ChevronRight } from 'lucide-react'
 
 export default async function DetailBerita({ params }: { params: Promise<{ id: string }> }) {
-    // Resolve params
     const resolvedParams = await params
     const paramId = String(resolvedParams.id)
 
-    // Cari berita utama
     const item = newsData.find(n => String(n.id) === paramId)
     const typedItem = item as (NewsItem & { pwmuUrl?: string }) | undefined
 
-    // Filter berita terkait
     const related = newsData.filter(n => String(n.id) !== paramId && n.status === 'published').slice(0, 3)
 
-    // --- TAMPILAN JIKA BERITA TIDAK DITEMUKAN ---
     if (!item) {
         return (
             <div className="max-w-3xl mx-auto px-4 pt-32 pb-32 text-center min-h-screen flex flex-col items-center justify-center bg-[var(--background)]">
@@ -29,11 +25,9 @@ export default async function DetailBerita({ params }: { params: Promise<{ id: s
         )
     }
 
-    // --- TAMPILAN UTAMA ---
     return (
         <div className="bg-[var(--background)] min-h-screen w-full selection:bg-[var(--primary)] selection:text-white">
 
-            {/* --- HERO & BREADCRUMB SECTION --- */}
             <div className="relative bg-[var(--primary-dark)] pt-32 pb-16 overflow-hidden">
                 <div
                     className="absolute top-0 left-0 w-full h-1.5"
@@ -64,10 +58,8 @@ export default async function DetailBerita({ params }: { params: Promise<{ id: s
                 </div>
             </div>
 
-            {/* --- KONTEN ARTIKEL --- */}
             <article className="max-w-4xl mx-auto px-4 sm:px-6 py-10 lg:py-16">
 
-                {/* META INFO BERITA */}
                 <div className="flex flex-wrap items-center gap-4 mb-8 bg-[var(--surface)] p-3 rounded-xl border border-[var(--border)] inline-flex shadow-sm">
                     <span className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-white bg-[var(--primary)] px-3 py-1.5 rounded-md font-display shadow-sm">
                         {item.category}
@@ -84,22 +76,18 @@ export default async function DetailBerita({ params }: { params: Promise<{ id: s
                     </span>
                 </div>
 
-                {/* JUDUL */}
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[var(--text-primary)] mb-8 leading-tight tracking-tight font-display">
                     {item.title}
                 </h1>
 
-                {/* COVER IMAGE */}
                 <div className="w-full aspect-[16/9] bg-[var(--surface-2)] mb-12 overflow-hidden rounded-2xl border border-[var(--border)] shadow-md relative">
                     <img src={item.cover} alt={item.title} className="w-full h-full object-cover" />
                 </div>
 
-                {/* ISI ARTIKEL */}
                 <div className="prose prose-lg prose-gray max-w-none mb-16 text-[var(--text-secondary)] leading-relaxed whitespace-pre-line">
                     <p>{item.content}</p>
                 </div>
 
-                {/* TAUTAN PORTAL LUBANG/PWMU */}
                 <div className="border-t border-[var(--border)] pt-12 pb-4 flex flex-col sm:flex-row items-center sm:items-start gap-4 justify-between">
                     <p className="text-xs text-[var(--text-muted)] text-center sm:text-left max-w-sm order-2 sm:order-1">
                         *Anda akan diarahkan ke halaman portal berita resmi Pimpinan Wilayah Muhammadiyah Jawa Timur.
@@ -116,7 +104,6 @@ export default async function DetailBerita({ params }: { params: Promise<{ id: s
                 </div>
             </article>
 
-            {/* --- SEKSI BERITA LAINNYA --- */}
             {related.length > 0 && (
                 <section className="bg-[var(--surface)] border-t border-[var(--border)] py-16">
                     <div className="max-w-4xl mx-auto px-4 sm:px-6">

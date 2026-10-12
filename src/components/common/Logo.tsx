@@ -1,4 +1,4 @@
-import logoImg from '../../../public/img/logo/logo.jpg'
+import logoImg from '../../../public/img/logo/logo.png'
 
 interface LogoProps {
     size?: 'sm' | 'md' | 'lg'

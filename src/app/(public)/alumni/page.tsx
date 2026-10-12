@@ -100,7 +100,7 @@ export default function Page() {
                 {/*                <div className="h-4 w-28 bg-[var(--surface-2)] rounded mb-2" />*/}
                 {/*                <div className="h-3 w-20 bg-[var(--surface-2)] rounded mb-4" />*/}
                 {/*                <p className="text-xs text-[var(--text-muted)] italic mb-4">*/}
-                {/*                    Data admin-alumni sedang dalam tahap pendataan & pembaruan database.*/}
+                {/*                    Data alumni sedang dalam tahap pendataan & pembaruan database.*/}
                 {/*                </p>*/}
                 {/*                <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)] font-display">*/}
                 {/*                    Page Kaizen #{i}*/}

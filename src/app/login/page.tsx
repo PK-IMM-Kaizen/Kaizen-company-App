@@ -1,22 +1,27 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Logo from '../../components/common/Logo'
 import { Lock, Mail, ArrowLeft, ShieldCheck } from 'lucide-react'
 
-type Role = 'superadmin'
+type Role = 'superadmin' | 'admin'
 
-const demoAccount = {
-    label: 'Super Admin',
-    role: 'superadmin' as Role,
-    email: 'superadmin@kaizen.id',
-    password: 'admin123'
-}
+const demoAccounts = [
+    {
+        label: 'Super Admin',
+        role: 'superadmin' as Role,
+        email: 'superadmin@kaizen.id',
+        password: 'admin123'
+    },
+    {
+        label: 'Admin Bidang',
+        role: 'admin' as Role,
+        email: 'admin@kaizen.id',
+        password: 'admin123'
+    }
+]
 
 export default function LoginPage() {
-    const router = useRouter()
-
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [error, setError] = useState('')
@@ -24,40 +29,51 @@ export default function LoginPage() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
+        processLogin(email, password)
+    }
+
+    const handleDemoLogin = (acc: typeof demoAccounts[0]) => {
+        setEmail(acc.email)
+        setPassword(acc.password)
+        processLogin(acc.email, acc.password)
+    }
+
+    const processLogin = (inputEmail: string, inputPass: string) => {
         setLoading(true)
         setError('')
 
         setTimeout(() => {
-            const inputEmail = email.trim()
+            const cleanInputEmail = inputEmail.trim().toLowerCase()
+            const validAccount = demoAccounts.find(
+                (acc) => acc.email.toLowerCase() === cleanInputEmail && acc.password === inputPass
+            )
 
-            if (inputEmail === demoAccount.email && password === demoAccount.password) {
+            if (validAccount) {
                 localStorage.setItem('isAuthenticated', 'true')
-                localStorage.setItem('userRole', demoAccount.role)
+                localStorage.setItem('userRole', validAccount.role)
 
-                router.replace('/dashboard')
+                window.location.href = '/dashboard'
             } else {
-                setError('Email atau kata sandi tidak valid. Coba klik tombol Demo di bawah.')
+                setError('Email atau kata sandi tidak valid.')
+                setLoading(false)
             }
-            setLoading(false)
-        }, 600)
+        }, 400)
     }
 
     return (
-        <div className="min-h-screen flex bg-[var(--surface)]">
+        <div className="min-h-screen flex bg-[var(--surface)] relative">
             <div
-                className="hidden lg:flex flex-col justify-between p-12 w-96 flex-shrink-0 relative overflow-hidden"
-                style={{
-                    background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)'
-                }}
+                className="hidden lg:flex flex-col justify-between p-12 w-96 flex-shrink-0 relative overflow-hidden z-10"
+                style={{ background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)' }}
             >
-                <div className="relative z-10">
+                <div className="relative z-20">
                     <Logo variant="white" size="md" />
                 </div>
 
-                <div className="relative z-10 flex flex-col items-center justify-center my-auto">
+                <div className="relative z-20 flex flex-col items-center justify-center my-auto">
                     <div className="w-36 h-36 rounded-full bg-black/20 border-2 border-white/10 flex items-center justify-center p-4 mb-6 shadow-2xl backdrop-blur-sm">
                         <img
-                            src="/img/logo/logo.jpg"
+                            src="/img/logo/logo.png"
                             alt="IMM Kaizen"
                             className="w-full h-full object-contain rounded-full mix-blend-screen drop-shadow-[0_0_15px_rgba(245,196,0,0.3)]"
                         />
@@ -73,14 +89,13 @@ export default function LoginPage() {
                     </div>
                 </div>
 
-                <div className="relative z-10 text-[10px] text-white/40 font-display uppercase tracking-widest text-center">
+                <div className="relative z-20 text-[10px] text-white/40 font-display uppercase tracking-widest text-center">
                     © 2026 IMM Kaizen · Kaizen Company V1
                 </div>
-
-                <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-white/5 rounded-full blur-2xl pointer-events-none" />
             </div>
 
-            <div className="flex-1 flex flex-col items-center justify-center p-6 sm:p-12">
+            {/* Panel Kanan (Form Input) */}
+            <div className="flex-1 flex flex-col items-center justify-center p-6 sm:p-12 relative z-20 bg-[var(--surface)]">
                 <div className="w-full max-w-sm space-y-6">
                     <div className="lg:hidden mb-8 flex justify-center">
                         <Logo size="md" />
@@ -134,8 +149,7 @@ export default function LoginPage() {
 
                         <button
                             type="submit"
-                            className="w-full py-3 px-4 bg-[var(--primary)] text-white text-xs font-bold tracking-widest uppercase rounded-lg shadow-md hover:bg-[var(--primary-dark)] hover:scale-[1.01] transition-all flex items-center justify-center gap-2"
-                            style={{ opacity: loading ? 0.7 : 1 }}
+                            className="w-full py-3 px-4 bg-[var(--primary)] text-white text-xs font-bold tracking-widest uppercase rounded-lg shadow-md hover:bg-[var(--primary-dark)] transition-all flex items-center justify-center gap-2 disabled:opacity-70"
                             disabled={loading}
                         >
                             {loading ? 'Memverifikasi...' : 'Masuk Dashboard'}
@@ -146,22 +160,24 @@ export default function LoginPage() {
                         <p className="text-xs font-bold text-[var(--text-secondary)] mb-3 font-display text-center">
                             Akses Cepat (Simulasi)
                         </p>
-                        <button
-                            type="button"
-                            onClick={() => {
-                                setEmail(demoAccount.email);
-                                setPassword(demoAccount.password);
-                                setError('');
-                            }}
-                            className="w-full text-xs px-3 py-2.5 rounded-lg font-bold transition-all text-center bg-[var(--surface)] hover:bg-[var(--primary)] hover:text-white border border-[var(--border)] font-display"
-                        >
-                            Isi Otomatis sebagai {demoAccount.label}
-                        </button>
+                        <div className="flex flex-col gap-2">
+                            {demoAccounts.map((acc) => (
+                                <button
+                                    key={acc.role}
+                                    type="button"
+                                    onClick={() => handleDemoLogin(acc)}
+                                    disabled={loading}
+                                    className="w-full text-xs px-3 py-2.5 rounded-lg font-bold transition-all text-center bg-[var(--surface)] hover:bg-[var(--primary)] hover:text-white border border-[var(--border)] font-display disabled:opacity-50"
+                                >
+                                    Login sebagai {acc.label}
+                                </button>
+                            ))}
+                        </div>
                     </div>
 
                     <button
                         type="button"
-                        onClick={() => router.push('/')}
+                        onClick={() => window.location.href = '/'}
                         className="mt-4 text-xs font-bold text-[var(--text-muted)] hover:text-[var(--primary)] w-full text-center transition-colors flex items-center justify-center gap-2 font-display"
                     >
                         <ArrowLeft className="w-3.5 h-3.5" /> Kembali ke Website Utama
