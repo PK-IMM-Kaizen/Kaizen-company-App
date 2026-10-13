@@ -1,18 +1,77 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
-import { newsData } from '../../lib/data'
-import { Search, ArrowRight, Calendar } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { createClient } from '@supabase/supabase-js'
+import { Search, ArrowRight, Calendar, RefreshCw } from 'lucide-react'
 
-const categories = ['Semua', 'Bidang HPKP', 'Bidang Kader']
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+const supabase = createClient(supabaseUrl, supabaseKey)
+
+const categories = ['Semua', 'Bidang HPKP', 'Bidang Kader', 'Organisasi', 'Medkom', 'Kewirausahaan', 'Keilmuan']
+
+export interface NewsArticle {
+    id: number
+    title: string
+    excerpt: string
+    content: string
+    category: string
+    date: string
+    publishDate: string
+    cover: string
+    gallery: string[]
+    status: string
+    pwmuUrl: string
+}
 
 export default function BeritaPage() {
     const [activeCategory, setActiveCategory] = useState('Semua')
     const [search, setSearch] = useState('')
+    const [newsData, setNewsData] = useState<NewsArticle[]>([])
+    const [isLoading, setIsLoading] = useState(true)
 
-    const published = newsData.filter(n => n.status === 'published')
-    const filtered = published.filter(n => {
+    useEffect(() => {
+        fetchNews()
+    }, [])
+
+    const fetchNews = async () => {
+        setIsLoading(true)
+        try {
+            // Mengambil data dari tabel 'news' (bukan 'berita')
+            const { data, error } = await supabase
+                .from('news')
+                .select('*')
+                .eq('status', 'published')
+                .order('id', { ascending: false })
+
+            if (error) throw error
+
+            if (data) {
+                // Pemetaan nama kolom Supabase (snake_case) ke objek frontend (camelCase)
+                const formatted: NewsArticle[] = data.map((item: any) => ({
+                    id: item.id,
+                    title: item.title || '',
+                    excerpt: item.excerpt || '',
+                    content: item.content || '',
+                    category: item.category || 'Organisasi',
+                    date: item.date || '',
+                    publishDate: item.publish_date || item.created_at || '',
+                    cover: item.cover || '',
+                    gallery: item.gallery || [],
+                    status: item.status || 'published',
+                    pwmuUrl: item.pwmu_url || ''
+                }))
+                setNewsData(formatted)
+            }
+        } catch (error: any) {
+            console.error('Error dari Supabase:', error.message || error)
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    const filtered = newsData.filter(n => {
         const matchCat = activeCategory === 'Semua' || n.category === activeCategory
         const matchSearch = n.title.toLowerCase().includes(search.toLowerCase()) ||
             n.excerpt.toLowerCase().includes(search.toLowerCase())
@@ -55,7 +114,7 @@ export default function BeritaPage() {
                             <button
                                 key={cat}
                                 onClick={() => setActiveCategory(cat)}
-                                className={`text-xs px-5 py-2.5 font-bold uppercase tracking-wider transition-all rounded-[var(--radius)] font-display ${
+                                className={`text-xs px-5 py-2.5 font-bold uppercase tracking-wider transition-all rounded-[var(--radius)] font-display cursor-pointer ${
                                     activeCategory === cat
                                         ? 'bg-[var(--primary)] text-white shadow-md'
                                         : 'bg-[var(--surface)] text-[var(--text-secondary)] border border-[var(--border)] hover:bg-[var(--surface-2)] hover:text-[var(--text-primary)]'
@@ -78,10 +137,17 @@ export default function BeritaPage() {
                     </div>
                 </div>
 
-                {filtered.length === 0 ? (
+                {isLoading ? (
+                    <div className="text-center py-24 border border-dashed border-[var(--border-strong)] rounded-[var(--radius)] bg-[var(--surface)]">
+                        <RefreshCw className="w-8 h-8 text-[var(--primary)] animate-spin mx-auto mb-4" />
+                        <p className="text-[var(--text-muted)] font-medium text-sm">
+                            Memuat berita dari Supabase...
+                        </p>
+                    </div>
+                ) : filtered.length === 0 ? (
                     <div className="text-center py-24 border border-dashed border-[var(--border-strong)] rounded-[var(--radius)] bg-[var(--surface)]">
                         <p className="text-[var(--text-muted)] font-medium text-sm">
-                            Tidak ada berita yang sesuai dengan pencarian Anda.
+                            Tidak ada berita publikasi yang ditemukan.
                         </p>
                     </div>
                 ) : (
@@ -89,15 +155,21 @@ export default function BeritaPage() {
                         {filtered.map(item => (
                             <Link
                                 key={item.id}
-                                href={`/berita/${item.id}`} // Menambahkan href untuk navigasi Next.js
+                                href={`/berita/${item.id}`}
                                 className="group cursor-pointer flex flex-col h-full border border-[var(--border)] hover:border-[var(--primary)] transition-all duration-300 bg-[var(--card)] rounded-[var(--radius)] overflow-hidden shadow-sm hover:shadow-md"
                             >
                                 <div className="relative aspect-[16/9] overflow-hidden bg-[#111111]">
-                                    <img
-                                        src={item.cover}
-                                        alt={item.title}
-                                        className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-700 transform group-hover:scale-105 opacity-90 group-hover:opacity-100"
-                                    />
+                                    {item.cover ? (
+                                        <img
+                                            src={item.cover}
+                                            alt={item.title}
+                                            className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-700 transform group-hover:scale-105 opacity-90 group-hover:opacity-100"
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center text-white/30 text-xs font-bold uppercase tracking-wider">
+                                            Tanpa Cover
+                                        </div>
+                                    )}
                                     <div className="absolute top-4 left-4 bg-[var(--primary)] text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-[calc(var(--radius)-2px)] font-display shadow-sm">
                                         {item.category}
                                     </div>
@@ -106,9 +178,9 @@ export default function BeritaPage() {
                                 <div className="p-6 flex flex-col flex-grow">
                                     <div className="text-xs text-[var(--text-muted)] font-medium mb-3 flex items-center gap-1.5">
                                         <Calendar className="w-3.5 h-3.5" />
-                                        <span>Rilis: {item.publishDate}</span>
+                                        <span>Rilis: {item.publishDate || '-'}</span>
                                     </div>
-                                    <h3 className="font-black text-[var(--text-primary)] text-lg leading-snug mb-3 group-hover:text-[var(--primary)] transition-colors font-display">
+                                    <h3 className="font-black text-[var(--text-primary)] text-lg leading-snug mb-3 group-hover:text-[var(--primary)] transition-colors font-display line-clamp-2">
                                         {item.title}
                                     </h3>
                                     <p className="text-sm text-[var(--text-secondary)] leading-relaxed line-clamp-3 mb-6">

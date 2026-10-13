@@ -1,20 +1,33 @@
 import Link from 'next/link'
-import { newsData, type NewsItem } from '../../../lib/data'
+import { createClient } from '@supabase/supabase-js'
 import { ArrowLeft, Calendar, Newspaper, ExternalLink, ChevronRight } from 'lucide-react'
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+const supabase = createClient(supabaseUrl, supabaseKey)
 
 export default async function DetailBerita({ params }: { params: Promise<{ id: string }> }) {
     const resolvedParams = await params
-    const paramId = String(resolvedParams.id)
+    const paramId = resolvedParams.id
 
-    const item = newsData.find(n => String(n.id) === paramId)
-    const typedItem = item as (NewsItem & { pwmuUrl?: string }) | undefined
+    const { data: rawItem, error } = await supabase
+        .from('news')
+        .select('*')
+        .eq('id', paramId)
+        .single()
 
-    const related = newsData.filter(n => String(n.id) !== paramId && n.status === 'published').slice(0, 3)
+    const { data: rawRelated } = await supabase
+        .from('news')
+        .select('*')
+        .eq('status', 'published')
+        .neq('id', paramId)
+        .order('id', { ascending: false })
+        .limit(3)
 
-    if (!item) {
+    if (error || !rawItem) {
         return (
             <div className="max-w-3xl mx-auto px-4 pt-32 pb-32 text-center min-h-screen flex flex-col items-center justify-center bg-[var(--background)]">
-                <p className="text-[var(--text-muted)] font-medium mb-6 text-sm">Berita tidak ditemukan.</p>
+                <p className="text-[var(--text-muted)] font-medium mb-6 text-sm">Berita tidak ditemukan atau telah dihapus.</p>
                 <Link
                     href="/berita"
                     className="inline-flex items-center gap-2 bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-white px-6 py-2.5 text-xs font-bold tracking-widest uppercase rounded-lg shadow-lg shadow-[var(--primary)]/20 transition-all"
@@ -24,6 +37,23 @@ export default async function DetailBerita({ params }: { params: Promise<{ id: s
             </div>
         )
     }
+
+    const item = {
+        title: rawItem.title || '',
+        content: rawItem.content || '',
+        category: rawItem.category || 'Organisasi',
+        date: rawItem.date || '',
+        publishDate: rawItem.publish_date || rawItem.created_at || '',
+        cover: rawItem.cover || '',
+        pwmuUrl: rawItem.pwmu_url || ''
+    }
+
+    const related = (rawRelated || []).map((r: any) => ({
+        id: r.id,
+        title: r.title,
+        category: r.category,
+        cover: r.cover
+    }))
 
     return (
         <div className="bg-[var(--background)] min-h-screen w-full selection:bg-[var(--primary)] selection:text-white">
@@ -67,12 +97,12 @@ export default async function DetailBerita({ params }: { params: Promise<{ id: s
                     <div className="w-[1px] h-4 bg-[var(--border)] hidden sm:block"></div>
                     <span className="text-[11px] sm:text-xs text-[var(--text-secondary)] font-medium flex items-center gap-1.5 uppercase tracking-wide">
                         <Calendar className="w-3.5 h-3.5 text-[var(--primary)]" />
-                        Pelaksanaan: <strong className="text-[var(--text-primary)]">{item.date || item.publishDate}</strong>
+                        Pelaksanaan: <strong className="text-[var(--text-primary)]">{item.date || item.publishDate || '-'}</strong>
                     </span>
                     <div className="w-[1px] h-4 bg-[var(--border)] hidden sm:block"></div>
                     <span className="text-[11px] sm:text-xs text-[var(--text-secondary)] font-medium flex items-center gap-1.5 uppercase tracking-wide">
                         <Newspaper className="w-3.5 h-3.5 text-[var(--primary)]" />
-                        Rilis: <strong className="text-[var(--text-primary)]">{item.publishDate}</strong>
+                        Rilis: <strong className="text-[var(--text-primary)]">{item.publishDate || '-'}</strong>
                     </span>
                 </div>
 
@@ -80,28 +110,32 @@ export default async function DetailBerita({ params }: { params: Promise<{ id: s
                     {item.title}
                 </h1>
 
-                <div className="w-full aspect-[16/9] bg-[var(--surface-2)] mb-12 overflow-hidden rounded-2xl border border-[var(--border)] shadow-md relative">
-                    <img src={item.cover} alt={item.title} className="w-full h-full object-cover" />
-                </div>
+                {item.cover && (
+                    <div className="w-full aspect-[16/9] bg-[var(--surface-2)] mb-12 overflow-hidden rounded-2xl border border-[var(--border)] shadow-md relative">
+                        <img src={item.cover} alt={item.title} className="w-full h-full object-cover" />
+                    </div>
+                )}
 
                 <div className="prose prose-lg prose-gray max-w-none mb-16 text-[var(--text-secondary)] leading-relaxed whitespace-pre-line">
                     <p>{item.content}</p>
                 </div>
 
-                <div className="border-t border-[var(--border)] pt-12 pb-4 flex flex-col sm:flex-row items-center sm:items-start gap-4 justify-between">
-                    <p className="text-xs text-[var(--text-muted)] text-center sm:text-left max-w-sm order-2 sm:order-1">
-                        *Anda akan diarahkan ke halaman portal berita resmi Pimpinan Wilayah Muhammadiyah Jawa Timur.
-                    </p>
-                    <a
-                        href={typedItem?.pwmuUrl || '#'}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="order-1 sm:order-2 inline-flex items-center justify-center w-full sm:w-auto bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-white px-8 py-4 text-xs sm:text-sm font-bold tracking-widest uppercase transition-all duration-300 rounded-xl shadow-lg shadow-[var(--primary)]/20 hover:-translate-y-1 group font-display"
-                    >
-                        Baca di PWMU.CO
-                        <ExternalLink className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
-                    </a>
-                </div>
+                {item.pwmuUrl && (
+                    <div className="border-t border-[var(--border)] pt-12 pb-4 flex flex-col sm:flex-row items-center sm:items-start gap-4 justify-between">
+                        <p className="text-xs text-[var(--text-muted)] text-center sm:text-left max-w-sm order-2 sm:order-1">
+                            *Anda akan diarahkan ke halaman portal berita resmi Pimpinan Wilayah Muhammadiyah Jawa Timur.
+                        </p>
+                        <a
+                            href={item.pwmuUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="order-1 sm:order-2 inline-flex items-center justify-center w-full sm:w-auto bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-white px-8 py-4 text-xs sm:text-sm font-bold tracking-widest uppercase transition-all duration-300 rounded-xl shadow-lg shadow-[var(--primary)]/20 hover:-translate-y-1 group font-display"
+                        >
+                            Baca di PWMU.CO
+                            <ExternalLink className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+                        </a>
+                    </div>
+                )}
             </article>
 
             {related.length > 0 && (
@@ -126,11 +160,15 @@ export default async function DetailBerita({ params }: { params: Promise<{ id: s
                                 >
                                     <div className="relative aspect-[16/9] overflow-hidden bg-[#111111]">
                                         <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-transparent z-10 opacity-60"></div>
-                                        <img
-                                            src={r.cover}
-                                            alt={r.title}
-                                            className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-700 transform group-hover:scale-105"
-                                        />
+                                        {r.cover ? (
+                                            <img
+                                                src={r.cover}
+                                                alt={r.title}
+                                                className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-700 transform group-hover:scale-105"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-white/30 text-xs font-bold">Tanpa Cover</div>
+                                        )}
                                         <div className="absolute top-4 left-4 z-20 bg-[var(--primary)] text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-md font-display shadow-md">
                                             {r.category}
                                         </div>

@@ -6,7 +6,7 @@ import Link from 'next/link'
 import Logo from '../../../components/common/Logo'
 import {
     LayoutDashboard, Newspaper, ShoppingBag, Users,
-    GraduationCap, Building, ShieldCheck, LogOut, Menu, X, MessageSquare
+    GraduationCap, Building, ShieldCheck, LogOut, Menu, X, MessageSquare,UserPlus
 } from 'lucide-react'
 import { createBrowserClient } from '@supabase/ssr'
 
@@ -20,7 +20,7 @@ const roleLabels: Record<string, string> = {
 
 const menuItems = [
     { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard className="w-4 h-4" />, allowedRoles: ['superadmin', 'admin', 'bpi', 'medkom', 'ekowir'] },
-    { name: 'Pendaftar DAD', path: '/dashboard/daftar-dad', icon: <GraduationCap className="w-4 h-4" />, allowedRoles: ['superadmin', 'admin', 'bpi'] },
+    { name: 'Pendaftar DAD', path: '/dashboard/daftar-dad', icon: <UserPlus className="w-4 h-4" />, allowedRoles: ['superadmin', 'admin', 'bpi'] },
     { name: 'Kelola Berita', path: '/dashboard/berita', icon: <Newspaper className="w-4 h-4" />, allowedRoles: ['superadmin', 'admin', 'bpi', 'medkom', 'ekowir'] },
     { name: 'Kotak Aspirasi', path: '/dashboard/aspirasi', icon: <MessageSquare className="w-4 h-4" />, allowedRoles: ['superadmin', 'admin', 'bpi'] },
     { name: 'Produk Ekowir', path: '/dashboard/ekowir', icon: <ShoppingBag className="w-4 h-4" />, allowedRoles: ['superadmin', 'ekowir'] },
