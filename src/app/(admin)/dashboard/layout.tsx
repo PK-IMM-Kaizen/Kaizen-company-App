@@ -6,8 +6,9 @@ import Link from 'next/link'
 import Logo from '../../../components/common/Logo'
 import {
     LayoutDashboard, Newspaper, ShoppingBag, Users,
-    GraduationCap, Building, ShieldCheck, LogOut, Menu, X
+    GraduationCap, Building, ShieldCheck, LogOut, Menu, X, MessageSquare
 } from 'lucide-react'
+import { createBrowserClient } from '@supabase/ssr'
 
 const roleLabels: Record<string, string> = {
     superadmin: 'Super Admin',
@@ -19,7 +20,9 @@ const roleLabels: Record<string, string> = {
 
 const menuItems = [
     { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard className="w-4 h-4" />, allowedRoles: ['superadmin', 'admin', 'bpi', 'medkom', 'ekowir'] },
+    { name: 'Pendaftar DAD', path: '/dashboard/daftar-dad', icon: <GraduationCap className="w-4 h-4" />, allowedRoles: ['superadmin', 'admin', 'bpi'] },
     { name: 'Kelola Berita', path: '/dashboard/berita', icon: <Newspaper className="w-4 h-4" />, allowedRoles: ['superadmin', 'admin', 'bpi', 'medkom', 'ekowir'] },
+    { name: 'Kotak Aspirasi', path: '/dashboard/aspirasi', icon: <MessageSquare className="w-4 h-4" />, allowedRoles: ['superadmin', 'admin', 'bpi'] },
     { name: 'Produk Ekowir', path: '/dashboard/ekowir', icon: <ShoppingBag className="w-4 h-4" />, allowedRoles: ['superadmin', 'ekowir'] },
     { name: 'Kepengurusan', path: '/dashboard/kepengurusan', icon: <Users className="w-4 h-4" />, allowedRoles: ['superadmin', 'admin', 'bpi'] },
     { name: 'Data Alumni', path: '/dashboard/alumni', icon: <GraduationCap className="w-4 h-4" />, allowedRoles: ['superadmin', 'admin', 'bpi'] },
@@ -35,22 +38,33 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const [role, setRole] = useState<string | null>(null)
     const [isMounted, setIsMounted] = useState(false)
 
+    const supabase = createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    )
+
     useEffect(() => {
         setIsMounted(true)
         const savedRole = localStorage.getItem('userRole')
         const isAuth = localStorage.getItem('isAuthenticated')
 
         if (!isAuth || !savedRole) {
-            router.replace('/')
+            router.replace('/login')
         } else {
             setRole(savedRole)
         }
     }, [router])
 
-    const handleLogout = () => {
-        localStorage.removeItem('isAuthenticated')
-        localStorage.removeItem('userRole')
-        router.replace('/')
+    const handleLogout = async () => {
+        try {
+            await supabase.auth.signOut()
+        } catch (error) {
+            console.error('Gagal logout Supabase:', error)
+        } finally {
+            localStorage.removeItem('isAuthenticated')
+            localStorage.removeItem('userRole')
+            router.replace('/login')
+        }
     }
 
     if (!isMounted || !role) {
@@ -115,7 +129,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <div className="p-4 border-t border-white/10">
                     <button
                         onClick={handleLogout}
-                        className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all text-white/60 hover:bg-red-500/10 hover:text-red-500 font-display uppercase tracking-wider"
+                        className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all text-white/60 hover:bg-red-500/10 hover:text-red-500 font-display uppercase tracking-wider cursor-pointer"
                     >
                         <LogOut className="w-4 h-4" /> Keluar
                     </button>
@@ -160,3 +174,4 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
     )
 }
+

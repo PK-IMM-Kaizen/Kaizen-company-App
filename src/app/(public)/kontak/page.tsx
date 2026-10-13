@@ -1,11 +1,13 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import {
     Mail,
     MapPin,
     Clock,
     ExternalLink
 } from 'lucide-react'
+import { createBrowserClient } from '@supabase/ssr'
 
 const InstagramIcon = ({ className }: { className?: string }) => (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -21,46 +23,57 @@ const WhatsAppIcon = ({ className }: { className?: string }) => (
     </svg>
 )
 
-// const TikTokIcon = ({ className }: { className?: string }) => (
-//     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-//         <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path>
-//     </svg>
-// )
+export default function ContactPage() {
+    const [profile, setProfile] = useState<any>(null)
 
-export default function Page() {
+    const supabase = createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    )
+
+    useEffect(() => {
+        async function fetchContactData() {
+            const { data } = await supabase
+                .from('organization_profile')
+                .select('*')
+                .eq('id', 1)
+                .single()
+
+            if (data) setProfile(data)
+        }
+        fetchContactData()
+    }, [])
+
+    const instagramHandle = profile?.instagram || '@imm_kaizen'
+    const whatsappHandle = profile?.whatsapp || '+62 812-3456-7890'
+    const emailHandle = profile?.email || 'pkimmkaizen.0@gmail.com'
+    const addressText = profile?.address || 'Kompleks Gedung PKM Lt. 1, Fakultas Teknik, Universitas Muhammadiyah Surabaya. Jl. Sutorejo No. 59, Mulyorejo, Surabaya, Jawa Timur 60113.'
+
     const kontakChannels = [
         {
             icon: <InstagramIcon className="w-5 h-5 text-[#E1306C]" />,
             platform: 'Instagram',
-            handle: 'pkimmkaizen.0@gmail.com',
+            handle: instagramHandle,
             desc: 'Ikuti kami untuk update kegiatan & dokumentasi terbaru',
-            link: 'https://www.instagram.com/imm_kaizen',
+            link: `https://www.instagram.com/${instagramHandle.replace('@', '')}`,
             placeholder: false,
         },
         {
             icon: <WhatsAppIcon className="w-5 h-5 text-[#25D366]" />,
             platform: 'WhatsApp',
-            handle: '+62 812-3456-7890',
+            handle: whatsappHandle,
             desc: 'Hubungi BPH & Pengurus aktif melalui layanan WhatsApp',
-            link: 'https://wa.me/6289601261250',
-            placeholder: true,
+            link: `https://wa.me/${whatsappHandle.replace(/[^0-9]/g, '')}`,
+            placeholder: false,
         },
         {
             icon: <Mail className="w-5 h-5 text-[var(--primary)]" />,
             platform: 'Email Resmi',
-            handle: 'immkaizen.umsura@gmail.com',
+            handle: emailHandle,
             desc: 'Kirimkan korespondensi, undangan, atau surat resmi',
-            link: 'mailto:immkaizen.umsura@gmail.com',
+            link: `mailto:${emailHandle}`,
             placeholder: false,
         },
-        // {
-        //     icon: <TikTokIcon className="w-5 h-5 text-[var(--text-primary)]" />,
-        //     platform: 'TikTok',
-        //     handle: '@immkaizen',
-        //     desc: 'Konten kreatif, reels, dan sorotan kegiatan kader',
-        //     link: 'https://tiktok.com/@immkaizen',
-        //     placeholder: true,
-        // },
     ]
 
     return (
@@ -120,11 +133,6 @@ export default function Page() {
                                             <h4 className="font-bold text-sm text-[var(--text-primary)] font-display group-hover:text-[var(--primary)] transition-colors">
                                                 {item.platform}
                                             </h4>
-                                            {item.placeholder && (
-                                                <span className="px-2 py-0.5 text-[10px] uppercase font-bold tracking-wider rounded-full bg-yellow-100 text-yellow-800 border border-yellow-200">
-                                                    Draft
-                                                </span>
-                                            )}
                                         </div>
                                         <p className="text-sm font-bold text-[var(--text-primary)] font-display mb-1 truncate">
                                             {item.handle}
@@ -139,7 +147,7 @@ export default function Page() {
                         </div>
 
                         <div className="p-4 rounded-[var(--radius)] bg-[#FFF8E7] border border-[#F0E4B0] text-[#7A5C00] text-xs leading-relaxed">
-                            <strong>Catatan:</strong> Kontak WhatsApp adalah saluran sementara. Informasi data nomor pengurus aktif periode berjalan dapat dikonfirmasi langsung via Direct Message Instagram resmi.
+                            <strong>Catatan:</strong> Informasi nomor kontak WhatsApp, Instagram, dan Email diperbarui secara berkala sesuai periode kepengurusan yang aktif.
                         </div>
                     </div>
 
@@ -167,11 +175,10 @@ export default function Page() {
                                 <MapPin className="w-5 h-5 text-[var(--primary)] shrink-0 mt-0.5" />
                                 <div>
                                     <h4 className="font-bold text-sm text-[var(--text-primary)] font-display mb-1">
-                                        Sekretariat PK IMM Kaizen
+                                        Sekretariat {profile?.short_name || 'PK IMM Kaizen'}
                                     </h4>
                                     <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
-                                        Universitas Muhammadiyah Surabaya<br />
-                                        Jl. Sutorejo No. 59, Dukuh Sutorejo, Mulyorejo, Surabaya, Jawa Timur 60113.
+                                        {addressText}
                                     </p>
                                 </div>
                             </div>

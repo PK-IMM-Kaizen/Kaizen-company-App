@@ -11,6 +11,7 @@ import {
     Loader2,
     ShieldCheck
 } from 'lucide-react'
+import {list} from "postcss";
 
 export default function AspirasiPage() {
     const [isSubmitting, setIsSubmitting] = useState(false)
@@ -93,9 +94,6 @@ export default function AspirasiPage() {
             <main className="flex-1 max-w-2xl w-full mx-auto px-4 py-8 relative z-10">
 
                 <div className="text-center mb-10">
-                    <span className="text-xs sm:text-sm font-bold tracking-[0.2em] uppercase text-[var(--accent)] font-display block mb-2 flex items-center justify-center gap-1.5">
-                        <Sparkles className="w-4 h-4 text-[var(--accent)]" /> Ruang Terbuka
-                    </span>
                     <h1 className="text-3xl sm:text-5xl font-black text-[var(--text-primary)] leading-tight font-display mb-4">
                         Suara Mahasiswa
                     </h1>

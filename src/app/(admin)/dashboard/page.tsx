@@ -57,7 +57,6 @@ export default function DashboardOverviewPage() {
                 <div className="relative z-10 flex items-start justify-between">
                     <div>
                         <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest mb-1 text-white/70 font-display">
-                            <Sparkles className="w-3.5 h-3.5 text-[var(--accent-light)]" />
                             Selamat Datang, {role === 'superadmin' ? 'Super Admin' : 'Admin'}
                         </div>
                         <h2 className="text-xl sm:text-2xl font-black text-white font-display">

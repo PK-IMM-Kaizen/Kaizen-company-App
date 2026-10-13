@@ -1,25 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Logo from '../../components/common/Logo'
 import { Lock, Mail, ArrowLeft, ShieldCheck } from 'lucide-react'
-
-type Role = 'superadmin' | 'admin'
-
-const demoAccounts = [
-    {
-        label: 'Super Admin',
-        role: 'superadmin' as Role,
-        email: 'superadmin@kaizen.id',
-        password: 'admin123'
-    },
-    {
-        label: 'Admin Bidang',
-        role: 'admin' as Role,
-        email: 'admin@kaizen.id',
-        password: 'admin123'
-    }
-]
+import { createBrowserClient } from '@supabase/ssr'
 
 export default function LoginPage() {
     const [email, setEmail] = useState('')
@@ -27,41 +11,60 @@ export default function LoginPage() {
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
 
-    const handleSubmit = (e: React.FormEvent) => {
+    // PERBAIKAN 1: Otomatis hapus sesi lama/nyangkut saat halaman login dibuka
+    useEffect(() => {
+        localStorage.removeItem('isAuthenticated')
+        localStorage.removeItem('userRole')
+    }, [])
+
+    const supabase = createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    )
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        processLogin(email, password)
-    }
-
-    const handleDemoLogin = (acc: typeof demoAccounts[0]) => {
-        setEmail(acc.email)
-        setPassword(acc.password)
-        processLogin(acc.email, acc.password)
-    }
-
-    const processLogin = (inputEmail: string, inputPass: string) => {
         setLoading(true)
         setError('')
 
-        setTimeout(() => {
-            const cleanInputEmail = inputEmail.trim().toLowerCase()
-            const validAccount = demoAccounts.find(
-                (acc) => acc.email.toLowerCase() === cleanInputEmail && acc.password === inputPass
-            )
+        try {
+            const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+                email: email.trim(),
+                password: password,
+            })
 
-            if (validAccount) {
-                localStorage.setItem('isAuthenticated', 'true')
-                localStorage.setItem('userRole', validAccount.role)
-
-                window.location.href = '/dashboard'
-            } else {
+            if (authError) {
                 setError('Email atau kata sandi tidak valid.')
                 setLoading(false)
+                return
             }
-        }, 400)
+
+            const { data: profileData, error: profileError } = await supabase
+                .from('profiles')
+                .select('role')
+                .eq('id', authData.user?.id)
+                .single()
+
+            if (profileError && profileError.code !== 'PGRST116') {
+                console.error('Gagal mengambil profil:', profileError)
+            }
+
+            // Memastikan data yang masuk huruf kecil dan bersih dari spasi
+            const userRole = (profileData?.role || 'admin').trim().toLowerCase()
+
+            localStorage.setItem('isAuthenticated', 'true')
+            localStorage.setItem('userRole', userRole)
+
+            window.location.href = '/dashboard'
+        } catch (err) {
+            setError('Terjadi kesalahan pada sistem. Silakan coba lagi.')
+            setLoading(false)
+        }
     }
 
     return (
-        <div className="min-h-screen flex bg-[var(--surface)] relative">
+        <div className="min-h-screen flex bg-[var(--surface)] relative overflow-hidden">
+            {/* Panel Kiri Desktop - Diberi batasan ketat agar tidak menutupi tombol */}
             <div
                 className="hidden lg:flex flex-col justify-between p-12 w-96 flex-shrink-0 relative overflow-hidden z-10"
                 style={{ background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)' }}
@@ -84,7 +87,7 @@ export default function LoginPage() {
                             <span className="text-[var(--accent-light)]">IMM KAIZEN</span>
                         </h2>
                         <p className="text-xs leading-relaxed text-white/70 max-w-xs font-sans">
-                            Masuk untuk mengelola konten, kepengurusan, produk Ekowir, dan data organisasi IMM Komisariat Kaizen.
+                            Masuk untuk mengelola konten, kepengurusan, produk Ekowir, dan data organisasi.
                         </p>
                     </div>
                 </div>
@@ -94,9 +97,9 @@ export default function LoginPage() {
                 </div>
             </div>
 
-            {/* Panel Kanan (Form Input) */}
-            <div className="flex-1 flex flex-col items-center justify-center p-6 sm:p-12 relative z-20 bg-[var(--surface)]">
-                <div className="w-full max-w-sm space-y-6">
+            {/* Panel Kanan (Form Input) - PERBAIKAN 2: z-index ditingkatkan & pointer-events dipastikan hidup */}
+            <div className="flex-1 flex flex-col items-center justify-center p-6 sm:p-12 relative z-50 bg-[var(--surface)] pointer-events-auto">
+                <div className="w-full max-w-sm space-y-6 relative z-50">
                     <div className="lg:hidden mb-8 flex justify-center">
                         <Logo size="md" />
                     </div>
@@ -113,14 +116,14 @@ export default function LoginPage() {
                         </p>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="space-y-4">
+                    <form onSubmit={handleSubmit} className="space-y-4 relative z-50">
                         <div>
                             <label className="form-label flex items-center gap-1.5 mb-1.5 text-sm font-medium">
                                 <Mail className="w-3.5 h-3.5 text-[var(--text-muted)]" /> Email
                             </label>
                             <input
                                 type="email"
-                                className="w-full px-4 py-2.5 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/50 transition-all text-sm"
+                                className="w-full px-4 py-2.5 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/50 transition-all text-sm cursor-text relative z-50"
                                 value={email}
                                 onChange={e => setEmail(e.target.value)}
                                 placeholder="nama@kaizen.id"
@@ -133,7 +136,7 @@ export default function LoginPage() {
                             </label>
                             <input
                                 type="password"
-                                className="w-full px-4 py-2.5 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/50 transition-all text-sm"
+                                className="w-full px-4 py-2.5 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/50 transition-all text-sm cursor-text relative z-50"
                                 value={password}
                                 onChange={e => setPassword(e.target.value)}
                                 placeholder="••••••••"
@@ -149,36 +152,17 @@ export default function LoginPage() {
 
                         <button
                             type="submit"
-                            className="w-full py-3 px-4 bg-[var(--primary)] text-white text-xs font-bold tracking-widest uppercase rounded-lg shadow-md hover:bg-[var(--primary-dark)] transition-all flex items-center justify-center gap-2 disabled:opacity-70"
+                            className="w-full py-3 px-4 bg-[var(--primary)] text-white text-xs font-bold tracking-widest uppercase rounded-lg shadow-md hover:bg-[var(--primary-dark)] transition-all flex items-center justify-center gap-2 cursor-pointer relative z-50 disabled:opacity-70 disabled:cursor-not-allowed"
                             disabled={loading}
                         >
                             {loading ? 'Memverifikasi...' : 'Masuk Dashboard'}
                         </button>
                     </form>
 
-                    <div className="p-4 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] shadow-sm">
-                        <p className="text-xs font-bold text-[var(--text-secondary)] mb-3 font-display text-center">
-                            Akses Cepat (Simulasi)
-                        </p>
-                        <div className="flex flex-col gap-2">
-                            {demoAccounts.map((acc) => (
-                                <button
-                                    key={acc.role}
-                                    type="button"
-                                    onClick={() => handleDemoLogin(acc)}
-                                    disabled={loading}
-                                    className="w-full text-xs px-3 py-2.5 rounded-lg font-bold transition-all text-center bg-[var(--surface)] hover:bg-[var(--primary)] hover:text-white border border-[var(--border)] font-display disabled:opacity-50"
-                                >
-                                    Login sebagai {acc.label}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
                     <button
                         type="button"
                         onClick={() => window.location.href = '/'}
-                        className="mt-4 text-xs font-bold text-[var(--text-muted)] hover:text-[var(--primary)] w-full text-center transition-colors flex items-center justify-center gap-2 font-display"
+                        className="mt-4 text-xs font-bold text-[var(--text-muted)] hover:text-[var(--primary)] w-full text-center transition-colors flex items-center justify-center gap-2 font-display relative z-50 cursor-pointer"
                     >
                         <ArrowLeft className="w-3.5 h-3.5" /> Kembali ke Website Utama
                     </button>

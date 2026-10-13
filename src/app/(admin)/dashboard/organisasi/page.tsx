@@ -1,23 +1,70 @@
 'use client'
 
-import { useState } from 'react'
-import { Building, Share2, CheckCircle2, Save, Camera, MapPin, Mail, AtSign, Phone } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Building, Share2, CheckCircle2, Save, Camera, MapPin, Mail, AtSign, Phone, RefreshCw } from 'lucide-react'
+import { createBrowserClient } from '@supabase/ssr'
 
 export default function AdminOrganizationPage() {
     const [saved, setSaved] = useState(false)
+    const [loading, setLoading] = useState(false)
+    const [fetching, setFetching] = useState(true)
     const [logoFile, setLogoFile] = useState<File | null>(null)
     const [logoPreview, setLogoPreview] = useState<string>('')
+    const [errorMessage, setErrorMessage] = useState('')
+
+    const supabase = createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    )
 
     const [form, setForm] = useState({
-        name: 'IMM Komisariat Kaizen',
-        shortName: 'IMM Kaizen',
-        founded: '2017',
-        description: 'Ikatan Mahasiswa Muhammadiyah (IMM) Komisariat Kaizen merupakan organisasi mahasiswa Islam yang bergerak di lingkungan Fakultas Teknik Universitas Muhammadiyah Surabaya.',
-        address: 'Kompleks Gedung PKM (Pusat Kegiatan Mahasiswa) Lt. 1, Fakultas Teknik, Universitas Muhammadiyah Surabaya. Jl. Sutorejo No. 59, Mulyorejo, Surabaya, Jawa Timur 60113.',
-        email: 'pkimmkaizen.0@gmail.com',
-        instagram: '@imm_kaizen',
-        whatsapp: '+62 812-3456-7890',
+        name: '',
+        shortName: '',
+        founded: '',
+        description: '',
+        address: '',
+        email: '',
+        instagram: '',
+        whatsapp: '',
     })
+
+    // 1. Ambil data profil dari Supabase saat halaman dimuat
+    useEffect(() => {
+        fetchProfile()
+    }, [])
+
+    const fetchProfile = async () => {
+        setFetching(true)
+        try {
+            const { data, error } = await supabase
+                .from('organization_profile')
+                .select('*')
+                .eq('id', 1)
+                .single()
+
+            if (error && error.code !== 'PGRST116') throw error
+
+            if (data) {
+                setForm({
+                    name: data.name || '',
+                    shortName: data.short_name || '',
+                    founded: data.founded || '',
+                    description: data.description || '',
+                    address: data.address || '',
+                    email: data.email || '',
+                    instagram: data.instagram || '',
+                    whatsapp: data.whatsapp || '',
+                })
+                if (data.logo_url) {
+                    setLogoPreview(data.logo_url)
+                }
+            }
+        } catch (err: any) {
+            console.error('Gagal mengambil profil:', err.message)
+        } finally {
+            setFetching(false)
+        }
+    }
 
     const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
@@ -27,10 +74,71 @@ export default function AdminOrganizationPage() {
         }
     }
 
-    const handleSave = (e: React.FormEvent) => {
+    // 2. Simpan Data & Upload Logo ke Supabase
+    const handleSave = async (e: React.FormEvent) => {
         e.preventDefault()
-        setSaved(true)
-        setTimeout(() => setSaved(false), 3000)
+        setLoading(true)
+        setSaved(false)
+        setErrorMessage('')
+
+        try {
+            let uploadedLogoUrl = logoPreview
+
+            // Jika pengguna memilih gambar logo baru, unggah ke Storage
+            if (logoFile) {
+                const fileExt = logoFile.name.split('.').pop()
+                const fileName = `logo-${Date.now()}.${fileExt}`
+                const filePath = `logos/${fileName}`
+
+                const { error: uploadError } = await supabase.storage
+                    .from('organization-assets')
+                    .upload(filePath, logoFile, { upsert: true })
+
+                if (uploadError) throw uploadError
+
+                const { data: publicUrlData } = supabase.storage
+                    .from('organization-assets')
+                    .getPublicUrl(filePath)
+
+                uploadedLogoUrl = publicUrlData.publicUrl
+            }
+
+            // Upsert / Update data profil ke tabel organization_profile
+            const { error: dbError } = await supabase
+                .from('organization_profile')
+                .upsert({
+                    id: 1,
+                    name: form.name,
+                    short_name: form.shortName,
+                    founded: form.founded,
+                    description: form.description,
+                    address: form.address,
+                    email: form.email,
+                    instagram: form.instagram,
+                    whatsapp: form.whatsapp,
+                    logo_url: uploadedLogoUrl,
+                    updated_at: new Date().toISOString()
+                })
+
+            if (dbError) throw dbError
+
+            setLogoPreview(uploadedLogoUrl)
+            setSaved(true)
+            setTimeout(() => setSaved(false), 4000)
+        } catch (err: any) {
+            setErrorMessage(err.message || 'Gagal menyimpan perubahan profil.')
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    if (fetching) {
+        return (
+            <div className="p-12 flex flex-col items-center justify-center text-[var(--text-muted)] font-display font-bold">
+                <RefreshCw className="w-6 h-6 animate-spin mb-2 text-[var(--primary)]" />
+                Memuat profil organisasi...
+            </div>
+        )
     }
 
     return (
@@ -51,8 +159,14 @@ export default function AdminOrganizationPage() {
                     </div>
                     <div>
                         <h4 className="text-sm font-bold">Berhasil Disimpan</h4>
-                        <p className="text-xs opacity-90">Profil organisasi telah berhasil diperbarui dan dipublikasikan.</p>
+                        <p className="text-xs opacity-90">Profil organisasi telah berhasil diperbarui di database.</p>
                     </div>
+                </div>
+            )}
+
+            {errorMessage && (
+                <div className="mb-6 p-4 rounded-xl bg-red-50 text-red-600 border border-red-200 font-medium text-xs">
+                    {errorMessage}
                 </div>
             )}
 
@@ -103,6 +217,7 @@ export default function AdminOrganizationPage() {
                                             className="w-full px-4 py-2.5 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/50 transition-all text-sm font-semibold"
                                             value={form.name}
                                             onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                                            required
                                         />
                                     </div>
                                     <div>
@@ -142,7 +257,7 @@ export default function AdminOrganizationPage() {
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                                     <div className="sm:col-span-2">
-                                        <label className="flex items-center gap-1.5 block text-xs font-bold text-[var(--text-secondary)] mb-1.5 font-display uppercase tracking-wide">
+                                        <label className="flex items-center gap-1.5 text-xs font-bold text-[var(--text-secondary)] mb-1.5 font-display uppercase tracking-wide">
                                             <MapPin className="w-3.5 h-3.5" /> Alamat Sekretariat
                                         </label>
                                         <textarea
@@ -154,7 +269,7 @@ export default function AdminOrganizationPage() {
                                         />
                                     </div>
                                     <div>
-                                        <label className="flex items-center gap-1.5 block text-xs font-bold text-[var(--text-secondary)] mb-1.5 font-display uppercase tracking-wide">
+                                        <label className="flex items-center gap-1.5 text-xs font-bold text-[var(--text-secondary)] mb-1.5 font-display uppercase tracking-wide">
                                             <Mail className="w-3.5 h-3.5" /> Email Resmi
                                         </label>
                                         <input
@@ -165,7 +280,7 @@ export default function AdminOrganizationPage() {
                                         />
                                     </div>
                                     <div>
-                                        <label className="flex items-center gap-1.5 block text-xs font-bold text-[var(--text-secondary)] mb-1.5 font-display uppercase tracking-wide">
+                                        <label className="flex items-center gap-1.5 text-xs font-bold text-[var(--text-secondary)] mb-1.5 font-display uppercase tracking-wide">
                                             <Phone className="w-3.5 h-3.5" /> WhatsApp Center
                                         </label>
                                         <input
@@ -176,14 +291,14 @@ export default function AdminOrganizationPage() {
                                         />
                                     </div>
                                     <div className="sm:col-span-2">
-                                        <label className="flex items-center gap-1.5 block text-xs font-bold text-[var(--text-secondary)] mb-1.5 font-display uppercase tracking-wide">
+                                        <label className="flex items-center gap-1.5 text-xs font-bold text-[var(--text-secondary)] mb-1.5 font-display uppercase tracking-wide">
                                             <AtSign className="w-3.5 h-3.5" /> Instagram Username
                                         </label>
                                         <div className="relative">
                                             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold text-[var(--text-muted)]">@</span>
                                             <input
                                                 className="w-full pl-9 pr-4 py-2.5 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/50 transition-all text-sm font-medium"
-                                                value={form.instagram.replace('@', '')} // Hapus '@' bawaan agar tidak dobel dengan prefix visual
+                                                value={form.instagram.replace('@', '')}
                                                 onChange={e => setForm(f => ({ ...f, instagram: `@${e.target.value.replace('@', '')}` }))}
                                                 placeholder="imm_kaizen"
                                             />
@@ -196,8 +311,12 @@ export default function AdminOrganizationPage() {
                     </div>
 
                     <div className="mt-10 pt-6 border-t border-[var(--border)] flex justify-end">
-                        <button type="submit" className="w-full sm:w-auto py-3 px-6 bg-[var(--primary)] text-white text-xs font-bold tracking-widest uppercase rounded-xl shadow-md shadow-[var(--primary)]/20 hover:bg-[var(--primary-dark)] transition-all flex items-center justify-center gap-2 hover:-translate-y-0.5">
-                            <Save className="w-4 h-4" /> Simpan Perubahan Profil
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="w-full sm:w-auto py-3 px-6 bg-[var(--primary)] text-white text-xs font-bold tracking-widest uppercase rounded-xl shadow-md shadow-[var(--primary)]/20 hover:bg-[var(--primary-dark)] transition-all flex items-center justify-center gap-2 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
+                        >
+                            <Save className="w-4 h-4" /> {loading ? 'Memproses & Menyimpan...' : 'Simpan Perubahan Profil'}
                         </button>
                     </div>
                 </div>
