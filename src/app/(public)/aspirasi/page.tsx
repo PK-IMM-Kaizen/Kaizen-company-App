@@ -7,21 +7,27 @@ import {
     CheckCircle2,
     ArrowLeft,
     Send,
-    Sparkles,
     Loader2,
-    ShieldCheck
+    ShieldCheck,
+    AlertCircle
 } from 'lucide-react'
-import {list} from "postcss";
+import { createBrowserClient } from '@supabase/ssr'
 
 export default function AspirasiPage() {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [isSuccess, setIsSuccess] = useState(false)
+    const [errorMessage, setErrorMessage] = useState('')
 
     const [formData, setFormData] = useState({
         nama: '',
         kategori: '',
         pesan: ''
     })
+
+    const supabase = createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    )
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -30,12 +36,31 @@ export default function AspirasiPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setIsSubmitting(true)
+        setErrorMessage('')
 
-        await new Promise(resolve => setTimeout(resolve, 1500))
+        try {
+            const { error } = await supabase
+                .from('aspirations')
+                .insert([
+                    {
+                        nama: formData.nama.trim() || 'Anonim',
+                        kategori: formData.kategori,
+                        pesan: formData.pesan,
+                        status: 'unread',
+                        created_at: new Date().toISOString()
+                    }
+                ])
 
-        setIsSubmitting(false)
-        setIsSuccess(true)
-        window.scrollTo({ top: 0, behavior: 'smooth' })
+            if (error) throw error
+
+            setIsSuccess(true)
+            window.scrollTo({ top: 0, behavior: 'smooth' })
+        } catch (err: any) {
+            console.error('Gagal mengirim aspirasi:', err.message)
+            setErrorMessage(err.message || 'Gagal mengirim aspirasi. Silakan coba lagi.')
+        } finally {
+            setIsSubmitting(false)
+        }
     }
 
     if (isSuccess) {
@@ -64,7 +89,7 @@ export default function AspirasiPage() {
                         </p>
                         <Link
                             href="/"
-                            className="btn-primary w-full justify-center py-3.5 text-xs tracking-widest uppercase font-display"
+                            className="btn-primary w-full justify-center py-3.5 text-xs tracking-widest uppercase font-display flex items-center justify-center"
                         >
                             Kembali ke Beranda
                         </Link>
@@ -102,6 +127,13 @@ export default function AspirasiPage() {
                     </p>
                 </div>
 
+                {errorMessage && (
+                    <div className="mb-6 p-4 rounded-xl bg-red-50 text-red-600 border border-red-200 text-xs font-bold flex items-center gap-2">
+                        <AlertCircle className="w-4 h-4 shrink-0" />
+                        <span>{errorMessage}</span>
+                    </div>
+                )}
+
                 <form onSubmit={handleSubmit} className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--radius)] p-6 sm:p-8 shadow-xl space-y-6">
 
                     <div>
@@ -130,7 +162,7 @@ export default function AspirasiPage() {
                             required
                             value={formData.kategori}
                             onChange={handleChange}
-                            className="form-input"
+                            className="form-input cursor-pointer"
                         >
                             <option value="" disabled>Pilih Kategori</option>
                             <option value="Kritik & Saran Organisasi">Kritik & Saran Organisasi</option>
@@ -159,7 +191,7 @@ export default function AspirasiPage() {
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="btn-primary w-full justify-center py-4 text-xs font-bold tracking-widest uppercase shadow-md flex items-center gap-2"
+                            className="btn-primary w-full justify-center py-4 text-xs font-bold tracking-widest uppercase shadow-md flex items-center gap-2 cursor-pointer disabled:opacity-50"
                         >
                             {isSubmitting ? (
                                 <>
