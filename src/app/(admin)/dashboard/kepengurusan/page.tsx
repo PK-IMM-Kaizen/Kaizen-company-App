@@ -141,16 +141,17 @@ export default function AdminKepengurusanPage() {
     }, [items, search, selectedDivision])
 
     const totalPages = Math.ceil(filteredItems.length / itemsPerPage) || 1
+
     const paginatedItems = useMemo(() => {
-        const start = (currentPage - 1) * itemsPerPage
-        return filteredItems.slice(start, start + itemsPerPage)
-    }, [filteredItems, currentPage])
+        const start = (currentPage - 1) * itemsPerPage;
+        return filteredItems.slice(start, start + itemsPerPage);
+    }, [filteredItems, currentPage]);
 
     const stats = useMemo(() => {
-        const bph = items.filter(i => i.division === 'BPH').length
-        const leaders = items.filter(i => i.isLeader).length
-        return { total: items.length, bph, leaders, members: items.length - leaders }
-    }, [items])
+        const bph = items.filter(i => i.division === 'BPH').length;
+        const leaders = items.filter(i => i.isLeader).length;
+        return { total: items.length, bph, leaders, members: items.length - leaders };
+    }, [items]);
 
     const startCreate = () => {
         setForm({

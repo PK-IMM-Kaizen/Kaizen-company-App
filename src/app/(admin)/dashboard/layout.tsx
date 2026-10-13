@@ -7,7 +7,7 @@ import Logo from '../../../components/common/Logo'
 import {
     LayoutDashboard, Newspaper, ShoppingBag, Users,
     GraduationCap, Building, ShieldCheck, LogOut, Menu, X, MessageSquare, UserPlus,
-    Maximize, Minimize, PanelLeftClose, PanelLeft
+    Maximize, Minimize, PanelLeftClose, PanelLeft, Briefcase
 } from 'lucide-react'
 import { createBrowserClient } from '@supabase/ssr'
 
@@ -25,6 +25,7 @@ const menuItems = [
     { name: 'Kelola Berita', path: '/dashboard/berita', icon: <Newspaper className="w-4 h-4 shrink-0" />, allowedRoles: ['superadmin', 'admin', 'bpi', 'medkom', 'ekowir'] },
     { name: 'Kotak Aspirasi', path: '/dashboard/aspirasi', icon: <MessageSquare className="w-4 h-4 shrink-0" />, allowedRoles: ['superadmin', 'admin', 'bpi'] },
     { name: 'Produk Ekowir', path: '/dashboard/ekowir', icon: <ShoppingBag className="w-4 h-4 shrink-0" />, allowedRoles: ['superadmin', 'ekowir'] },
+    { name: 'Manajemen Bidang', path: '/dashboard/bidang', icon: <Briefcase className="w-4 h-4 shrink-0" />, allowedRoles: ['superadmin', 'ekowir'] },
     { name: 'Kepengurusan', path: '/dashboard/kepengurusan', icon: <Users className="w-4 h-4 shrink-0" />, allowedRoles: ['superadmin', 'admin', 'bpi'] },
     { name: 'Data Alumni', path: '/dashboard/alumni', icon: <GraduationCap className="w-4 h-4 shrink-0" />, allowedRoles: ['superadmin', 'admin', 'bpi'] },
     { name: 'Profil Organisasi', path: '/dashboard/organisasi', icon: <Building className="w-4 h-4 shrink-0" />, allowedRoles: ['superadmin'] },
