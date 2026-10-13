@@ -7,7 +7,7 @@ import Footer from '../../components/common/Footer'
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname()
 
-    const hideNavFooter = pathname.startsWith('/daftar-daftar-dad') || pathname.startsWith('/aspirasi')
+    const hideNavFooter = pathname.startsWith('/daftar-dad') || pathname.startsWith('/aspirasi')
 
     if (hideNavFooter) {
         return <>{children}</>

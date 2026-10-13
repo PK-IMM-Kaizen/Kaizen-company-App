@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Logo from '../../../components/common/Logo'
+import { createBrowserClient } from '@supabase/ssr'
 import {
     CheckCircle2,
     Clock,
@@ -14,20 +15,47 @@ import {
 } from 'lucide-react'
 
 export default function DaftarDADPage() {
-    const [isRegistrationOpen] = useState(false)
+    const [isRegistrationOpen, setIsRegistrationOpen] = useState(false)
+    const [isCheckingStatus, setIsCheckingStatus] = useState(true)
 
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [isSuccess, setIsSuccess] = useState(false)
 
     const [formData, setFormData] = useState({
         namaLengkap: '',
-        nim: '',
-        fakultas: '',
-        programStudi: '',
-        semester: '',
-        whatsapp: '',
-        motivasi: ''
+        asal: '',
+        tempatTanggalLahir: '',
+        domisili: '',
+        asalKomisariat: '',
+        prodi: ''
     })
+
+    const supabase = createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    )
+
+    useEffect(() => {
+        const fetchStatus = async () => {
+            try {
+                const { data, error } = await supabase
+                    .from('site_settings')
+                    .select('value')
+                    .eq('key', 'is_dad_open')
+                    .maybeSingle()
+
+                if (error) throw error
+                if (data) {
+                    setIsRegistrationOpen(data.value)
+                }
+            } catch (error) {
+                console.error('Error fetching settings:', error)
+            } finally {
+                setIsCheckingStatus(false)
+            }
+        }
+        fetchStatus()
+    }, [supabase])
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -37,11 +65,30 @@ export default function DaftarDADPage() {
         e.preventDefault()
         setIsSubmitting(true)
 
-        await new Promise(resolve => setTimeout(resolve, 1500))
+        try {
+            const { error } = await supabase
+                .from('dad_registrations')
+                .insert([
+                    {
+                        nama_lengkap: formData.namaLengkap,
+                        asal: formData.asal,
+                        tempat_tanggal_lahir: formData.tempatTanggalLahir,
+                        domisili: formData.domisili,
+                        asal_komisariat: formData.asalKomisariat,
+                        prodi: formData.prodi
+                    }
+                ])
 
-        setIsSubmitting(false)
-        setIsSuccess(true)
-        window.scrollTo({ top: 0, behavior: 'smooth' })
+            if (error) throw error
+
+            setIsSuccess(true)
+            window.scrollTo({ top: 0, behavior: 'smooth' })
+        } catch (error: any) {
+            console.error('Error submitting form:', error.message)
+            alert('Gagal mengirim pendaftaran. Silakan coba lagi.')
+        } finally {
+            setIsSubmitting(false)
+        }
     }
 
     if (isSuccess) {
@@ -66,7 +113,7 @@ export default function DaftarDADPage() {
                             Pendaftaran Berhasil!
                         </h2>
                         <p className="text-[var(--text-secondary)] text-sm mb-8 leading-relaxed">
-                            Terima kasih, <strong className="text-[var(--text-primary)]">{formData.namaLengkap}</strong>. Data pendaftaran Darul Arqam Dasar (DAD) kamu telah kami terima. Panitia akan segera menghubungi kamu melalui WhatsApp untuk informasi selanjutnya.
+                            Terima kasih, <strong className="text-[var(--text-primary)]">{formData.namaLengkap}</strong>. Data pendaftaran Darul Arqam Dasar (DAD) kamu telah kami terima. Panitia akan segera menghubungi kamu untuk informasi selanjutnya.
                         </p>
                         <Link
                             href="/"
@@ -87,7 +134,14 @@ export default function DaftarDADPage() {
     return (
         <div className="min-h-screen bg-[var(--background)] flex flex-col justify-between relative overflow-hidden font-sans">
 
-            {!isRegistrationOpen && (
+            {isCheckingStatus ? (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+                    <div className="flex flex-col items-center gap-3">
+                        <Loader2 className="w-10 h-10 animate-spin text-[var(--primary)]" />
+                        <p className="text-sm font-bold text-white tracking-widest uppercase font-display">Mengecek Sistem...</p>
+                    </div>
+                </div>
+            ) : !isRegistrationOpen ? (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
                     <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--radius)] p-8 sm:p-10 max-w-md w-full text-center shadow-2xl relative overflow-hidden">
                         <div
@@ -117,7 +171,7 @@ export default function DaftarDADPage() {
                         </Link>
                     </div>
                 </div>
-            )}
+            ) : null}
 
             <header className="p-6 relative z-10 max-w-7xl mx-auto w-full flex items-center justify-between">
                 <Logo size="md" />
@@ -130,18 +184,15 @@ export default function DaftarDADPage() {
             </header>
 
             <main className="flex-1 max-w-3xl w-full mx-auto px-4 py-8 relative z-10">
-                <div className={`transition-all duration-300 ${!isRegistrationOpen ? 'pointer-events-none opacity-40 select-none' : ''}`}>
+                <div className={`transition-all duration-300 ${(!isRegistrationOpen || isCheckingStatus) ? 'pointer-events-none opacity-40 select-none' : ''}`}>
 
                     <div className="text-center mb-10">
-                        <span className="text-xs sm:text-sm font-bold tracking-[0.2em] uppercase text-[var(--accent)] font-display block mb-2 flex items-center justify-center gap-1.5">
-                            <Sparkles className="w-4 h-4 text-[var(--accent)]" /> Penerimaan Anggota Baru
-                        </span>
                         <h1 className="text-3xl sm:text-5xl font-black text-[var(--text-primary)] leading-tight font-display mb-4">
                             Form Pendaftaran <br className="hidden sm:block" />
                             <span className="text-[var(--primary)]">Darul Arqam Dasar</span>
                         </h1>
                         <p className="text-[var(--text-muted)] text-xs sm:text-sm max-w-xl mx-auto leading-relaxed">
-                            Langkah awalmu untuk berproses, belajar, dan berdampak bersama Ikatan Mahasiswa Muhammadiyah Pimpinan Komisariat Kaizen UMSurabaya.
+                            Langkah awalmu untuk berproses, belajar, dan berdampak bersama Ikatan Mahasiswa Muhammadiyah.
                         </p>
                     </div>
 
@@ -161,111 +212,84 @@ export default function DaftarDADPage() {
                             />
                         </div>
 
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label htmlFor="asal" className="form-label">Asal</label>
+                                <input
+                                    type="text"
+                                    id="asal"
+                                    name="asal"
+                                    required
+                                    value={formData.asal}
+                                    onChange={handleChange}
+                                    placeholder="Contoh: Surabaya"
+                                    className="form-input"
+                                />
+                            </div>
+
+                            <div>
+                                <label htmlFor="tempatTanggalLahir" className="form-label">Tempat, Tanggal Lahir</label>
+                                <input
+                                    type="text"
+                                    id="tempatTanggalLahir"
+                                    name="tempatTanggalLahir"
+                                    required
+                                    value={formData.tempatTanggalLahir}
+                                    onChange={handleChange}
+                                    placeholder="Contoh: Surabaya, 17 Agustus 2005"
+                                    className="form-input"
+                                />
+                            </div>
+                        </div>
+
                         <div>
-                            <label htmlFor="nim" className="form-label">Nomor Induk Mahasiswa (NIM)</label>
+                            <label htmlFor="domisili" className="form-label">Domisili Saat Ini</label>
                             <input
-                                type="number"
-                                id="nim"
-                                name="nim"
+                                type="text"
+                                id="domisili"
+                                name="domisili"
                                 required
-                                value={formData.nim}
+                                value={formData.domisili}
                                 onChange={handleChange}
-                                placeholder="Masukkan NIM"
-                                className="form-input [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                placeholder="Alamat tinggal saat ini"
+                                className="form-input"
                             />
                         </div>
 
-                        {/* Grid Fakultas & Prodi */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label htmlFor="fakultas" className="form-label">Fakultas</label>
-                                <select
-                                    id="fakultas"
-                                    name="fakultas"
-                                    required
-                                    value={formData.fakultas}
-                                    onChange={handleChange}
-                                    className="form-input"
-                                >
-                                    <option value="" disabled>Pilih Fakultas</option>
-                                    <option value="Fakultas Teknik">Fakultas Teknik</option>
-                                    <option value="Fakultas Agama Islam">Fakultas Agama Islam</option>
-                                    <option value="Fakultas Kedokteran">Fakultas Kedokteran</option>
-                                    <option value="Fakultas Ilmu Kesehatan">Fakultas Ilmu Kesehatan</option>
-                                    <option value="Fakultas Ekonomi dan Bisnis">Fakultas Ekonomi dan Bisnis</option>
-                                    <option value="Fakultas Hukum">Fakultas Hukum</option>
-                                    <option value="Fakultas Psikologi">Fakultas Psikologi</option>
-                                    <option value="Lainnya">Lainnya</option>
-                                </select>
-                            </div>
-
-                            <div>
-                                <label htmlFor="programStudi" className="form-label">Program Studi</label>
+                                <label htmlFor="asalKomisariat" className="form-label">Asal Komisariat</label>
                                 <input
                                     type="text"
-                                    id="programStudi"
-                                    name="programStudi"
+                                    id="asalKomisariat"
+                                    name="asalKomisariat"
                                     required
-                                    value={formData.programStudi}
+                                    value={formData.asalKomisariat}
                                     onChange={handleChange}
-                                    placeholder="Contoh: S1 Teknik Informatika"
+                                    placeholder="Contoh: PK IMM Kaizen"
                                     className="form-input"
                                 />
                             </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label htmlFor="semester" className="form-label">Semester</label>
-                                <select
-                                    id="semester"
-                                    name="semester"
-                                    required
-                                    value={formData.semester}
-                                    onChange={handleChange}
-                                    className="form-input"
-                                >
-                                    <option value="" disabled>Pilih Semester</option>
-                                    <option value="1">Semester 1</option>
-                                    <option value="3">Semester 3</option>
-                                    <option value="5">Semester 5</option>
-                                    <option value="7">Semester 7</option>
-                                </select>
-                            </div>
 
                             <div>
-                                <label htmlFor="whatsapp" className="form-label">Nomor WhatsApp Aktif</label>
+                                <label htmlFor="prodi" className="form-label">Program Studi</label>
                                 <input
-                                    type="tel"
-                                    id="whatsapp"
-                                    name="whatsapp"
+                                    type="text"
+                                    id="prodi"
+                                    name="prodi"
                                     required
-                                    value={formData.whatsapp}
+                                    value={formData.prodi}
                                     onChange={handleChange}
-                                    placeholder="Contoh: 081234567890"
+                                    placeholder="Contoh: S1 Informatika"
                                     className="form-input"
                                 />
                             </div>
-                        </div>
-
-                        <div>
-                            <label htmlFor="motivasi" className="form-label">Motivasi Bergabung IMM</label>
-                            <textarea
-                                id="motivasi"
-                                name="motivasi"
-                                required
-                                rows={4}
-                                value={formData.motivasi}
-                                onChange={handleChange}
-                                placeholder="Ceritakan singkat alasan kamu ingin bergabung..."
-                                className="form-input resize-none"
-                            ></textarea>
                         </div>
 
                         <div className="pt-4">
                             <button
                                 type="submit"
-                                disabled={isSubmitting || !isRegistrationOpen}
+                                disabled={isSubmitting || !isRegistrationOpen || isCheckingStatus}
                                 className="btn-primary w-full justify-center py-4 text-xs font-bold tracking-widest uppercase shadow-md flex items-center gap-2"
                             >
                                 {isSubmitting ? (
