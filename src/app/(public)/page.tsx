@@ -1,46 +1,102 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { newsData } from '../lib/data'
+import { createBrowserClient } from '@supabase/ssr'
+
+interface Agenda {
+    id: string | number
+    title: string
+    date: string
+    month: string
+    location: string
+    time: string
+}
+
+interface News {
+    id: string | number
+    title: string
+    excerpt: string
+    cover: string
+    category: string
+    publishDate: string
+    pwmuUrl: string
+    status: string
+}
+
+interface BPH {
+    id: string | number
+    name: string
+    position: string
+    photo: string
+}
 
 export default function HomePage() {
     const [openFaq, setOpenFaq] = useState<number | null>(null)
 
-    const latestNews = newsData.filter(n => n.status === 'published').slice(0, 3)
+    const [upcomingAgendas, setUpcomingAgendas] = useState<Agenda[]>([])
+    const [latestNews, setLatestNews] = useState<News[]>([])
+    const [bphData, setBphData] = useState<BPH[]>([])
 
-    const upcomingAgendas = [
-        {
-            id: 1,
-            date: '31',
-            month: 'Okt',
-            title: 'Sharing Session Dikti & Study Club',
-            location: 'Universitas Muhammadiyah Surabaya',
-            time: '08:00 WIB - Selesai'
-        },
-        {
-            id: 2,
-            date: 'COMING SOON',
-            month: '',
-            title: 'Darul Arqam Dasar',
-            location: '',
-            time: ''
-        },
-        {
-            id: 3,
-            date: 'COMING SOON',
-            month: '',
-            title: 'Serawung Kader',
-            location: '',
-            time: ''
+    const [isLoadingAgendas, setIsLoadingAgendas] = useState(true)
+    const [isLoadingNews, setIsLoadingNews] = useState(true)
+    const [isLoadingBph, setIsLoadingBph] = useState(true)
+
+    const supabase = createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    )
+
+    useEffect(() => {
+        const fetchAllData = async () => {
+            try {
+                const agendasPromise = supabase
+                    .from('agendas')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(3)
+
+                const newsPromise = supabase
+                    .from('news')
+                    .select('*')
+                    .eq('status', 'published')
+                    .order('created_at', { ascending: false })
+                    .limit(3)
+
+                const bphPromise = supabase
+                    .from('pengurus')
+                    .select('*')
+                    .eq('division', 'BPH')
+                    .order('created_at', { ascending: true })
+
+                const [agendasRes, newsRes, bphRes] = await Promise.all([
+                    agendasPromise,
+                    newsPromise,
+                    bphPromise
+                ])
+
+                if (agendasRes.error) console.error('Error fetching agendas:', agendasRes.error)
+                else if (agendasRes.data) setUpcomingAgendas(agendasRes.data)
+                setIsLoadingAgendas(false)
+
+                if (newsRes.error) console.error('Error fetching news:', newsRes.error)
+                else if (newsRes.data) setLatestNews(newsRes.data)
+                setIsLoadingNews(false)
+
+                if (bphRes.error) console.error('Error fetching BPH:', JSON.stringify(bphRes.error, null, 2))
+                else if (bphRes.data) setBphData(bphRes.data)
+                setIsLoadingBph(false)
+
+            } catch (error) {
+                console.error('Unexpected error fetching data:', error)
+                setIsLoadingAgendas(false)
+                setIsLoadingNews(false)
+                setIsLoadingBph(false)
+            }
         }
-    ]
 
-    const bphData = [
-        { id: 1, name: "Abdul Baari' Al Fakhri", role: 'Ketua Umum', photo: '/img/profile/ketum.png' },
-        { id: 2, name: 'Muhammad Zakky Arifina', role: 'Sekretaris Umum', photo: '/img/profile/sekum.jpg' },
-        { id: 3, name: 'Muhammad Zidan Al Farezel', role: 'Bendahara Umum', photo: '/img/profile/bendum.png' },
-    ]
+        fetchAllData()
+    }, [supabase])
 
     const faqData = [
         { id: 1, question: 'Bagaimana cara bergabung dengan IMM Kaizen?', answer: 'Mahasiswa Universitas Muhammadiyah Surabaya dapat bergabung melalui kegiatan Darul Arqam Dasar (DAD) yang rutin kami selenggarakan di awal semester.' },
@@ -193,53 +249,65 @@ export default function HomePage() {
                         </h2>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {latestNews.map((item) => (
-                            <article
-                                key={item.id}
-                                className="group bg-[var(--card)] border border-[var(--border)] hover:border-[var(--text-primary)] transition-colors flex flex-col h-full rounded-[var(--radius)] overflow-hidden"
-                            >
-                                <Link
-                                    href={`/berita/${item.id}`}
-                                    className="relative aspect-[4/3] overflow-hidden bg-[var(--surface-2)] block"
+                    {isLoadingNews ? (
+                        <div className="py-12 text-center w-full">
+                            <span className="text-[var(--text-muted)] animate-pulse font-medium">Memuat berita terbaru...</span>
+                        </div>
+                    ) : latestNews.length === 0 ? (
+                        <div className="py-12 text-center w-full bg-[var(--background)] rounded-[var(--radius)] border border-[var(--border)]">
+                            <span className="text-[var(--text-secondary)]">Belum ada berita yang dipublikasikan.</span>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            {latestNews.map((item) => (
+                                <article
+                                    key={item.id}
+                                    className="group bg-[var(--card)] border border-[var(--border)] hover:border-[var(--text-primary)] transition-colors flex flex-col h-full rounded-[var(--radius)] overflow-hidden"
                                 >
-                                    <img
-                                        src={item.cover}
-                                        alt={item.title}
-                                        className="w-full h-full object-cover grayscale opacity-90 transition-all duration-700 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105"
-                                    />
-                                    <div className="absolute top-4 left-4 bg-[#111111] text-white px-3 py-1.5 rounded-[calc(var(--radius)-2px)]">
-                                        <span className="text-[10px] font-bold uppercase tracking-widest font-display">{item.category}</span>
-                                    </div>
-                                </Link>
-
-                                <div className="p-6 sm:p-8 flex flex-col flex-1">
-                                    <span className="text-xs text-[var(--text-muted)] font-bold tracking-wider uppercase mb-3 block">
-                                        {item.publishDate}
-                                    </span>
-                                    <Link href={`/berita/${item.id}`}>
-                                        <h3 className="font-black text-xl leading-tight mb-4 text-[var(--text-primary)] group-hover:text-[var(--primary)] transition-colors cursor-pointer font-display">
-                                            {item.title}
-                                        </h3>
+                                    <Link
+                                        href={`/berita/${item.id}`}
+                                        className="relative aspect-[4/3] overflow-hidden bg-[var(--surface-2)] block"
+                                    >
+                                        <img
+                                            src={item.cover}
+                                            alt={item.title}
+                                            className="w-full h-full object-cover grayscale opacity-90 transition-all duration-700 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105"
+                                        />
+                                        <div className="absolute top-4 left-4 bg-[#111111] text-white px-3 py-1.5 rounded-[calc(var(--radius)-2px)]">
+                                            <span className="text-[10px] font-bold uppercase tracking-widest font-display">{item.category}</span>
+                                        </div>
                                     </Link>
-                                    <p className="text-sm text-[var(--text-secondary)] leading-relaxed line-clamp-3 mb-6">
-                                        {item.excerpt}
-                                    </p>
 
-                                    <div className="mt-auto pt-4">
-                                        <a
-                                            href={item.pwmuUrl}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-widest border-b-2 border-[var(--text-primary)] pb-1 hover:text-[var(--primary)] hover:border-[var(--primary)] transition-colors inline-flex items-center gap-2 font-display"
-                                        >
-                                            Baca Selengkapnya di PWMU <span>→</span>
-                                        </a>
+                                    <div className="p-6 sm:p-8 flex flex-col flex-1">
+                                        <span className="text-xs text-[var(--text-muted)] font-bold tracking-wider uppercase mb-3 block">
+                                            {item.publishDate}
+                                        </span>
+                                        <Link href={`/berita/${item.id}`}>
+                                            <h3 className="font-black text-xl leading-tight mb-4 text-[var(--text-primary)] group-hover:text-[var(--primary)] transition-colors cursor-pointer font-display">
+                                                {item.title}
+                                            </h3>
+                                        </Link>
+                                        <p className="text-sm text-[var(--text-secondary)] leading-relaxed line-clamp-3 mb-6">
+                                            {item.excerpt}
+                                        </p>
+
+                                        <div className="mt-auto pt-4">
+                                            {item.pwmuUrl && (
+                                                <a
+                                                    href={item.pwmuUrl}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-widest border-b-2 border-[var(--text-primary)] pb-1 hover:text-[var(--primary)] hover:border-[var(--primary)] transition-colors inline-flex items-center gap-2 font-display"
+                                                >
+                                                    Baca Selengkapnya di PWMU <span>→</span>
+                                                </a>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
-                            </article>
-                        ))}
-                    </div>
+                                </article>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </section>
 
@@ -253,50 +321,60 @@ export default function HomePage() {
                     </div>
 
                     <div className="flex flex-col gap-4">
-                        {upcomingAgendas.map((agenda) => {
-                            const isComingSoon = !agenda.month || agenda.date.toLowerCase().includes('soon');
+                        {isLoadingAgendas ? (
+                            <div className="py-12 text-center">
+                                <span className="text-[var(--text-muted)] animate-pulse font-medium">Memuat jadwal kegiatan...</span>
+                            </div>
+                        ) : upcomingAgendas.length === 0 ? (
+                            <div className="py-12 text-center bg-[var(--surface)] rounded-[var(--radius)] border border-[var(--border)]">
+                                <span className="text-[var(--text-secondary)]">Belum ada agenda dalam waktu dekat.</span>
+                            </div>
+                        ) : (
+                            upcomingAgendas.map((agenda) => {
+                                const isComingSoon = !agenda.month || (agenda.date && agenda.date.toLowerCase().includes('soon'));
 
-                            return (
-                                <div
-                                    key={agenda.id}
-                                    className="group flex flex-col md:flex-row items-start md:items-center p-6 sm:p-8 bg-[var(--surface)] border border-[var(--border)] hover:border-[var(--primary)] transition-colors gap-6 sm:gap-8 rounded-[var(--radius)]"
-                                >
-                                    <div className="flex flex-col items-center justify-center min-w-[80px] text-center border-b md:border-b-0 md:border-r border-[var(--border-strong)] pb-4 md:pb-0 md:pr-8 w-full md:w-auto">
-                                        <span
-                                            className={`${isComingSoon ? 'text-xl sm:text-2xl' : 'text-4xl'} font-black text-[var(--primary)] uppercase font-display`}
-                                        >
-                                            {agenda.date}
-                                        </span>
-                                        {agenda.month && (
-                                            <span className="text-sm font-bold text-[var(--text-muted)] uppercase tracking-widest mt-1 font-display">
-                                                {agenda.month}
+                                return (
+                                    <div
+                                        key={agenda.id}
+                                        className="group flex flex-col md:flex-row items-start md:items-center p-6 sm:p-8 bg-[var(--surface)] border border-[var(--border)] hover:border-[var(--primary)] transition-colors gap-6 sm:gap-8 rounded-[var(--radius)]"
+                                    >
+                                        <div className="flex flex-col items-center justify-center min-w-[80px] text-center border-b md:border-b-0 md:border-r border-[var(--border-strong)] pb-4 md:pb-0 md:pr-8 w-full md:w-auto">
+                                            <span
+                                                className={`${isComingSoon ? 'text-xl sm:text-2xl' : 'text-4xl'} font-black text-[var(--primary)] uppercase font-display`}
+                                            >
+                                                {agenda.date || 'TBA'}
                                             </span>
-                                        )}
+                                            {agenda.month && (
+                                                <span className="text-sm font-bold text-[var(--text-muted)] uppercase tracking-widest mt-1 font-display">
+                                                    {agenda.month}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div className="flex-1">
+                                            <h3 className="text-xl font-bold text-[var(--text-primary)] group-hover:text-[var(--primary)] transition-colors font-display">
+                                                {agenda.title}
+                                            </h3>
+                                            {(agenda.location || agenda.time) && (
+                                                <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-[var(--text-secondary)] font-medium mt-2">
+                                                    {agenda.location && (
+                                                        <span className="flex items-center gap-2">
+                                                            <span className="w-1.5 h-1.5 bg-[var(--text-muted)] rounded-full"></span>
+                                                            {agenda.location}
+                                                        </span>
+                                                    )}
+                                                    {agenda.time && (
+                                                        <span className="flex items-center gap-2">
+                                                            <span className="w-1.5 h-1.5 bg-[var(--text-muted)] rounded-full"></span>
+                                                            {agenda.time}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
-                                    <div className="flex-1">
-                                        <h3 className="text-xl font-bold text-[var(--text-primary)] group-hover:text-[var(--primary)] transition-colors font-display">
-                                            {agenda.title}
-                                        </h3>
-                                        {(agenda.location || agenda.time) && (
-                                            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-[var(--text-secondary)] font-medium mt-2">
-                                                {agenda.location && (
-                                                    <span className="flex items-center gap-2">
-                                                        <span className="w-1.5 h-1.5 bg-[var(--text-muted)] rounded-full"></span>
-                                                        {agenda.location}
-                                                    </span>
-                                                )}
-                                                {agenda.time && (
-                                                    <span className="flex items-center gap-2">
-                                                        <span className="w-1.5 h-1.5 bg-[var(--text-muted)] rounded-full"></span>
-                                                        {agenda.time}
-                                                    </span>
-                                                )}
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            );
-                        })}
+                                );
+                            })
+                        )}
                     </div>
                 </div>
             </section>
@@ -308,32 +386,42 @@ export default function HomePage() {
                         <h2 className="text-3xl sm:text-4xl font-black font-display">Badan Pengurus Harian</h2>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {bphData.map(bph => (
-                            <div
-                                key={bph.id}
-                                className="group bg-[#111111] border border-white/10 hover:border-[var(--accent)] transition-colors p-8 flex flex-col items-center text-center rounded-[var(--radius)]"
-                            >
-                                <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full overflow-hidden mb-6 border-2 border-white/10 group-hover:border-[var(--accent)] transition-colors bg-gray-800 flex items-center justify-center">
-                                    {bph.photo ? (
-                                        <img
-                                            src={bph.photo}
-                                            alt={bph.name}
-                                            className="w-full h-full object-cover grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500"
-                                        />
-                                    ) : (
-                                        <span className="text-xs text-white/40 font-bold uppercase font-display">No Photo</span>
-                                    )}
+                    {isLoadingBph ? (
+                        <div className="py-12 text-center w-full">
+                            <span className="text-white/50 animate-pulse font-medium">Memuat data BPH...</span>
+                        </div>
+                    ) : bphData.length === 0 ? (
+                        <div className="py-12 text-center w-full border border-white/10 rounded-[var(--radius)]">
+                            <span className="text-white/50">Data kepengurusan belum tersedia.</span>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            {bphData.map(bph => (
+                                <div
+                                    key={bph.id}
+                                    className="group bg-[#111111] border border-white/10 hover:border-[var(--accent)] transition-colors p-8 flex flex-col items-center text-center rounded-[var(--radius)]"
+                                >
+                                    <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full overflow-hidden mb-6 border-2 border-white/10 group-hover:border-[var(--accent)] transition-colors bg-gray-800 flex items-center justify-center">
+                                        {bph.photo ? (
+                                            <img
+                                                src={bph.photo}
+                                                alt={bph.name}
+                                                className="w-full h-full object-cover grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500"
+                                            />
+                                        ) : (
+                                            <span className="text-xs text-white/40 font-bold uppercase font-display">No Photo</span>
+                                        )}
+                                    </div>
+                                    <h4 className="font-bold text-xl sm:text-2xl text-white mb-2 group-hover:text-[var(--accent)] transition-colors font-display">
+                                        {bph.name}
+                                    </h4>
+                                    <span className="text-xs font-bold tracking-widest uppercase text-[var(--accent-light)] font-display">
+                                        {bph.position}
+                                    </span>
                                 </div>
-                                <h4 className="font-bold text-xl sm:text-2xl text-white mb-2 group-hover:text-[var(--accent)] transition-colors font-display">
-                                    {bph.name}
-                                </h4>
-                                <span className="text-xs font-bold tracking-widest uppercase text-[var(--accent-light)] font-display">
-                                    {bph.role}
-                                </span>
-                            </div>
-                        ))}
-                    </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </section>
 
@@ -402,7 +490,6 @@ export default function HomePage() {
                     </Link>
                 </div>
             </section>
-
         </div>
     )
 }

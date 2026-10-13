@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-    title: 'Kaizen Company — IMM Kaizen UMSurabaya',
+    title: 'Kaizen Company — IMM Kaizen UMSURA',
     description: 'Badan Usaha Milik Komisariat PK IMM Kaizen Universitas Muhammadiyah Surabaya.',
 }
 
