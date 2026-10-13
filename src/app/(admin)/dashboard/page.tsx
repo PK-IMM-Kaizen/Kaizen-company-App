@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { newsData, products, managementData, alumniData } from '../../lib/data'
+import { createBrowserClient } from '@supabase/ssr'
 import {
     Newspaper,
     FileEdit,
@@ -13,19 +13,47 @@ import {
     ArrowRight,
     ExternalLink,
     Activity,
-    Clock
+    Clock,
+    Loader2
 } from 'lucide-react'
 
-const recentActivities = [
-    { id: 1, admin: 'Ahmad (Bid. Kaderisasi)', action: 'menambahkan data pengurus baru', target: 'Syamil - Angkatan 2023', time: '10 menit yang lalu', type: 'users' },
-    { id: 2, admin: 'Siti (Bid. Medkom)', action: 'menerbitkan berita', target: 'Pelatihan Jurnalistik 2024', time: '1 jam yang lalu', type: 'news' },
-    { id: 3, admin: 'Budi (Bid. Kewirausahaan)', action: 'memperbarui stok produk', target: 'Kemeja PDH IMM Kaizen', time: '3 jam yang lalu', type: 'product' },
-    { id: 4, admin: 'Rina (Bid. Keilmuan)', action: 'menyimpan draft berita', target: 'Kajian Rutin Pekanan', time: 'Kemarin, 15:30', type: 'draft' },
-]
+const timeAgo = (dateString: string) => {
+    const date = new Date(dateString)
+    const now = new Date()
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000)
+
+    if (diffInSeconds < 60) return 'Baru saja'
+    const diffInMinutes = Math.floor(diffInSeconds / 60)
+    if (diffInMinutes < 60) return `${diffInMinutes} menit yang lalu`
+    const diffInHours = Math.floor(diffInMinutes / 60)
+    if (diffInHours < 24) return `${diffInHours} jam yang lalu`
+    const diffInDays = Math.floor(diffInHours / 24)
+    if (diffInDays < 7) return `${diffInDays} hari yang lalu`
+
+    return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })
+}
 
 export default function DashboardOverviewPage() {
     const [role, setRole] = useState<string | null>('')
     const [currentDate, setCurrentDate] = useState<string>('')
+    const [isLoading, setIsLoading] = useState(true)
+
+    const [dashboardStats, setDashboardStats] = useState({
+        publishedNews: 0,
+        draftNews: 0,
+        availableProducts: 0,
+        totalProducts: 0,
+        activePengurus: 0,
+        totalAlumni: 0
+    })
+
+    const [recentNews, setRecentNews] = useState<any[]>([])
+    const [recentActivities, setRecentActivities] = useState<any[]>([])
+
+    const supabase = createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    )
 
     useEffect(() => {
         const savedRole = localStorage.getItem('userRole')
@@ -37,37 +65,83 @@ export default function DashboardOverviewPage() {
             month: 'long',
             year: 'numeric'
         }))
-    }, [])
 
-    const publishedNews = newsData.filter(n => n.status === 'published').length
-    const draftNews = newsData.filter(n => n.status === 'draft').length
-    const availableProducts = products.filter(p => p.available).length
+        const fetchDashboardData = async () => {
+            setIsLoading(true)
+            try {
+                const [
+                    { count: publishedNewsCount },
+                    { count: draftNewsCount },
+                    { count: availableProductsCount },
+                    { count: totalProductsCount },
+                    { count: pengurusCount },
+                    { count: alumniCount },
+                    { data: recentNewsData },
+                    { data: recentLogsData }
+                ] = await Promise.all([
+                    supabase.from('news').select('*', { count: 'exact', head: true }).eq('status', 'published'),
+                    supabase.from('news').select('*', { count: 'exact', head: true }).eq('status', 'draft'),
+                    supabase.from('products').select('*', { count: 'exact', head: true }).eq('available', true),
+                    supabase.from('products').select('*', { count: 'exact', head: true }),
+                    supabase.from('pengurus').select('*', { count: 'exact', head: true }),
+                    supabase.from('alumni').select('*', { count: 'exact', head: true }),
+                    supabase.from('news').select('id, title, category, publish_date, status, created_at').order('created_at', { ascending: false }).limit(5),
+                    supabase.from('system_logs').select('*').order('created_at', { ascending: false }).limit(6)
+                ])
+
+                setDashboardStats({
+                    publishedNews: publishedNewsCount || 0,
+                    draftNews: draftNewsCount || 0,
+                    availableProducts: availableProductsCount || 0,
+                    totalProducts: totalProductsCount || 0,
+                    activePengurus: pengurusCount || 0,
+                    totalAlumni: alumniCount || 0
+                })
+
+                if (recentNewsData) setRecentNews(recentNewsData)
+                if (recentLogsData) setRecentActivities(recentLogsData)
+
+            } catch (error) {
+                console.error('Gagal mengambil data dashboard:', error)
+            } finally {
+                setIsLoading(false)
+            }
+        }
+
+        fetchDashboardData()
+    }, [supabase])
 
     const stats = [
-        { label: 'Berita Terbit', value: publishedNews, color: 'var(--primary)', href: '/dashboard/berita', icon: <Newspaper className="w-5 h-5 text-[var(--primary)]" /> },
-        { label: 'Draft Berita', value: draftNews, color: 'var(--accent-dark)', href: '/dashboard/berita?tab=draft', icon: <FileEdit className="w-5 h-5 text-[var(--accent-dark)]" /> },
-        { label: 'Produk Aktif', value: availableProducts, color: 'var(--success)', href: '/dashboard/produk', icon: <ShoppingBag className="w-5 h-5 text-[var(--success)]" /> },
-        { label: 'Pengurus Aktif', value: managementData.length, color: 'var(--info)', href: '/dashboard/pengurus', icon: <Users className="w-5 h-5 text-[var(--info)]" /> },
-        { label: 'Alumni Terdaftar', value: alumniData.length, color: '#6B46C1', href: '/dashboard/alumni', icon: <GraduationCap className="w-5 h-5 text-[#6B46C1]" /> },
-        { label: 'Total Produk', value: products.length, color: 'var(--text-secondary)', href: '/dashboard/produk', icon: <Package className="w-5 h-5 text-[var(--text-secondary)]" /> },
+        { label: 'Berita Terbit', value: dashboardStats.publishedNews, color: 'var(--primary)', href: '/dashboard/berita', icon: <Newspaper className="w-5 h-5 text-[var(--primary)]" /> },
+        { label: 'Draft Berita', value: dashboardStats.draftNews, color: 'var(--accent-dark)', href: '/dashboard/berita?tab=draft', icon: <FileEdit className="w-5 h-5 text-[var(--accent-dark)]" /> },
+        { label: 'Produk Aktif', value: dashboardStats.availableProducts, color: 'var(--success)', href: '/dashboard/produk', icon: <ShoppingBag className="w-5 h-5 text-[var(--success)]" /> },
+        { label: 'Pengurus Aktif', value: dashboardStats.activePengurus, color: 'var(--info)', href: '/dashboard/kepengurusan', icon: <Users className="w-5 h-5 text-[var(--info)]" /> },
+        { label: 'Alumni Terdaftar', value: dashboardStats.totalAlumni, color: '#6B46C1', href: '/dashboard/alumni', icon: <GraduationCap className="w-5 h-5 text-[#6B46C1]" /> },
+        { label: 'Total Produk', value: dashboardStats.totalProducts, color: 'var(--text-secondary)', href: '/dashboard/produk', icon: <Package className="w-5 h-5 text-[var(--text-secondary)]" /> },
     ]
 
-    const recentNews = newsData.slice(0, 5)
-
-    // Helper icon untuk timeline aktivitas
     const getActivityIcon = (type: string) => {
         switch (type) {
             case 'users': return <Users className="w-4 h-4 text-[var(--info)]" />
             case 'news': return <Newspaper className="w-4 h-4 text-[var(--primary)]" />
             case 'product': return <Package className="w-4 h-4 text-[var(--success)]" />
             case 'draft': return <FileEdit className="w-4 h-4 text-[var(--accent-dark)]" />
+            case 'settings': return <Activity className="w-4 h-4 text-orange-500" />
             default: return <Activity className="w-4 h-4 text-[var(--text-muted)]" />
         }
     }
 
+    if (isLoading) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
+                <Loader2 className="w-8 h-8 animate-spin text-[var(--primary)]" />
+                <p className="text-sm font-bold text-[var(--text-muted)] uppercase tracking-widest font-display">Memuat Data Dashboard...</p>
+            </div>
+        )
+    }
+
     return (
         <div className="space-y-6 animate-in fade-in duration-300">
-            {/* --- HEADER --- */}
             <div
                 className="rounded-[var(--radius)] p-6 relative overflow-hidden shadow-sm"
                 style={{
@@ -90,7 +164,6 @@ export default function DashboardOverviewPage() {
                 <div className="absolute -bottom-10 -right-10 w-48 h-48 bg-white/5 rounded-full blur-xl pointer-events-none" />
             </div>
 
-            {/* --- STATISTIK --- */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 {stats.map(s => (
                     <Link
@@ -119,11 +192,8 @@ export default function DashboardOverviewPage() {
                 ))}
             </div>
 
-            {/* --- GRID KONTEN BAWAH --- */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-                {/* TABEL BERITA TERKINI - Lebar dinamis tergantung role */}
-                <div className={`bg-[var(--card)] rounded-[var(--radius)] border border-[var(--border)] overflow-hidden shadow-sm ${role === 'superadmin' ? 'lg:col-span-2' : 'lg:col-span-3'}`}>
+                <div className={`bg-[var(--card)] rounded-[var(--radius)] border border-[var(--border)] overflow-hidden shadow-sm flex flex-col h-full ${role === 'superadmin' ? 'lg:col-span-2' : 'lg:col-span-3'}`}>
                     <div className="px-5 py-4 border-b border-[var(--border)] bg-[var(--surface)] flex items-center justify-between">
                         <h3 className="font-black text-sm text-[var(--text-primary)] font-display">
                             Berita Terkini
@@ -135,8 +205,8 @@ export default function DashboardOverviewPage() {
                             Lihat Semua <ArrowRight className="w-3.5 h-3.5" />
                         </Link>
                     </div>
-                    <div className="overflow-x-auto">
-                        <table className="admin-table w-full text-left border-collapse">
+                    <div className="overflow-x-auto flex-1">
+                        <table className="admin-table w-full text-left border-collapse h-full">
                             <thead>
                             <tr className="bg-[var(--surface-2)] border-b border-[var(--border)] text-xs text-[var(--text-muted)] uppercase tracking-wider font-display">
                                 <th className="p-4 font-bold">Judul</th>
@@ -147,43 +217,50 @@ export default function DashboardOverviewPage() {
                             </tr>
                             </thead>
                             <tbody>
-                            {recentNews.map(n => (
-                                <tr key={n.id} className="border-b border-[var(--border)] hover:bg-[var(--surface)] transition-colors group">
-                                    <td className="p-4">
-                                        <p className="font-semibold text-xs line-clamp-1 text-[var(--text-primary)] font-display">
-                                            {n.title}
-                                        </p>
-                                    </td>
-                                    <td className="p-4">
-                                        <span className="text-[10px] font-bold text-[var(--primary)] font-display bg-[var(--primary)]/10 px-2.5 py-1 rounded-md uppercase tracking-wider">
-                                            {n.category}
-                                        </span>
-                                    </td>
-                                    <td className="p-4 text-xs text-[var(--text-muted)] whitespace-nowrap font-medium">
-                                        {n.publishDate}
-                                    </td>
-                                    <td className="p-4">
-                                        <span className={`text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-md ${n.status === 'published' ? 'bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-400' : 'bg-gray-100 text-gray-600 dark:bg-gray-500/10 dark:text-gray-400'}`}>
-                                            {n.status === 'published' ? 'Terbit' : 'Draft'}
-                                        </span>
-                                    </td>
-                                    <td className="p-4 text-right">
-                                        <Link
-                                            href={`/dashboard/berita/${n.id}`}
-                                            className="inline-flex items-center justify-center p-1.5 text-[var(--text-muted)] hover:text-[var(--primary)] hover:bg-[var(--primary)]/10 rounded-md transition-colors"
-                                            title="Edit Berita"
-                                        >
-                                            <ExternalLink className="w-4 h-4" />
-                                        </Link>
+                            {recentNews.length > 0 ? (
+                                recentNews.map(n => (
+                                    <tr key={n.id} className="border-b border-[var(--border)] hover:bg-[var(--surface)] transition-colors group">
+                                        <td className="p-4">
+                                            <p className="font-semibold text-xs line-clamp-1 text-[var(--text-primary)] font-display">
+                                                {n.title}
+                                            </p>
+                                        </td>
+                                        <td className="p-4">
+                                            <span className="text-[10px] font-bold text-[var(--primary)] font-display bg-[var(--primary)]/10 px-2.5 py-1 rounded-md uppercase tracking-wider">
+                                                {n.category || '-'}
+                                            </span>
+                                        </td>
+                                        <td className="p-4 text-xs text-[var(--text-muted)] whitespace-nowrap font-medium">
+                                            {timeAgo(n.publish_date || n.created_at)}
+                                        </td>
+                                        <td className="p-4">
+                                            <span className={`text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-md ${n.status === 'published' ? 'bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-400' : 'bg-gray-100 text-gray-600 dark:bg-gray-500/10 dark:text-gray-400'}`}>
+                                                {n.status === 'published' ? 'Terbit' : 'Draft'}
+                                            </span>
+                                        </td>
+                                        <td className="p-4 text-right">
+                                            <Link
+                                                href={`/dashboard/berita/${n.id}`}
+                                                className="inline-flex items-center justify-center p-1.5 text-[var(--text-muted)] hover:text-[var(--primary)] hover:bg-[var(--primary)]/10 rounded-md transition-colors"
+                                                title="Edit Berita"
+                                            >
+                                                <ExternalLink className="w-4 h-4" />
+                                            </Link>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan={5} className="p-8 text-center text-sm text-[var(--text-muted)]">
+                                        Belum ada berita yang diterbitkan atau di-draft.
                                     </td>
                                 </tr>
-                            ))}
+                            )}
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                {/* RIWAYAT AKTIVITAS ADMIN (Hanya Superadmin) */}
                 {role === 'superadmin' && (
                     <div className="bg-[var(--card)] rounded-[var(--radius)] border border-[var(--border)] overflow-hidden shadow-sm flex flex-col h-full">
                         <div className="px-5 py-4 border-b border-[var(--border)] bg-[var(--surface)] flex items-center gap-2">
@@ -194,32 +271,36 @@ export default function DashboardOverviewPage() {
                         </div>
 
                         <div className="p-5 flex-1 bg-[var(--surface-2)]/50">
-                            <div className="space-y-6 relative before:absolute before:inset-0 before:ml-4 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-[var(--border)] before:via-[var(--border)] before:to-transparent">
-                                {recentActivities.map((activity, index) => (
-                                    <div key={activity.id} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                            {recentActivities.length > 0 ? (
+                                <div className="space-y-6 relative before:absolute before:inset-0 before:ml-4 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-[var(--border)] before:via-[var(--border)] before:to-transparent">
+                                    {recentActivities.map((activity) => (
+                                        <div key={activity.id} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
 
-                                        {/* Icon Node */}
-                                        <div className="flex items-center justify-center w-8 h-8 rounded-full border-4 border-[var(--card)] bg-[var(--surface)] text-slate-500 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 relative">
-                                            {getActivityIcon(activity.type)}
-                                        </div>
-
-                                        {/* Content Box */}
-                                        <div className="w-[calc(100%-2.5rem)] md:w-[calc(50%-1.5rem)] p-3 rounded-xl border border-[var(--border)] bg-[var(--card)] shadow-sm hover:border-[var(--primary)]/30 transition-colors">
-                                            <div className="flex items-center justify-between mb-1 gap-2">
-                                                <span className="font-bold text-xs text-[var(--text-primary)] font-display truncate">
-                                                    {activity.admin}
-                                                </span>
-                                                <span className="text-[10px] font-semibold text-[var(--text-muted)] flex items-center gap-1 whitespace-nowrap">
-                                                    <Clock className="w-3 h-3" /> {activity.time}
-                                                </span>
+                                            <div className="flex items-center justify-center w-8 h-8 rounded-full border-4 border-[var(--card)] bg-[var(--surface)] text-slate-500 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 relative">
+                                                {getActivityIcon(activity.type)}
                                             </div>
-                                            <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
-                                                Telah {activity.action} <span className="font-semibold text-[var(--text-primary)]">{activity.target}</span>.
-                                            </p>
+
+                                            <div className="w-[calc(100%-2.5rem)] md:w-[calc(50%-1.5rem)] p-3 rounded-xl border border-[var(--border)] bg-[var(--card)] shadow-sm hover:border-[var(--primary)]/30 transition-colors">
+                                                <div className="flex items-center justify-between mb-1 gap-2">
+                                                    <span className="font-bold text-xs text-[var(--text-primary)] font-display truncate">
+                                                        {activity.admin_name}
+                                                    </span>
+                                                    <span className="text-[10px] font-semibold text-[var(--text-muted)] flex items-center gap-1 whitespace-nowrap">
+                                                        <Clock className="w-3 h-3" /> {timeAgo(activity.created_at)}
+                                                    </span>
+                                                </div>
+                                                <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                                                    Telah {activity.action} <span className="font-semibold text-[var(--text-primary)]">{activity.target}</span>.
+                                                </p>
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
-                            </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="text-center py-10 opacity-70">
+                                    <p className="text-xs text-[var(--text-muted)] font-semibold">Belum ada riwayat aktivitas.</p>
+                                </div>
+                            )}
                         </div>
 
                         <div className="px-5 py-3 border-t border-[var(--border)] bg-[var(--card)] text-center">

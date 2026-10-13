@@ -76,6 +76,31 @@ export default function AdminDaftarDadPage() {
         }
     }
 
+    const logActivity = async (action: string, target: string, type: string) => {
+        try {
+            const savedRole = localStorage.getItem('userRole')
+            const adminName = savedRole === 'superadmin' ? 'Super Admin' : (savedRole?.toUpperCase() || 'Admin')
+
+            console.log(`Mencoba merekam log: ${adminName} ${action} ${target}`) // Log untuk debugging awal
+
+            const { data, error } = await supabase.from('system_logs').insert([
+                {
+                    admin_name: adminName,
+                    action: action,
+                    target: target,
+                    type: type
+                }
+            ])
+
+            if (error) throw error
+
+            console.log("Log berhasil disimpan!")
+        } catch (error: any) {
+            console.error('Gagal merekam log ke Supabase:', error.message || error)
+            // alert(`Gagal merekam log: ${error.message}`)
+        }
+    }
+
     const handleStatusChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
         const newStatus = e.target.value === 'open'
         setIsToggling(true)
@@ -86,6 +111,13 @@ export default function AdminDaftarDadPage() {
 
             if (error) throw error
             setIsRegistrationOpen(newStatus)
+
+            await logActivity(
+                newStatus ? 'membuka' : 'menutup',
+                'Pendaftaran DAD',
+                'settings'
+            )
+
         } catch (error: any) {
             alert(`Gagal mengubah status pendaftaran: ${error.message}`)
         } finally {
@@ -155,6 +187,10 @@ export default function AdminDaftarDadPage() {
                 prev.map(item => (item.id === id ? { ...item, status: newStatus } : item))
             )
 
+            const targetName = selectedItem?.namaLengkap || 'Pendaftar'
+            const statusLabel = newStatus === 'pending' ? 'Menunggu' : newStatus === 'verified' ? 'Lolos Verifikasi' : 'Ditolak'
+            await logActivity('mengubah status', `Peserta DAD (${targetName}) menjadi ${statusLabel}`, 'users')
+
             if (selectedItem && selectedItem.id === id) {
                 setSelectedItem(prev => (prev ? { ...prev, status: newStatus } : null))
             }
@@ -167,12 +203,18 @@ export default function AdminDaftarDadPage() {
 
     const handleDelete = async (id: string) => {
         try {
+            const itemToDelete = registrants.find(item => item.id === id)
+            const targetName = itemToDelete ? itemToDelete.namaLengkap : 'Data Pendaftar DAD'
+
             const { error } = await supabase.from('dad_registrations').delete().eq('id', id)
             if (error) throw error
 
             setRegistrants(prev => prev.filter(item => item.id !== id))
             setDeleteId(null)
             if (selectedItem?.id === id) setSelectedItem(null)
+
+            await logActivity('menghapus', `Peserta DAD: ${targetName}`, 'users')
+
         } catch (error: any) {
             alert(`Gagal menghapus data pendaftar: ${error.message}`)
         }

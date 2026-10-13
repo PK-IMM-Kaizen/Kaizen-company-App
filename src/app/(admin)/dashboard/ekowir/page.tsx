@@ -30,7 +30,6 @@ export default function AdminEkowirPage() {
     const [isLoading, setIsLoading] = useState(true)
     const [isSaving, setIsSaving] = useState(false)
 
-    // State Form diperbarui
     const [form, setForm] = useState({
         name: '',
         description: '',
@@ -220,7 +219,6 @@ export default function AdminEkowirPage() {
 
                 <div className="bg-[var(--card)] rounded-2xl p-6 md:p-8 border border-[var(--border)] shadow-sm">
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        {/* KOLOM KIRI (FORM UTAMA) */}
                         <div className="lg:col-span-2 space-y-5">
                             <div>
                                 <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1.5 font-display uppercase tracking-wide">Nama Produk</label>
@@ -269,7 +267,6 @@ export default function AdminEkowirPage() {
                                 </div>
                             </div>
 
-                            {/* SECTION PRE-ORDER & DP */}
                             <div className="p-5 border border-[var(--border-strong)] rounded-xl bg-[var(--surface)] space-y-5">
                                 <div className="flex items-center justify-between cursor-pointer" onClick={() => setForm(f => ({ ...f, isPreorder: !f.isPreorder }))}>
                                     <div>
@@ -313,7 +310,6 @@ export default function AdminEkowirPage() {
                             </div>
                         </div>
 
-                        {/* KOLOM KANAN (GAMBAR & STATUS) */}
                         <div className="space-y-5">
                             <div>
                                 <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1.5 font-display uppercase tracking-wide flex items-center gap-1.5">

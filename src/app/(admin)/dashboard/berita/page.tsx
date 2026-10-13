@@ -85,6 +85,28 @@ export default function AdminBeritaPage() {
         }
     }
 
+    const logActivity = async (action: string, target: string, type: string) => {
+        try {
+            const savedRole = localStorage.getItem('userRole')
+            const adminName = savedRole === 'superadmin'
+                ? 'Super Admin'
+                : savedRole ? `Admin (${savedRole.toUpperCase()})` : 'Admin'
+
+            const { error } = await supabase.from('system_logs').insert([
+                {
+                    admin_name: adminName,
+                    action: action,
+                    target: target,
+                    type: type
+                }
+            ])
+
+            if (error) throw error
+        } catch (error: any) {
+            console.error('Gagal merekam log berita ke Supabase:', error.message || error)
+        }
+    }
+
     const filtered = news.filter(n => n.title.toLowerCase().includes(search.toLowerCase()))
     const canPublish = role === 'superadmin' || role === 'bpi' || role === 'medkom'
 
@@ -145,12 +167,17 @@ export default function AdminBeritaPage() {
             if (view === 'create') {
                 const { error } = await supabase.from('news').insert([payload])
                 if (error) throw error
+
+                await logActivity('menerbitkan berita', `Judul: "${form.title}"`, 'news')
+
             } else if (editItem) {
                 const { error } = await supabase
                     .from('news')
                     .update(payload)
                     .eq('id', editItem.id)
                 if (error) throw error
+
+                await logActivity('memperbarui berita', `Judul: "${form.title}"`, 'news')
             }
 
             await fetchNews()
@@ -164,11 +191,17 @@ export default function AdminBeritaPage() {
 
     const handleDelete = async (id: number) => {
         try {
+            const itemToDelete = news.find(n => n.id === id)
+            const targetName = itemToDelete ? itemToDelete.title : 'Data Berita'
+
             const { error } = await supabase.from('news').delete().eq('id', id)
             if (error) throw error
 
             setNews(prev => prev.filter(n => n.id !== id))
             setDeleteId(null)
+
+            await logActivity('menghapus berita', `Judul: "${targetName}"`, 'news')
+
         } catch (error: any) {
             alert(`Gagal menghapus berita: ${error.message}`)
         }

@@ -113,12 +113,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const filteredMenu = menuItems.filter(item => item.allowedRoles.includes(role))
     const currentMenuLabel = filteredMenu.find(m => m.path === pathname)?.name ?? 'Dashboard'
 
-    // Status visual sidebar: jika sedang collapsed TETAPI di-hover kursor, maka tampilkan versi terbuka
     const showExpandedUI = !isCollapsed || isHovered
 
     return (
         <div className="h-screen flex bg-[var(--background)] overflow-hidden">
-            {/* OVERLAY MOBILE */}
             {sidebarOpen && (
                 <div
                     className="fixed inset-0 z-40 md:hidden bg-black/60 backdrop-blur-sm transition-opacity"
@@ -126,14 +124,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 />
             )}
 
-            {/* CONTAINER DUMMY PENJAGA LAYOUT DESKTOP KETIKA EXPAND-ON-HOVER */}
             <div
                 className={`hidden md:block shrink-0 transition-all duration-300 ${
                     isCollapsed ? 'w-[72px]' : 'w-[240px]'
                 }`}
             />
 
-            {/* SIDEBAR UTAMA */}
             <aside
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
@@ -143,7 +139,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         : 'md:w-[240px]'
                 } ${sidebarOpen ? 'translate-x-0 w-[240px]' : '-translate-x-full md:translate-x-0'}`}
             >
-                {/* HEADER LOGO */}
                 <div className={`p-4 border-b border-white/10 flex items-center ${!showExpandedUI ? 'justify-center' : 'justify-between'}`}>
                     {!showExpandedUI ? (
                         <div className="w-8 h-8 flex items-center justify-center overflow-hidden">
@@ -161,7 +156,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     </button>
                 </div>
 
-                {/* ROLE BADGE */}
                 {showExpandedUI && (
                     <div className="px-5 py-3 border-b border-white/5 bg-white/5 transition-all">
                         <span className="text-[10px] font-black uppercase tracking-widest text-[var(--primary)] font-display block truncate">
@@ -170,7 +164,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     </div>
                 )}
 
-                {/* MENU NAVIGASI */}
                 <nav className="flex-1 py-4 overflow-y-auto px-3 space-y-1">
                     {filteredMenu.map(item => {
                         const isActive = pathname === item.path
@@ -195,7 +188,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     })}
                 </nav>
 
-                {/* TOMBOL LOGOUT */}
                 <div className="p-4 border-t border-white/10">
                     <button
                         onClick={handleLogout}
@@ -210,11 +202,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </div>
             </aside>
 
-            {/* AREA UTAMA / HEADER & KONTEN */}
             <div className="flex-1 flex flex-col h-full overflow-y-auto max-w-full relative z-0">
                 <header className="flex items-center justify-between px-4 sm:px-6 py-4 bg-[var(--card)] border-b border-[var(--border)] sticky top-0 z-30 shadow-sm">
                     <div className="flex items-center gap-3">
-                        {/* Mobile Toggle Drawer */}
                         <button
                             className="md:hidden p-2 rounded-lg bg-[var(--surface)] text-[var(--text-secondary)] hover:text-[var(--primary)] hover:bg-[var(--primary)]/10 transition-colors cursor-pointer"
                             onClick={() => setSidebarOpen(true)}
@@ -222,7 +212,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                             <Menu className="w-5 h-5" />
                         </button>
 
-                        {/* Desktop Toggle Collapsed Sidebar */}
                         <button
                             className="hidden md:flex p-2 rounded-xl bg-[var(--surface)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--primary)] hover:bg-[var(--surface-2)] transition-colors cursor-pointer"
                             onClick={toggleCollapse}
@@ -237,7 +226,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     </div>
 
                     <div className="flex items-center gap-2 sm:gap-3">
-                        {/* Tombol Fullscreen */}
                         <button
                             onClick={toggleFullscreen}
                             className="p-2 rounded-xl bg-[var(--surface)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--primary)] hover:bg-[var(--surface-2)] transition-colors cursor-pointer"

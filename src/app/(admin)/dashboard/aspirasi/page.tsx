@@ -86,6 +86,28 @@ export default function AdminAspirasiPage() {
         }
     }
 
+    const logActivity = async (action: string, target: string, type: string) => {
+        try {
+            const savedRole = localStorage.getItem('userRole')
+            const adminName = savedRole === 'superadmin'
+                ? 'Super Admin'
+                : savedRole ? `Admin (${savedRole.toUpperCase()})` : 'Admin'
+
+            const { error } = await supabase.from('system_logs').insert([
+                {
+                    admin_name: adminName,
+                    action: action,
+                    target: target,
+                    type: type
+                }
+            ])
+
+            if (error) throw error
+        } catch (error: any) {
+            console.error('Gagal merekam log ke Supabase:', error.message || error)
+        }
+    }
+
     const filteredList = aspirasiList.filter(item => {
         const matchesSearch =
             item.message.toLowerCase().includes(search.toLowerCase()) ||
@@ -117,6 +139,10 @@ export default function AdminAspirasiPage() {
                 )
             )
 
+            const statusLabel = newStatus === 'pending' ? 'Menunggu' : newStatus === 'process' ? 'Diproses' : 'Selesai'
+            const targetName = selectedItem?.isAnonymous ? 'Anonim' : selectedItem?.name || 'Seseorang'
+            await logActivity('memperbarui status & catatan pada', `Aspirasi ${targetName} menjadi ${statusLabel}`, 'aspirasi')
+
             if (selectedItem && selectedItem.id === id) {
                 setSelectedItem(prev => (prev ? { ...prev, status: newStatus, adminNote: adminNoteInput } : null))
             }
@@ -129,12 +155,18 @@ export default function AdminAspirasiPage() {
 
     const handleDelete = async (id: string | number) => {
         try {
+            const itemToDelete = aspirasiList.find(item => item.id === id)
+            const targetName = itemToDelete ? (itemToDelete.isAnonymous ? 'Anonim' : itemToDelete.name) : 'Data Aspirasi'
+
             const { error } = await supabase.from('aspirations').delete().eq('id', id)
             if (error) throw error
 
             setAspirasiList(prev => prev.filter(item => item.id !== id))
             setDeleteId(null)
             if (selectedItem?.id === id) setSelectedItem(null)
+
+            await logActivity('menghapus', `Aspirasi dari ${targetName}`, 'aspirasi')
+
         } catch (error: any) {
             alert(`Gagal menghapus aspirasi: ${error.message}`)
         }
