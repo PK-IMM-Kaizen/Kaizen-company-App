@@ -1,10 +1,43 @@
 import Link from 'next/link'
+import type { Metadata } from 'next' // <-- Tambahkan import Metadata
 import { createClient } from '@supabase/supabase-js'
 import { ArrowLeft, Calendar, Newspaper, ExternalLink, ChevronRight } from 'lucide-react'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 const supabase = createClient(supabaseUrl, supabaseKey)
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+    const resolvedParams = await params
+    const paramId = resolvedParams.id
+
+    const { data: rawItem } = await supabase
+        .from('news')
+        .select('title, content, cover')
+        .eq('id', paramId)
+        .single()
+
+    if (!rawItem) {
+        return {
+            title: 'Berita Tidak Ditemukan',
+        }
+    }
+
+    const excerpt = rawItem.content
+        ? rawItem.content.substring(0, 150).replace(/\n/g, ' ') + '...'
+        : 'Berita terbaru dari IMM Kaizen'
+
+    return {
+        title: rawItem.title,
+        description: excerpt,
+        openGraph: {
+            title: rawItem.title,
+            description: excerpt,
+            images: rawItem.cover ? [rawItem.cover] : ['/img/og-image.jpg'],
+            type: 'article',
+        },
+    }
+}
 
 export default async function DetailBerita({ params }: { params: Promise<{ id: string }> }) {
     const resolvedParams = await params

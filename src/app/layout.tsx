@@ -1,12 +1,32 @@
+import type { Metadata } from 'next'
 import './globals.css'
 import Navbar from '../components/common/Navbar'
 
-export const metadata = {
-    title: "Website Resmi PK IMM Kaizen",
-    description: "Pusat Informasi dan Media PK IMM Kaizen",
+export const metadata: Metadata = {
+    title: {
+        template: '%s | IMM Komisariat Kaizen',
+        default: 'Website Resmi PK IMM Kaizen - Fakultas Teknik UMSurabaya',
+    },
+    description: 'Pusat Informasi dan Media PK IMM Kaizen. Website resmi Ikatan Mahasiswa Muhammadiyah (IMM) Komisariat Kaizen Fakultas Teknik Universitas Muhammadiyah Surabaya.',
+    keywords: ['IMM', 'Muhammadiyah', 'Mahasiswa Teknik', 'UMSURA', 'IMM Kaizen', 'Organisasi Mahasiswa'],
     icons: {
         icon: '/img/logo/logo.png'
-    }
+    },
+    openGraph: {
+        title: 'Website Resmi PK IMM Kaizen',
+        description: 'Pusat Informasi dan Media PK IMM Kaizen Fakultas Teknik UMSurabaya.',
+        url: 'https://immkaizen.com',
+        siteName: 'IMM Kaizen',
+        images: [
+            {
+                url: '/img/og-image.jpg',
+                width: 1200,
+                height: 630,
+            },
+        ],
+        locale: 'id_ID',
+        type: 'website',
+    },
 }
 
 export default function RootLayout({
@@ -17,7 +37,6 @@ export default function RootLayout({
     return (
         <html lang="id" data-scroll-behavior="smooth">
         <body>
-
         {children}
         </body>
         </html>
