@@ -21,20 +21,42 @@ export default function LoginPage() {
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     )
 
+    const logLoginActivity = async (userEmail: string, action: 'LOGIN_SUCCESS' | 'LOGIN_FAILED', details: string) => {
+        try {
+            await supabase.from('system_logs').insert([
+                {
+                    admin_name: userEmail,
+                    user_email: userEmail,
+                    action: action === 'LOGIN_SUCCESS' ? 'Login Berhasil' : 'Login Gagal',
+                    target: 'Dashboard Panel',
+                    type: 'users',
+                    module: 'Autentikasi',
+                    details: details,
+                }
+            ])
+        } catch (logErr) {
+            console.error('Gagal mencatat log login:', logErr)
+        }
+    }
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setLoading(true)
         setError('')
 
+        const cleanEmail = email.trim()
+
         try {
             const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-                email: email.trim(),
+                email: cleanEmail,
                 password: password,
             })
 
             if (authError) {
                 setError('Email atau kata sandi tidak valid.')
                 setLoading(false)
+
+                await logLoginActivity(cleanEmail, 'LOGIN_FAILED', 'Gagal login: Email atau kata sandi salah')
                 return
             }
 
@@ -53,10 +75,14 @@ export default function LoginPage() {
             localStorage.setItem('isAuthenticated', 'true')
             localStorage.setItem('userRole', userRole)
 
+            await logLoginActivity(cleanEmail, 'LOGIN_SUCCESS', `Pengurus berhasil masuk dashboard dengan role: ${userRole}`)
+
             window.location.href = '/dashboard'
         } catch (err) {
             setError('Terjadi kesalahan pada sistem. Silakan coba lagi.')
             setLoading(false)
+
+            await logLoginActivity(cleanEmail, 'LOGIN_FAILED', 'Terjadi kesalahan sistem saat mencoba login')
         }
     }
 

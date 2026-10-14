@@ -6,31 +6,83 @@ import Link from 'next/link'
 import Logo from '../../../components/common/Logo'
 import {
     LayoutDashboard, Newspaper, ShoppingBag, Users,
-    GraduationCap, Building, ShieldCheck, LogOut, Menu, X, MessageSquare, UserPlus,
-    Maximize, Minimize, PanelLeftClose, PanelLeft, Briefcase, Calendar
+    GraduationCap, Building2, ShieldCheck, LogOut, Menu, X, MessageSquare, UserPlus,
+    Maximize, Minimize, PanelLeftClose, PanelLeft, Briefcase, CalendarDays
 } from 'lucide-react'
 import { createBrowserClient } from '@supabase/ssr'
 
 const roleLabels: Record<string, string> = {
     superadmin: 'Super Admin',
     admin: 'Admin Bidang',
-    bpi: 'Admin BPI',
-    medkom: 'Admin Medkom',
-    ekowir: 'Admin Ekowir'
 }
 
 const menuItems = [
-    { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard className="w-4 h-4 shrink-0" />, allowedRoles: ['superadmin', 'admin', 'bpi', 'medkom', 'ekowir'] },
-    { name: 'Pendaftar DAD', path: '/dashboard/daftar-dad', icon: <UserPlus className="w-4 h-4 shrink-0" />, allowedRoles: ['superadmin', 'admin', 'bpi'] },
-    { name: 'Kelola Berita', path: '/dashboard/berita', icon: <Newspaper className="w-4 h-4 shrink-0" />, allowedRoles: ['superadmin', 'admin', 'bpi', 'medkom', 'ekowir'] },
-    { name: 'Agenda', path: '/dashboard/agenda', icon: <Calendar className="w-4 h-4 shrink-0" />, allowedRoles: ['superadmin', 'admin'] },
-    { name: 'Kotak Aspirasi', path: '/dashboard/aspirasi', icon: <MessageSquare className="w-4 h-4 shrink-0" />, allowedRoles: ['superadmin', 'admin', 'bpi'] },
-    { name: 'Produk Ekowir', path: '/dashboard/ekowir', icon: <ShoppingBag className="w-4 h-4 shrink-0" />, allowedRoles: ['superadmin', 'ekowir'] },
-    { name: 'Manajemen Bidang', path: '/dashboard/bidang', icon: <Briefcase className="w-4 h-4 shrink-0" />, allowedRoles: ['superadmin', 'ekowir'] },
-    { name: 'Kepengurusan', path: '/dashboard/kepengurusan', icon: <Users className="w-4 h-4 shrink-0" />, allowedRoles: ['superadmin', 'admin', 'bpi'] },
-    { name: 'Data Alumni', path: '/dashboard/alumni', icon: <GraduationCap className="w-4 h-4 shrink-0" />, allowedRoles: ['superadmin', 'admin', 'bpi'] },
-    { name: 'Profil Organisasi', path: '/dashboard/organisasi', icon: <Building className="w-4 h-4 shrink-0" />, allowedRoles: ['superadmin'] },
-    { name: 'Pengguna & Akses', path: '/dashboard/users', icon: <ShieldCheck className="w-4 h-4 shrink-0" />, allowedRoles: ['superadmin'] },
+    {
+        name: 'Dashboard',
+        path: '/dashboard',
+        icon: <LayoutDashboard className="w-4 h-4 shrink-0" />,
+        allowedRoles: ['superadmin', 'admin']
+    },
+    {
+        name: 'Pendaftar DAD',
+        path: '/dashboard/daftar-dad',
+        icon: <UserPlus className="w-4 h-4 shrink-0" />,
+        allowedRoles: ['superadmin', 'admin']
+    },
+    {
+        name: 'Kotak Aspirasi',
+        path: '/dashboard/aspirasi',
+        icon: <MessageSquare className="w-4 h-4 shrink-0" />,
+        allowedRoles: ['superadmin', 'admin']
+    },
+    {
+        name: 'Data Alumni',
+        path: '/dashboard/alumni',
+        icon: <GraduationCap className="w-4 h-4 shrink-0" />,
+        allowedRoles: ['superadmin', 'admin']
+    },
+    {
+        name: 'Kelola Berita',
+        path: '/dashboard/berita',
+        icon: <Newspaper className="w-4 h-4 shrink-0" />,
+        allowedRoles: ['superadmin', 'admin']
+    },
+    {
+        name: 'Agenda Kegiatan',
+        path: '/dashboard/agenda',
+        icon: <CalendarDays className="w-4 h-4 shrink-0" />,
+        allowedRoles: ['superadmin', 'admin']
+    },
+    {
+        name: 'Kepengurusan',
+        path: '/dashboard/kepengurusan',
+        icon: <Users className="w-4 h-4 shrink-0" />,
+        allowedRoles: ['superadmin', 'admin']
+    },
+    {
+        name: 'Profil Bidang',
+        path: '/dashboard/bidang',
+        icon: <Briefcase className="w-4 h-4 shrink-0" />,
+        allowedRoles: ['superadmin', 'admin']
+    },
+    {
+        name: 'Produk Ekowir',
+        path: '/dashboard/ekowir',
+        icon: <ShoppingBag className="w-4 h-4 shrink-0" />,
+        allowedRoles: ['superadmin', 'admin']
+    },
+    {
+        name: 'Profil Organisasi',
+        path: '/dashboard/organisasi',
+        icon: <Building2 className="w-4 h-4 shrink-0" />,
+        allowedRoles: ['superadmin']
+    },
+    {
+        name: 'Pengguna & Akses',
+        path: '/dashboard/users',
+        icon: <ShieldCheck className="w-4 h-4 shrink-0" />,
+        allowedRoles: ['superadmin']
+    },
 ]
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -206,7 +258,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </div>
             </aside>
 
-            <div className="flex-1 flex flex-col h-full overflow-y-auto max-w-full relative z-0">
+            <div className="flex-1 flex flex-col h-full overflow-y-auto w-full min-w-0 relative z-0">
                 <header className="flex items-center justify-between px-3.5 sm:px-6 py-3.5 sm:py-4 bg-[var(--card)] border-b border-[var(--border)] sticky top-0 z-30 shadow-sm">
                     <div className="flex items-center gap-2.5 sm:gap-3">
                         <button
@@ -255,10 +307,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     </div>
                 </header>
 
-                <main className="flex-1 p-3.5 sm:p-5 md:p-6 lg:p-8">
-                    <div className="max-w-[1200px] mx-auto">
-                        {children}
-                    </div>
+                <main className="flex-1 p-3.5 sm:p-5 md:p-6 lg:p-8 w-full min-w-0">
+                    {children}
                 </main>
             </div>
         </div>

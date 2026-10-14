@@ -14,7 +14,9 @@ import {
     ExternalLink,
     Activity,
     Clock,
-    Loader2
+    Loader2,
+    ShieldCheck,
+    ShieldAlert
 } from 'lucide-react'
 
 const timeAgo = (dateString: string) => {
@@ -25,11 +27,11 @@ const timeAgo = (dateString: string) => {
 
     if (diffInSeconds < 60) return 'Baru saja'
     const diffInMinutes = Math.floor(diffInSeconds / 60)
-    if (diffInMinutes < 60) return `${diffInMinutes} menit yang lalu`
+    if (diffInMinutes < 60) return `${diffInMinutes}m lalu`
     const diffInHours = Math.floor(diffInMinutes / 60)
-    if (diffInHours < 24) return `${diffInHours} jam yang lalu`
+    if (diffInHours < 24) return `${diffInHours}j lalu`
     const diffInDays = Math.floor(diffInHours / 24)
-    if (diffInDays < 7) return `${diffInDays} hari yang lalu`
+    if (diffInDays < 7) return `${diffInDays}h lalu`
 
     return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })
 }
@@ -87,7 +89,8 @@ export default function DashboardOverviewPage() {
                     supabase.from('pengurus').select('*', { count: 'exact', head: true }),
                     supabase.from('alumni').select('*', { count: 'exact', head: true }),
                     supabase.from('news').select('id, title, category, publish_date, status, created_at').order('created_at', { ascending: false }).limit(5),
-                    supabase.from('system_logs').select('*').order('created_at', { ascending: false }).limit(6)
+
+                    supabase.from('system_logs').select('*').order('created_at', { ascending: false }).limit(3)
                 ])
 
                 setDashboardStats({
@@ -114,27 +117,35 @@ export default function DashboardOverviewPage() {
 
     const stats = [
         { label: 'Berita Terbit', value: dashboardStats.publishedNews, color: 'var(--primary)', href: '/dashboard/berita', icon: <Newspaper className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--primary)]" /> },
-        { label: 'Draft Berita', value: dashboardStats.draftNews, color: 'var(--accent-dark)', href: '/dashboard/berita?tab=draft', icon: <FileEdit className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--accent-dark)]" /> },
+        { label: 'Draft Berita', value: dashboardStats.draftNews, color: 'var(--accent-dark)', href: '/dashboard/berita', icon: <FileEdit className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--accent-dark)]" /> },
         { label: 'Produk Aktif', value: dashboardStats.availableProducts, color: 'var(--success)', href: '/dashboard/ekowir', icon: <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--success)]" /> },
         { label: 'Pengurus Aktif', value: dashboardStats.activePengurus, color: 'var(--info)', href: '/dashboard/kepengurusan', icon: <Users className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--info)]" /> },
         { label: 'Alumni Terdaftar', value: dashboardStats.totalAlumni, color: '#6B46C1', href: '/dashboard/alumni', icon: <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5 text-[#6B46C1]" /> },
         { label: 'Total Produk', value: dashboardStats.totalProducts, color: 'var(--text-secondary)', href: '/dashboard/ekowir', icon: <Package className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--text-secondary)]" /> },
     ]
 
-    const getActivityIcon = (type: string) => {
-        switch (type) {
-            case 'users': return <Users className="w-3.5 h-3.5 text-[var(--info)]" />
-            case 'news': return <Newspaper className="w-3.5 h-3.5 text-[var(--primary)]" />
-            case 'product': return <Package className="w-3.5 h-3.5 text-[var(--success)]" />
-            case 'draft': return <FileEdit className="w-3.5 h-3.5 text-[var(--accent-dark)]" />
-            case 'settings': return <Activity className="w-3.5 h-3.5 text-orange-500" />
-            default: return <Activity className="w-3.5 h-3.5 text-[var(--text-muted)]" />
+    const getActivityIcon = (actionOrType: string) => {
+        switch (actionOrType) {
+            case 'LOGIN_SUCCESS':
+                return <ShieldCheck className="w-3.5 h-3.5 text-green-500" />
+            case 'LOGIN_FAILED':
+                return <ShieldAlert className="w-3.5 h-3.5 text-red-500" />
+            case 'users':
+                return <Users className="w-3.5 h-3.5 text-[var(--info)]" />
+            case 'news':
+                return <Newspaper className="w-3.5 h-3.5 text-[var(--primary)]" />
+            case 'product':
+                return <Package className="w-3.5 h-3.5 text-[var(--success)]" />
+            case 'draft':
+                return <FileEdit className="w-3.5 h-3.5 text-[var(--accent-dark)]" />
+            default:
+                return <Activity className="w-3.5 h-3.5 text-[var(--primary)]" />
         }
     }
 
     if (isLoading) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[50vh] sm:min-h-[60vh] gap-3">
+            <div className="flex flex-col items-center justify-center min-h-[50vh] sm:min-h-[60vh] gap-3 w-full">
                 <Loader2 className="w-7 h-7 sm:w-8 sm:h-8 animate-spin text-[var(--primary)]" />
                 <p className="text-xs sm:text-sm font-bold text-[var(--text-muted)] uppercase tracking-widest font-display">
                     Memuat Data Dashboard...
@@ -144,10 +155,10 @@ export default function DashboardOverviewPage() {
     }
 
     return (
-        <div className="space-y-5 sm:space-y-6 font-sans">
+        <div className="space-y-5 sm:space-y-6 font-sans w-full min-w-0">
 
             <div
-                className="rounded-2xl p-5 sm:p-6 lg:p-8 relative overflow-hidden shadow-sm"
+                className="rounded-2xl p-5 sm:p-6 lg:p-8 relative overflow-hidden shadow-sm w-full"
                 style={{
                     background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)'
                 }}
@@ -168,7 +179,7 @@ export default function DashboardOverviewPage() {
                 <div className="absolute -bottom-10 -right-10 w-36 h-36 sm:w-48 sm:h-48 bg-white/5 rounded-full blur-xl pointer-events-none" />
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 w-full">
                 {stats.map(s => (
                     <Link
                         href={s.href}
@@ -196,9 +207,9 @@ export default function DashboardOverviewPage() {
                 ))}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-start">
+            <div className="flex flex-col lg:flex-row gap-5 sm:gap-6 w-full items-start">
 
-                <div className={`bg-[var(--card)] rounded-2xl border border-[var(--border)] overflow-hidden shadow-sm flex flex-col ${role === 'superadmin' ? 'lg:col-span-7 xl:col-span-8' : 'lg:col-span-12'}`}>
+                <div className={`bg-[var(--card)] rounded-2xl border border-[var(--border)] overflow-hidden shadow-sm flex flex-col w-full min-w-0 ${role === 'superadmin' ? 'lg:w-2/3' : 'lg:w-full'}`}>
                     <div className="px-4 sm:px-5 py-3.5 sm:py-4 border-b border-[var(--border)] bg-[var(--surface)] flex items-center justify-between">
                         <h3 className="font-black text-xs sm:text-sm text-[var(--text-primary)] font-display uppercase tracking-wider">
                             Berita Terkini
@@ -212,7 +223,7 @@ export default function DashboardOverviewPage() {
                     </div>
 
                     <div className="overflow-x-auto w-full scrollbar-none">
-                        <table className="w-full text-left border-collapse min-w-[550px]">
+                        <table className="w-full text-left border-collapse min-w-[500px]">
                             <thead>
                             <tr className="bg-[var(--surface-2)] border-b border-[var(--border)] text-[10px] sm:text-xs text-[var(--text-muted)] uppercase tracking-wider font-display">
                                 <th className="p-3.5 sm:p-4 font-bold">Judul</th>
@@ -227,7 +238,7 @@ export default function DashboardOverviewPage() {
                                 recentNews.map(n => (
                                     <tr key={n.id} className="border-b border-[var(--border)] hover:bg-[var(--surface)] transition-colors group">
                                         <td className="p-3.5 sm:p-4">
-                                            <p className="font-semibold text-xs text-[var(--text-primary)] font-display line-clamp-1 max-w-xs">
+                                            <p className="font-semibold text-xs text-[var(--text-primary)] font-display line-clamp-1">
                                                 {n.title}
                                             </p>
                                         </td>
@@ -239,14 +250,14 @@ export default function DashboardOverviewPage() {
                                         <td className="p-3.5 sm:p-4 text-[11px] sm:text-xs text-[var(--text-muted)] whitespace-nowrap font-medium">
                                             {timeAgo(n.publish_date || n.created_at)}
                                         </td>
-                                        <td className="p-3.5 sm:p-4">
-                                                <span className={`text-[9px] sm:text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md whitespace-nowrap ${n.status === 'published' ? 'bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-400' : 'bg-gray-100 text-gray-600 dark:bg-gray-500/10 dark:text-gray-400'}`}>
+                                        <td className="p-3.5 sm:p-4 whitespace-nowrap">
+                                                <span className={`text-[9px] sm:text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md ${n.status === 'published' ? 'bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-400' : 'bg-gray-100 text-gray-600 dark:bg-gray-500/10 dark:text-gray-400'}`}>
                                                     {n.status === 'published' ? 'Terbit' : 'Draft'}
                                                 </span>
                                         </td>
                                         <td className="p-3.5 sm:p-4 text-right">
                                             <Link
-                                                href={`/dashboard/berita/${n.id}`}
+                                                href="/dashboard/berita"
                                                 className="inline-flex items-center justify-center p-1.5 text-[var(--text-muted)] hover:text-[var(--primary)] hover:bg-[var(--primary)]/10 rounded-lg transition-colors"
                                                 title="Edit Berita"
                                             >
@@ -268,12 +279,17 @@ export default function DashboardOverviewPage() {
                 </div>
 
                 {role === 'superadmin' && (
-                    <div className="bg-[var(--card)] rounded-2xl border border-[var(--border)] overflow-hidden shadow-sm flex flex-col lg:col-span-5 xl:col-span-4">
-                        <div className="px-4 sm:px-5 py-3.5 sm:py-4 border-b border-[var(--border)] bg-[var(--surface)] flex items-center gap-2">
-                            <Activity className="w-4 h-4 text-[var(--primary)] shrink-0" />
-                            <h3 className="font-black text-xs sm:text-sm text-[var(--text-primary)] font-display uppercase tracking-wider">
-                                Aktivitas Sistem
-                            </h3>
+                    <div className="bg-[var(--card)] rounded-2xl border border-[var(--border)] overflow-hidden shadow-sm flex flex-col w-full lg:w-1/3 min-w-0">
+                        <div className="px-4 sm:px-5 py-3.5 sm:py-4 border-b border-[var(--border)] bg-[var(--surface)] flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <Activity className="w-4 h-4 text-[var(--primary)] shrink-0" />
+                                <h3 className="font-black text-xs sm:text-sm text-[var(--text-primary)] font-display uppercase tracking-wider">
+                                    Aktivitas Sistem
+                                </h3>
+                            </div>
+                            <span className="text-[10px] font-bold px-2 py-0.5 bg-[var(--primary)]/10 text-[var(--primary)] rounded-full uppercase font-display">
+                                Realtime
+                            </span>
                         </div>
 
                         <div className="p-4 sm:p-5 flex-1 bg-[var(--surface-2)]/30">
@@ -284,10 +300,10 @@ export default function DashboardOverviewPage() {
                                             <div className="flex items-center justify-between mb-1.5 gap-2">
                                                 <div className="flex items-center gap-1.5 min-w-0">
                                                     <div className="p-1 rounded-md bg-[var(--surface)] border border-[var(--border)] shrink-0">
-                                                        {getActivityIcon(activity.type)}
+                                                        {getActivityIcon(activity.action || activity.type)}
                                                     </div>
                                                     <span className="font-bold text-xs text-[var(--text-primary)] font-display truncate">
-                                                        {activity.admin_name || 'Admin'}
+                                                        {activity.user_email || activity.admin_name || 'Sistem'}
                                                     </span>
                                                 </div>
                                                 <span className="text-[10px] font-semibold text-[var(--text-muted)] flex items-center gap-1 shrink-0">
@@ -295,7 +311,12 @@ export default function DashboardOverviewPage() {
                                                 </span>
                                             </div>
                                             <p className="text-[11px] sm:text-xs text-[var(--text-secondary)] leading-relaxed">
-                                                {activity.action} <span className="font-semibold text-[var(--text-primary)]">{activity.target}</span>.
+                                                {activity.module && (
+                                                    <span className="font-bold text-[var(--text-primary)] mr-1 font-display">
+                                                        [{activity.module}]
+                                                    </span>
+                                                )}
+                                                {activity.details || `${activity.action || ''} ${activity.target || ''}`}
                                             </p>
                                         </div>
                                     ))}
