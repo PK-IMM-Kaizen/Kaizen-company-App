@@ -106,8 +106,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
     if (!isMounted || !role) {
         return (
-            <div className="h-screen flex items-center justify-center bg-[var(--background)] text-[var(--text-primary)] font-display font-bold">
-                Memuat Dashboard...
+            <div className="h-screen flex flex-col items-center justify-center bg-[var(--background)] text-[var(--text-primary)] font-display font-bold text-sm gap-2">
+                <div className="w-8 h-8 border-4 border-[var(--primary)] border-t-transparent rounded-full animate-spin" />
+                Memuat Dashboard Admin...
             </div>
         )
     }
@@ -118,7 +119,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const showExpandedUI = !isCollapsed || isHovered
 
     return (
-        <div className="h-screen flex bg-[var(--background)] overflow-hidden">
+        <div className="h-screen flex bg-[var(--background)] overflow-hidden font-sans selection:bg-[var(--primary)] selection:text-white">
+
             {sidebarOpen && (
                 <div
                     className="fixed inset-0 z-40 md:hidden bg-black/60 backdrop-blur-sm transition-opacity"
@@ -135,7 +137,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <aside
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
-                className={`fixed inset-y-0 left-0 z-50 flex flex-col transition-all duration-300 bg-[#111111] text-white flex-shrink-0 shadow-2xl md:shadow-none ${
+                className={`fixed inset-y-0 left-0 z-50 flex flex-col transition-all duration-300 bg-[#111111] text-white shrink-0 shadow-2xl md:shadow-none ${
                     isCollapsed
                         ? (isHovered ? 'md:w-[240px] md:shadow-2xl' : 'md:w-[72px]')
                         : 'md:w-[240px]'
@@ -153,20 +155,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     ) : (
                         <Logo variant="white" size="sm" />
                     )}
-                    <button className="md:hidden text-white/50 hover:text-white" onClick={() => setSidebarOpen(false)}>
+                    <button className="md:hidden text-white/50 hover:text-white p-1 rounded-lg transition-colors cursor-pointer" onClick={() => setSidebarOpen(false)}>
                         <X className="w-5 h-5" />
                     </button>
                 </div>
 
                 {showExpandedUI && (
-                    <div className="px-5 py-3 border-b border-white/5 bg-white/5 transition-all">
+                    <div className="px-4 py-2.5 border-b border-white/5 bg-white/5 transition-all">
                         <span className="text-[10px] font-black uppercase tracking-widest text-[var(--primary)] font-display block truncate">
                             Akses: {roleLabels[role] || role}
                         </span>
                     </div>
                 )}
 
-                <nav className="flex-1 py-4 overflow-y-auto px-3 space-y-1">
+                <nav className="flex-1 py-3 overflow-y-auto px-2.5 space-y-1 scrollbar-none">
                     {filteredMenu.map(item => {
                         const isActive = pathname === item.path
                         return (
@@ -175,11 +177,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                 href={item.path}
                                 onClick={() => setSidebarOpen(false)}
                                 title={!showExpandedUI ? item.name : undefined}
-                                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all font-display ${
+                                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all font-display ${
                                     !showExpandedUI ? 'justify-center' : ''
                                 } ${
                                     isActive
-                                        ? 'bg-[var(--primary)] text-white shadow-md shadow-[var(--primary)]/20'
+                                        ? 'bg-[var(--primary)] text-white shadow-md shadow-[var(--primary)]/20 font-bold'
                                         : 'text-white/60 hover:bg-white/10 hover:text-white'
                                 }`}
                             >
@@ -190,7 +192,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     })}
                 </nav>
 
-                <div className="p-4 border-t border-white/10">
+                <div className="p-3 border-t border-white/10">
                     <button
                         onClick={handleLogout}
                         title={!showExpandedUI ? 'Keluar' : undefined}
@@ -205,11 +207,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </aside>
 
             <div className="flex-1 flex flex-col h-full overflow-y-auto max-w-full relative z-0">
-                <header className="flex items-center justify-between px-4 sm:px-6 py-4 bg-[var(--card)] border-b border-[var(--border)] sticky top-0 z-30 shadow-sm">
-                    <div className="flex items-center gap-3">
+                <header className="flex items-center justify-between px-3.5 sm:px-6 py-3.5 sm:py-4 bg-[var(--card)] border-b border-[var(--border)] sticky top-0 z-30 shadow-sm">
+                    <div className="flex items-center gap-2.5 sm:gap-3">
                         <button
-                            className="md:hidden p-2 rounded-lg bg-[var(--surface)] text-[var(--text-secondary)] hover:text-[var(--primary)] hover:bg-[var(--primary)]/10 transition-colors cursor-pointer"
+                            className="md:hidden p-2 rounded-xl bg-[var(--surface)] text-[var(--text-secondary)] hover:text-[var(--primary)] hover:bg-[var(--primary)]/10 transition-colors cursor-pointer"
                             onClick={() => setSidebarOpen(true)}
+                            aria-label="Buka Navigasi"
                         >
                             <Menu className="w-5 h-5" />
                         </button>
@@ -222,7 +225,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                             {isCollapsed ? <PanelLeft className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
                         </button>
 
-                        <h1 className="text-base sm:text-lg font-black text-[var(--text-primary)] font-display tracking-tight">
+                        <h1 className="text-sm sm:text-base md:text-lg font-black text-[var(--text-primary)] font-display tracking-tight truncate max-w-[150px] xs:max-w-[220px] sm:max-w-none">
                             {currentMenuLabel}
                         </h1>
                     </div>
@@ -239,20 +242,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         <div className="h-5 w-[1px] bg-[var(--border)] hidden sm:block" />
 
                         <div className="text-right hidden sm:block">
-                            <p className="text-sm font-bold text-[var(--text-primary)] font-display leading-none mb-1">
+                            <p className="text-xs sm:text-sm font-bold text-[var(--text-primary)] font-display leading-none mb-1">
                                 Panel Admin
                             </p>
-                            <p className="text-[10px] uppercase tracking-wider font-bold text-[var(--text-muted)]">
+                            <p className="text-[10px] uppercase tracking-wider font-bold text-[var(--text-muted)] font-display">
                                 {roleLabels[role] || 'Administrator'}
                             </p>
                         </div>
-                        <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white text-sm font-black shadow-md shadow-[var(--primary)]/20 font-display bg-[var(--primary)] shrink-0">
+                        <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center text-white text-xs sm:text-sm font-black shadow-md shadow-[var(--primary)]/20 font-display bg-[var(--primary)] shrink-0">
                             {(roleLabels[role] || role)?.charAt(0).toUpperCase() || 'A'}
                         </div>
                     </div>
                 </header>
 
-                <main className="flex-1 p-4 sm:p-6 lg:p-8">
+                <main className="flex-1 p-3.5 sm:p-5 md:p-6 lg:p-8">
                     <div className="max-w-[1200px] mx-auto">
                         {children}
                     </div>

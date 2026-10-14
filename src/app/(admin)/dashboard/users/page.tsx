@@ -122,14 +122,14 @@ export default function UsersManagementPage() {
     }
 
     return (
-        <div className="space-y-6">
-            <div className="bg-[var(--card)] p-6 rounded-2xl shadow-sm border border-[var(--border)]">
-                <div className="flex items-center gap-3 mb-6 border-b border-[var(--border)] pb-4">
-                    <div className="w-10 h-10 rounded-lg bg-[var(--primary)]/10 flex items-center justify-center text-[var(--primary)]">
-                        {editingUserId ? <Edit className="w-5 h-5" /> : <UserPlus className="w-5 h-5" />}
+        <div className="space-y-4 sm:space-y-6 font-sans">
+            <div className="bg-[var(--card)] p-4 sm:p-6 rounded-2xl shadow-sm border border-[var(--border)]">
+                <div className="flex items-center gap-3 mb-4 sm:mb-6 border-b border-[var(--border)] pb-3.5 sm:pb-4">
+                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[var(--primary)]/10 flex items-center justify-center text-[var(--primary)] shrink-0">
+                        {editingUserId ? <Edit className="w-4 h-4 sm:w-5 sm:h-5" /> : <UserPlus className="w-4 h-4 sm:w-5 sm:h-5" />}
                     </div>
                     <div>
-                        <h2 className="text-lg font-black font-display text-[var(--text-primary)]">
+                        <h2 className="text-base sm:text-lg font-black font-display text-[var(--text-primary)]">
                             {editingUserId ? 'Edit Pengurus' : 'Tambah Pengurus Baru'}
                         </h2>
                         <p className="text-xs text-[var(--text-muted)]">
@@ -139,15 +139,15 @@ export default function UsersManagementPage() {
                 </div>
 
                 {message.text && (
-                    <div className={`p-3 mb-5 rounded-xl text-xs font-bold ${message.type === 'success' ? 'bg-green-50 text-green-600 border border-green-200' : 'bg-red-50 text-red-600 border border-red-200'}`}>
+                    <div className={`p-3 mb-4 sm:mb-5 rounded-xl text-xs font-bold ${message.type === 'success' ? 'bg-green-50 text-green-600 border border-green-200 dark:bg-green-500/10 dark:text-green-400 dark:border-green-500/20' : 'bg-red-50 text-red-600 border border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20'}`}>
                         {message.text}
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="space-y-5 max-w-md">
+                <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5 max-w-md">
                     <div>
-                        <label className="flex items-center gap-1.5 text-xs font-bold text-[var(--text-muted)] mb-2 uppercase tracking-wider">
-                            <Mail className="w-3.5 h-3.5" /> Email Pengurus
+                        <label className="flex items-center gap-1.5 text-xs font-bold text-[var(--text-muted)] mb-1.5 uppercase tracking-wider font-display">
+                            <Mail className="w-3.5 h-3.5 text-[var(--primary)] shrink-0" /> Email Pengurus
                         </label>
                         <input
                             type="email"
@@ -155,14 +155,14 @@ export default function UsersManagementPage() {
                             disabled={!!editingUserId}
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] text-sm focus:ring-2 focus:ring-[var(--primary)]/50 focus:border-[var(--primary)] outline-none transition-all disabled:opacity-50"
+                            className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-primary)] text-xs sm:text-sm focus:ring-2 focus:ring-[var(--primary)]/50 focus:border-[var(--primary)] outline-none transition-all disabled:opacity-50 placeholder-[var(--text-muted)]"
                             placeholder="bidang@kaizen.id"
                         />
                     </div>
 
                     <div>
-                        <label className="flex items-center gap-1.5 text-xs font-bold text-[var(--text-muted)] mb-2 uppercase tracking-wider">
-                            <Lock className="w-3.5 h-3.5" /> {editingUserId ? 'Kata Sandi Baru (Kosongkan jika tidak diubah)' : 'Kata Sandi (Minimal 6 Karakter)'}
+                        <label className="flex items-center gap-1.5 text-xs font-bold text-[var(--text-muted)] mb-1.5 uppercase tracking-wider font-display">
+                            <Lock className="w-3.5 h-3.5 text-[var(--primary)] shrink-0" /> {editingUserId ? 'Kata Sandi Baru (Kosongkan jika tidak diubah)' : 'Kata Sandi (Minimal 6 Karakter)'}
                         </label>
                         <input
                             type="password"
@@ -170,31 +170,32 @@ export default function UsersManagementPage() {
                             minLength={6}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] text-sm focus:ring-2 focus:ring-[var(--primary)]/50 focus:border-[var(--primary)] outline-none transition-all"
+                            className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-primary)] text-xs sm:text-sm focus:ring-2 focus:ring-[var(--primary)]/50 focus:border-[var(--primary)] outline-none transition-all placeholder-[var(--text-muted)]"
                             placeholder="••••••••"
                         />
                     </div>
 
                     <div>
-                        <label className="flex items-center gap-1.5 text-xs font-bold text-[var(--text-muted)] mb-2 uppercase tracking-wider">
-                            <Shield className="w-3.5 h-3.5" /> Hak Akses (Role)
+                        <label className="flex items-center gap-1.5 text-xs font-bold text-[var(--text-muted)] mb-1.5 uppercase tracking-wider font-display">
+                            <Shield className="w-3.5 h-3.5 text-[var(--primary)] shrink-0" /> Hak Akses (Role)
                         </label>
                         <select
                             value={role}
                             onChange={(e) => setRole(e.target.value)}
-                            className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] text-sm focus:ring-2 focus:ring-[var(--primary)]/50 focus:border-[var(--primary)] outline-none transition-all cursor-pointer appearance-none"
+                            className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-primary)] text-xs sm:text-sm focus:ring-2 focus:ring-[var(--primary)]/50 focus:border-[var(--primary)] outline-none transition-all cursor-pointer font-display"
                         >
                             <option value="admin">Admin Bidang (Akses Standar)</option>
                             <option value="superadmin">Super Admin (Akses Penuh)</option>
                         </select>
                     </div>
 
-                    <div className="flex gap-3 pt-2">
+                    <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-3 pt-2">
                         <button
                             type="submit"
                             disabled={loading}
-                            className="flex-1 py-3.5 px-4 bg-[var(--primary)] text-white text-xs font-bold tracking-widest uppercase rounded-xl hover:bg-[var(--primary-dark)] transition-all disabled:opacity-70 disabled:cursor-not-allowed shadow-md shadow-[var(--primary)]/20"
+                            className="flex-1 py-2.5 sm:py-3.5 px-4 bg-[var(--primary)] text-white text-xs font-bold tracking-widest uppercase rounded-xl hover:bg-[var(--primary-dark)] transition-all disabled:opacity-70 disabled:cursor-not-allowed shadow-md shadow-[var(--primary)]/20 cursor-pointer font-display flex justify-center items-center gap-2"
                         >
+                            {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : null}
                             {loading ? 'Memproses...' : (editingUserId ? 'Simpan Perubahan' : 'Buat Akun Sekarang')}
                         </button>
 
@@ -202,7 +203,7 @@ export default function UsersManagementPage() {
                             <button
                                 type="button"
                                 onClick={cancelEdit}
-                                className="py-3.5 px-6 bg-[var(--surface)] border border-[var(--border)] text-[var(--text-primary)] text-xs font-bold tracking-widest uppercase rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-all"
+                                className="py-2.5 sm:py-3.5 px-6 bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text-primary)] text-xs font-bold tracking-widest uppercase rounded-xl hover:bg-[var(--surface)] transition-all cursor-pointer font-display"
                             >
                                 Batal
                             </button>
@@ -211,79 +212,82 @@ export default function UsersManagementPage() {
                 </form>
             </div>
 
-            <div className="bg-[var(--card)] p-6 rounded-2xl shadow-sm border border-[var(--border)]">
-                <div className="flex items-center justify-between mb-6 border-b border-[var(--border)] pb-4">
+            <div className="bg-[var(--card)] rounded-2xl shadow-sm border border-[var(--border)] overflow-hidden">
+                <div className="p-4 sm:p-6 flex items-center justify-between border-b border-[var(--border)] bg-[var(--surface)]">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500">
-                            <Users className="w-5 h-5" />
+                        <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500 shrink-0">
+                            <Users className="w-4 h-4 sm:w-5 sm:h-5" />
                         </div>
                         <div>
-                            <h2 className="text-lg font-black font-display text-[var(--text-primary)]">Daftar Pengurus</h2>
+                            <h2 className="text-base sm:text-lg font-black font-display text-[var(--text-primary)]">Daftar Pengurus</h2>
                             <p className="text-xs text-[var(--text-muted)]">Kelola akun dan akses sistem</p>
                         </div>
                     </div>
                     <button
                         onClick={fetchUsers}
-                        className="p-2 rounded-lg bg-[var(--surface)] border border-[var(--border)] hover:bg-[var(--primary)]/10 hover:text-[var(--primary)] transition-colors text-[var(--text-muted)]"
+                        className="p-2 sm:p-2.5 rounded-xl bg-[var(--card)] border border-[var(--border)] hover:bg-[var(--primary)]/10 hover:text-[var(--primary)] transition-colors text-[var(--text-muted)] cursor-pointer"
                         title="Segarkan Data"
                     >
                         <RefreshCw className={`w-4 h-4 ${isLoadingUsers ? 'animate-spin' : ''}`} />
                     </button>
                 </div>
 
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left text-sm">
-                        <thead className="bg-[var(--surface)] text-[var(--text-muted)] uppercase text-[10px] font-bold tracking-wider">
-                        <tr>
-                            <th className="px-4 py-3 rounded-l-xl">Email</th>
-                            <th className="px-4 py-3">Hak Akses</th>
-                            <th className="px-4 py-3">Status</th>
-                            <th className="px-4 py-3 text-right rounded-r-xl">Aksi</th>
+                <div className="overflow-x-auto w-full scrollbar-none">
+                    <table className="w-full text-left border-collapse min-w-[550px]">
+                        <thead>
+                        <tr className="bg-[var(--surface-2)] border-b border-[var(--border)] text-[10px] sm:text-xs text-[var(--text-muted)] uppercase tracking-wider font-display">
+                            <th className="p-3.5 sm:p-4 font-bold pl-5 sm:pl-6">Email</th>
+                            <th className="p-3.5 sm:p-4 font-bold">Hak Akses</th>
+                            <th className="p-3.5 sm:p-4 font-bold">Status</th>
+                            <th className="p-3.5 sm:p-4 font-bold text-right pr-5 sm:pr-6">Aksi</th>
                         </tr>
                         </thead>
                         <tbody className="divide-y divide-[var(--border)]">
                         {isLoadingUsers ? (
                             <tr>
-                                <td colSpan={4} className="text-center py-8 text-[var(--text-muted)] text-xs font-medium">
-                                    Memuat data...
+                                <td colSpan={4} className="text-center py-12 text-[var(--text-muted)] text-xs font-bold font-display">
+                                    <RefreshCw className="w-4 h-4 animate-spin text-[var(--primary)] mx-auto mb-2" />
+                                    Memuat data pengurus...
                                 </td>
                             </tr>
                         ) : users.length === 0 ? (
                             <tr>
-                                <td colSpan={4} className="text-center py-8 text-[var(--text-muted)] text-xs font-medium">
+                                <td colSpan={4} className="text-center py-12 text-[var(--text-muted)] text-xs sm:text-sm font-medium">
                                     Belum ada data pengurus.
                                 </td>
                             </tr>
                         ) : (
                             users.map((u) => (
-                                <tr key={u.id} className="hover:bg-[var(--surface)]/50 transition-colors">
-                                    <td className="px-4 py-4 font-medium text-[var(--text-primary)]">{u.email}</td>
-                                    <td className="px-4 py-4">
-                                            <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${u.role === 'superadmin' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400' : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'}`}>
+                                <tr key={u.id} className="hover:bg-[var(--surface)] transition-colors">
+                                    <td className="p-3.5 sm:p-4 pl-5 sm:pl-6 font-semibold text-xs sm:text-sm text-[var(--text-primary)] font-display">
+                                        {u.email}
+                                    </td>
+                                    <td className="p-3.5 sm:p-4">
+                                            <span className={`px-2.5 py-1 rounded-md text-[9px] sm:text-[10px] font-bold uppercase tracking-wider whitespace-nowrap font-display ${u.role === 'superadmin' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400' : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'}`}>
                                                 {u.role}
                                             </span>
                                     </td>
-                                    <td className="px-4 py-4">
+                                    <td className="p-3.5 sm:p-4 whitespace-nowrap">
                                         <button
                                             onClick={() => handleToggleStatus(u.id, u.is_active)}
-                                            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition-colors ${u.is_active !== false ? 'bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-500 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400'}`}
+                                            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[9px] sm:text-[10px] font-bold uppercase tracking-wider transition-colors cursor-pointer font-display ${u.is_active !== false ? 'bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-500 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400'}`}
                                         >
-                                            <Power className="w-3 h-3" />
+                                            <Power className="w-3 h-3 shrink-0" />
                                             {u.is_active !== false ? 'Aktif' : 'Nonaktif'}
                                         </button>
                                     </td>
-                                    <td className="px-4 py-4">
-                                        <div className="flex items-center justify-end gap-2">
+                                    <td className="p-3.5 sm:p-4 pr-5 sm:pr-6 text-right">
+                                        <div className="flex items-center justify-end gap-1.5">
                                             <button
                                                 onClick={() => handleEditClick(u)}
-                                                className="p-2 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                                                className="p-1.5 sm:p-2 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors cursor-pointer"
                                                 title="Edit Pengguna"
                                             >
                                                 <Edit className="w-4 h-4" />
                                             </button>
                                             <button
                                                 onClick={() => handleDelete(u.id)}
-                                                className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                                                className="p-1.5 sm:p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors cursor-pointer"
                                                 title="Hapus Pengguna"
                                             >
                                                 <Trash2 className="w-4 h-4" />

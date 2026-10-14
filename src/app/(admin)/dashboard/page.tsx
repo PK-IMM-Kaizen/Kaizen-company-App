@@ -18,6 +18,7 @@ import {
 } from 'lucide-react'
 
 const timeAgo = (dateString: string) => {
+    if (!dateString) return '-'
     const date = new Date(dateString)
     const now = new Date()
     const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000)
@@ -112,136 +113,141 @@ export default function DashboardOverviewPage() {
     }, [supabase])
 
     const stats = [
-        { label: 'Berita Terbit', value: dashboardStats.publishedNews, color: 'var(--primary)', href: '/dashboard/berita', icon: <Newspaper className="w-5 h-5 text-[var(--primary)]" /> },
-        { label: 'Draft Berita', value: dashboardStats.draftNews, color: 'var(--accent-dark)', href: '/dashboard/berita?tab=draft', icon: <FileEdit className="w-5 h-5 text-[var(--accent-dark)]" /> },
-        { label: 'Produk Aktif', value: dashboardStats.availableProducts, color: 'var(--success)', href: '/dashboard/produk', icon: <ShoppingBag className="w-5 h-5 text-[var(--success)]" /> },
-        { label: 'Pengurus Aktif', value: dashboardStats.activePengurus, color: 'var(--info)', href: '/dashboard/kepengurusan', icon: <Users className="w-5 h-5 text-[var(--info)]" /> },
-        { label: 'Alumni Terdaftar', value: dashboardStats.totalAlumni, color: '#6B46C1', href: '/dashboard/alumni', icon: <GraduationCap className="w-5 h-5 text-[#6B46C1]" /> },
-        { label: 'Total Produk', value: dashboardStats.totalProducts, color: 'var(--text-secondary)', href: '/dashboard/produk', icon: <Package className="w-5 h-5 text-[var(--text-secondary)]" /> },
+        { label: 'Berita Terbit', value: dashboardStats.publishedNews, color: 'var(--primary)', href: '/dashboard/berita', icon: <Newspaper className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--primary)]" /> },
+        { label: 'Draft Berita', value: dashboardStats.draftNews, color: 'var(--accent-dark)', href: '/dashboard/berita?tab=draft', icon: <FileEdit className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--accent-dark)]" /> },
+        { label: 'Produk Aktif', value: dashboardStats.availableProducts, color: 'var(--success)', href: '/dashboard/ekowir', icon: <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--success)]" /> },
+        { label: 'Pengurus Aktif', value: dashboardStats.activePengurus, color: 'var(--info)', href: '/dashboard/kepengurusan', icon: <Users className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--info)]" /> },
+        { label: 'Alumni Terdaftar', value: dashboardStats.totalAlumni, color: '#6B46C1', href: '/dashboard/alumni', icon: <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5 text-[#6B46C1]" /> },
+        { label: 'Total Produk', value: dashboardStats.totalProducts, color: 'var(--text-secondary)', href: '/dashboard/ekowir', icon: <Package className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--text-secondary)]" /> },
     ]
 
     const getActivityIcon = (type: string) => {
         switch (type) {
-            case 'users': return <Users className="w-4 h-4 text-[var(--info)]" />
-            case 'news': return <Newspaper className="w-4 h-4 text-[var(--primary)]" />
-            case 'product': return <Package className="w-4 h-4 text-[var(--success)]" />
-            case 'draft': return <FileEdit className="w-4 h-4 text-[var(--accent-dark)]" />
-            case 'settings': return <Activity className="w-4 h-4 text-orange-500" />
-            default: return <Activity className="w-4 h-4 text-[var(--text-muted)]" />
+            case 'users': return <Users className="w-3.5 h-3.5 text-[var(--info)]" />
+            case 'news': return <Newspaper className="w-3.5 h-3.5 text-[var(--primary)]" />
+            case 'product': return <Package className="w-3.5 h-3.5 text-[var(--success)]" />
+            case 'draft': return <FileEdit className="w-3.5 h-3.5 text-[var(--accent-dark)]" />
+            case 'settings': return <Activity className="w-3.5 h-3.5 text-orange-500" />
+            default: return <Activity className="w-3.5 h-3.5 text-[var(--text-muted)]" />
         }
     }
 
     if (isLoading) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
-                <Loader2 className="w-8 h-8 animate-spin text-[var(--primary)]" />
-                <p className="text-sm font-bold text-[var(--text-muted)] uppercase tracking-widest font-display">Memuat Data Dashboard...</p>
+            <div className="flex flex-col items-center justify-center min-h-[50vh] sm:min-h-[60vh] gap-3">
+                <Loader2 className="w-7 h-7 sm:w-8 sm:h-8 animate-spin text-[var(--primary)]" />
+                <p className="text-xs sm:text-sm font-bold text-[var(--text-muted)] uppercase tracking-widest font-display">
+                    Memuat Data Dashboard...
+                </p>
             </div>
         )
     }
 
     return (
-        <div className="space-y-6 animate-in fade-in duration-300">
+        <div className="space-y-5 sm:space-y-6 font-sans">
+
             <div
-                className="rounded-[var(--radius)] p-6 relative overflow-hidden shadow-sm"
+                className="rounded-2xl p-5 sm:p-6 lg:p-8 relative overflow-hidden shadow-sm"
                 style={{
                     background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)'
                 }}
             >
                 <div className="relative z-10 flex items-start justify-between">
                     <div>
-                        <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest mb-1 text-white/70 font-display">
+                        <div className="flex items-center gap-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-1 text-white/70 font-display">
                             Selamat Datang, {role === 'superadmin' ? 'Super Admin' : 'Admin'}
                         </div>
-                        <h2 className="text-xl sm:text-2xl font-black text-white font-display">
+                        <h2 className="text-lg xs:text-xl sm:text-3xl font-black text-white font-display tracking-tight">
                             Panel Admin IMM Kaizen
                         </h2>
-                        <p className="text-xs sm:text-sm mt-1 text-white/80">
+                        <p className="text-xs sm:text-sm mt-1 text-white/80 font-sans">
                             Kaizen Company V1 — {currentDate || 'Memuat tanggal...'}
                         </p>
                     </div>
                 </div>
-                <div className="absolute -bottom-10 -right-10 w-48 h-48 bg-white/5 rounded-full blur-xl pointer-events-none" />
+                <div className="absolute -bottom-10 -right-10 w-36 h-36 sm:w-48 sm:h-48 bg-white/5 rounded-full blur-xl pointer-events-none" />
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
                 {stats.map(s => (
                     <Link
                         href={s.href}
                         key={s.label}
-                        className="group bg-[var(--card)] rounded-[var(--radius)] p-4 border border-[var(--border)] shadow-sm hover:border-[var(--primary)] hover:shadow-md transition-all duration-300 block relative overflow-hidden"
+                        className="group bg-[var(--card)] rounded-2xl p-3.5 sm:p-4 border border-[var(--border)] shadow-sm hover:border-[var(--primary)] hover:shadow-md transition-all duration-300 block relative overflow-hidden"
                     >
-                        <div className="flex items-center justify-between mb-3">
-                            <div className="w-9 h-9 rounded-[var(--radius)] bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <div className="flex items-center justify-between mb-2 sm:mb-3">
+                            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center group-hover:scale-105 transition-transform duration-300 shrink-0">
                                 {s.icon}
                             </div>
                             <span
-                                className="text-2xl font-black font-display"
+                                className="text-xl sm:text-2xl font-black font-display shrink-0"
                                 style={{ color: s.color }}
                             >
                                 {s.value}
                             </span>
                         </div>
-                        <div className="flex items-center justify-between mt-2">
-                            <p className="text-xs font-bold text-[var(--text-muted)] group-hover:text-[var(--text-primary)] font-display uppercase tracking-wider transition-colors">
+                        <div className="flex items-center justify-between mt-1">
+                            <p className="text-[10px] sm:text-xs font-bold text-[var(--text-muted)] group-hover:text-[var(--text-primary)] font-display uppercase tracking-wider transition-colors truncate">
                                 {s.label}
                             </p>
-                            <ArrowRight className="w-3.5 h-3.5 text-[var(--text-muted)] opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
+                            <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[var(--text-muted)] opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 shrink-0 hidden sm:block" />
                         </div>
                     </Link>
                 ))}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className={`bg-[var(--card)] rounded-[var(--radius)] border border-[var(--border)] overflow-hidden shadow-sm flex flex-col h-full ${role === 'superadmin' ? 'lg:col-span-2' : 'lg:col-span-3'}`}>
-                    <div className="px-5 py-4 border-b border-[var(--border)] bg-[var(--surface)] flex items-center justify-between">
-                        <h3 className="font-black text-sm text-[var(--text-primary)] font-display">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-start">
+
+                <div className={`bg-[var(--card)] rounded-2xl border border-[var(--border)] overflow-hidden shadow-sm flex flex-col ${role === 'superadmin' ? 'lg:col-span-7 xl:col-span-8' : 'lg:col-span-12'}`}>
+                    <div className="px-4 sm:px-5 py-3.5 sm:py-4 border-b border-[var(--border)] bg-[var(--surface)] flex items-center justify-between">
+                        <h3 className="font-black text-xs sm:text-sm text-[var(--text-primary)] font-display uppercase tracking-wider">
                             Berita Terkini
                         </h3>
                         <Link
                             href="/dashboard/berita"
-                            className="text-xs font-bold text-[var(--primary)] hover:text-[var(--primary-dark)] flex items-center gap-1 transition-colors uppercase tracking-wider font-display"
+                            className="text-[11px] sm:text-xs font-bold text-[var(--primary)] hover:text-[var(--primary-dark)] flex items-center gap-1 transition-colors uppercase tracking-wider font-display"
                         >
                             Lihat Semua <ArrowRight className="w-3.5 h-3.5" />
                         </Link>
                     </div>
-                    <div className="overflow-x-auto flex-1">
-                        <table className="admin-table w-full text-left border-collapse h-full">
+
+                    <div className="overflow-x-auto w-full scrollbar-none">
+                        <table className="w-full text-left border-collapse min-w-[550px]">
                             <thead>
-                            <tr className="bg-[var(--surface-2)] border-b border-[var(--border)] text-xs text-[var(--text-muted)] uppercase tracking-wider font-display">
-                                <th className="p-4 font-bold">Judul</th>
-                                <th className="p-4 font-bold">Kategori</th>
-                                <th className="p-4 font-bold">Tanggal</th>
-                                <th className="p-4 font-bold">Status</th>
-                                <th className="p-4 font-bold text-right">Aksi</th>
+                            <tr className="bg-[var(--surface-2)] border-b border-[var(--border)] text-[10px] sm:text-xs text-[var(--text-muted)] uppercase tracking-wider font-display">
+                                <th className="p-3.5 sm:p-4 font-bold">Judul</th>
+                                <th className="p-3.5 sm:p-4 font-bold">Kategori</th>
+                                <th className="p-3.5 sm:p-4 font-bold">Tanggal</th>
+                                <th className="p-3.5 sm:p-4 font-bold">Status</th>
+                                <th className="p-3.5 sm:p-4 font-bold text-right">Aksi</th>
                             </tr>
                             </thead>
                             <tbody>
                             {recentNews.length > 0 ? (
                                 recentNews.map(n => (
                                     <tr key={n.id} className="border-b border-[var(--border)] hover:bg-[var(--surface)] transition-colors group">
-                                        <td className="p-4">
-                                            <p className="font-semibold text-xs line-clamp-1 text-[var(--text-primary)] font-display">
+                                        <td className="p-3.5 sm:p-4">
+                                            <p className="font-semibold text-xs text-[var(--text-primary)] font-display line-clamp-1 max-w-xs">
                                                 {n.title}
                                             </p>
                                         </td>
-                                        <td className="p-4">
-                                            <span className="text-[10px] font-bold text-[var(--primary)] font-display bg-[var(--primary)]/10 px-2.5 py-1 rounded-md uppercase tracking-wider">
-                                                {n.category || '-'}
-                                            </span>
+                                        <td className="p-3.5 sm:p-4">
+                                                <span className="text-[9px] sm:text-[10px] font-bold text-[var(--primary)] font-display bg-[var(--primary)]/10 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md uppercase tracking-wider whitespace-nowrap">
+                                                    {n.category || '-'}
+                                                </span>
                                         </td>
-                                        <td className="p-4 text-xs text-[var(--text-muted)] whitespace-nowrap font-medium">
+                                        <td className="p-3.5 sm:p-4 text-[11px] sm:text-xs text-[var(--text-muted)] whitespace-nowrap font-medium">
                                             {timeAgo(n.publish_date || n.created_at)}
                                         </td>
-                                        <td className="p-4">
-                                            <span className={`text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-md ${n.status === 'published' ? 'bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-400' : 'bg-gray-100 text-gray-600 dark:bg-gray-500/10 dark:text-gray-400'}`}>
-                                                {n.status === 'published' ? 'Terbit' : 'Draft'}
-                                            </span>
+                                        <td className="p-3.5 sm:p-4">
+                                                <span className={`text-[9px] sm:text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md whitespace-nowrap ${n.status === 'published' ? 'bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-400' : 'bg-gray-100 text-gray-600 dark:bg-gray-500/10 dark:text-gray-400'}`}>
+                                                    {n.status === 'published' ? 'Terbit' : 'Draft'}
+                                                </span>
                                         </td>
-                                        <td className="p-4 text-right">
+                                        <td className="p-3.5 sm:p-4 text-right">
                                             <Link
                                                 href={`/dashboard/berita/${n.id}`}
-                                                className="inline-flex items-center justify-center p-1.5 text-[var(--text-muted)] hover:text-[var(--primary)] hover:bg-[var(--primary)]/10 rounded-md transition-colors"
+                                                className="inline-flex items-center justify-center p-1.5 text-[var(--text-muted)] hover:text-[var(--primary)] hover:bg-[var(--primary)]/10 rounded-lg transition-colors"
                                                 title="Edit Berita"
                                             >
                                                 <ExternalLink className="w-4 h-4" />
@@ -251,7 +257,7 @@ export default function DashboardOverviewPage() {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={5} className="p-8 text-center text-sm text-[var(--text-muted)]">
+                                    <td colSpan={5} className="p-8 text-center text-xs sm:text-sm text-[var(--text-muted)]">
                                         Belum ada berita yang diterbitkan atau di-draft.
                                     </td>
                                 </tr>
@@ -262,54 +268,47 @@ export default function DashboardOverviewPage() {
                 </div>
 
                 {role === 'superadmin' && (
-                    <div className="bg-[var(--card)] rounded-[var(--radius)] border border-[var(--border)] overflow-hidden shadow-sm flex flex-col h-full">
-                        <div className="px-5 py-4 border-b border-[var(--border)] bg-[var(--surface)] flex items-center gap-2">
-                            <Activity className="w-4 h-4 text-[var(--primary)]" />
-                            <h3 className="font-black text-sm text-[var(--text-primary)] font-display">
+                    <div className="bg-[var(--card)] rounded-2xl border border-[var(--border)] overflow-hidden shadow-sm flex flex-col lg:col-span-5 xl:col-span-4">
+                        <div className="px-4 sm:px-5 py-3.5 sm:py-4 border-b border-[var(--border)] bg-[var(--surface)] flex items-center gap-2">
+                            <Activity className="w-4 h-4 text-[var(--primary)] shrink-0" />
+                            <h3 className="font-black text-xs sm:text-sm text-[var(--text-primary)] font-display uppercase tracking-wider">
                                 Aktivitas Sistem
                             </h3>
                         </div>
 
-                        <div className="p-5 flex-1 bg-[var(--surface-2)]/50">
+                        <div className="p-4 sm:p-5 flex-1 bg-[var(--surface-2)]/30">
                             {recentActivities.length > 0 ? (
-                                <div className="space-y-6 relative before:absolute before:inset-0 before:ml-4 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-[var(--border)] before:via-[var(--border)] before:to-transparent">
+                                <div className="space-y-3.5">
                                     {recentActivities.map((activity) => (
-                                        <div key={activity.id} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-
-                                            <div className="flex items-center justify-center w-8 h-8 rounded-full border-4 border-[var(--card)] bg-[var(--surface)] text-slate-500 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 relative">
-                                                {getActivityIcon(activity.type)}
-                                            </div>
-
-                                            <div className="w-[calc(100%-2.5rem)] md:w-[calc(50%-1.5rem)] p-3 rounded-xl border border-[var(--border)] bg-[var(--card)] shadow-sm hover:border-[var(--primary)]/30 transition-colors">
-                                                <div className="flex items-center justify-between mb-1 gap-2">
+                                        <div key={activity.id} className="p-3 rounded-xl border border-[var(--border)] bg-[var(--card)] shadow-sm hover:border-[var(--primary)]/30 transition-colors">
+                                            <div className="flex items-center justify-between mb-1.5 gap-2">
+                                                <div className="flex items-center gap-1.5 min-w-0">
+                                                    <div className="p-1 rounded-md bg-[var(--surface)] border border-[var(--border)] shrink-0">
+                                                        {getActivityIcon(activity.type)}
+                                                    </div>
                                                     <span className="font-bold text-xs text-[var(--text-primary)] font-display truncate">
-                                                        {activity.admin_name}
-                                                    </span>
-                                                    <span className="text-[10px] font-semibold text-[var(--text-muted)] flex items-center gap-1 whitespace-nowrap">
-                                                        <Clock className="w-3 h-3" /> {timeAgo(activity.created_at)}
+                                                        {activity.admin_name || 'Admin'}
                                                     </span>
                                                 </div>
-                                                <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
-                                                    Telah {activity.action} <span className="font-semibold text-[var(--text-primary)]">{activity.target}</span>.
-                                                </p>
+                                                <span className="text-[10px] font-semibold text-[var(--text-muted)] flex items-center gap-1 shrink-0">
+                                                    <Clock className="w-3 h-3 text-[var(--primary)]" /> {timeAgo(activity.created_at)}
+                                                </span>
                                             </div>
+                                            <p className="text-[11px] sm:text-xs text-[var(--text-secondary)] leading-relaxed">
+                                                {activity.action} <span className="font-semibold text-[var(--text-primary)]">{activity.target}</span>.
+                                            </p>
                                         </div>
                                     ))}
                                 </div>
                             ) : (
-                                <div className="text-center py-10 opacity-70">
+                                <div className="text-center py-8 opacity-70">
                                     <p className="text-xs text-[var(--text-muted)] font-semibold">Belum ada riwayat aktivitas.</p>
                                 </div>
                             )}
                         </div>
-
-                        <div className="px-5 py-3 border-t border-[var(--border)] bg-[var(--card)] text-center">
-                            <button className="text-xs font-bold text-[var(--primary)] hover:text-[var(--primary-dark)] uppercase tracking-wider font-display transition-colors">
-                                Muat Lebih Banyak
-                            </button>
-                        </div>
                     </div>
                 )}
+
             </div>
         </div>
     )
