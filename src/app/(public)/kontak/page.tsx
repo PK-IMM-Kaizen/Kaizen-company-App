@@ -42,7 +42,7 @@ export default function ContactPage() {
             if (data) setProfile(data)
         }
         fetchContactData()
-    }, [])
+    }, [supabase])
 
     const instagramHandle = profile?.instagram || '@imm_kaizen'
     const whatsappHandle = profile?.whatsapp || '+62 812-3456-7890'
@@ -56,7 +56,6 @@ export default function ContactPage() {
             handle: instagramHandle,
             desc: 'Ikuti kami untuk update kegiatan & dokumentasi terbaru',
             link: `https://www.instagram.com/${instagramHandle.replace('@', '')}`,
-            placeholder: false,
         },
         {
             icon: <WhatsAppIcon className="w-5 h-5 text-[#25D366]" />,
@@ -64,7 +63,6 @@ export default function ContactPage() {
             handle: whatsappHandle,
             desc: 'Hubungi BPH & Pengurus aktif melalui layanan WhatsApp',
             link: `https://wa.me/${whatsappHandle.replace(/[^0-9]/g, '')}`,
-            placeholder: false,
         },
         {
             icon: <Mail className="w-5 h-5 text-[var(--primary)]" />,
@@ -72,13 +70,13 @@ export default function ContactPage() {
             handle: emailHandle,
             desc: 'Kirimkan korespondensi, undangan, atau surat resmi',
             link: `mailto:${emailHandle}`,
-            placeholder: false,
         },
     ]
 
     return (
-        <div className="bg-[var(--background)] min-h-screen">
-            <div className="relative bg-[var(--primary-dark)] pt-32 pb-20 overflow-hidden">
+        <div className="bg-[var(--background)] min-h-screen font-sans selection:bg-[var(--primary)] selection:text-white">
+
+            <div className="relative bg-[var(--primary-dark)] pt-28 sm:pt-32 pb-16 sm:pb-20 overflow-hidden">
                 <div
                     className="absolute top-0 left-0 w-full h-1"
                     style={{
@@ -86,80 +84,84 @@ export default function ContactPage() {
                     }}
                 />
                 <div
-                    className="absolute top-0 right-0 w-1/2 h-full opacity-10"
+                    className="absolute top-0 right-0 w-1/2 h-full opacity-10 pointer-events-none"
                     style={{
                         background: 'linear-gradient(to left, var(--primary), transparent)'
                     }}
                 />
 
-                <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
-                    <div className="flex items-center gap-4 mb-6">
-                        <div className="w-8 h-[1px] bg-[var(--accent)]"></div>
-                        <span className="text-[var(--accent)] text-xs sm:text-sm font-bold tracking-[0.2em] uppercase font-display">
+                <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
+                        <div className="w-6 sm:w-8 h-[1px] bg-[var(--accent)]"></div>
+                        <span className="text-[var(--accent)] text-[10px] sm:text-xs md:text-sm font-bold tracking-[0.2em] uppercase font-display">
                             Hubungi Kami
                         </span>
                     </div>
-                    <h1 className="text-4xl sm:text-6xl font-black text-white tracking-tight font-display">
+                    <h1 className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl font-black text-white tracking-tight font-display">
                         Kontak Resmi
                     </h1>
                 </div>
             </div>
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 lg:py-24">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 lg:py-24">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 lg:gap-16 items-start">
 
                     <div className="lg:col-span-7 space-y-6">
                         <div>
-                            <span className="section-label mb-2 block">Kanal Komunikasi</span>
-                            <h2 className="text-2xl sm:text-3xl font-black text-[var(--text-primary)] mb-8 font-display">
+                            <span className="text-[10px] sm:text-xs font-bold text-[var(--primary)] tracking-[0.2em] uppercase mb-1.5 block font-display">
+                                Kanal Komunikasi
+                            </span>
+                            <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-[var(--text-primary)] mb-6 sm:mb-8 font-display tracking-tight">
                                 Kami Siap Terhubung dengan Anda
                             </h2>
                         </div>
 
-                        <div className="space-y-4">
+                        <div className="space-y-3.5 sm:space-y-4">
                             {kontakChannels.map((item) => (
                                 <a
                                     key={item.platform}
                                     href={item.link}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="group flex items-start gap-4 p-5 rounded-[var(--radius)] bg-[var(--card)] border border-[var(--border)] hover:border-[var(--primary)] transition-all duration-300 shadow-sm"
+                                    className="group flex items-start gap-3.5 sm:gap-4 p-4 sm:p-5 rounded-2xl bg-[var(--card)] border border-[var(--border)] hover:border-[var(--primary)]/60 transition-all duration-300 shadow-sm hover:shadow-md"
                                 >
-                                    <div className="w-12 h-12 rounded-[var(--radius)] bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+                                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
                                         {item.icon}
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <div className="flex items-center gap-2 mb-1">
-                                            <h4 className="font-bold text-sm text-[var(--text-primary)] font-display group-hover:text-[var(--primary)] transition-colors">
+                                        <div className="flex items-center gap-2 mb-0.5">
+                                            <h3 className="font-bold text-xs sm:text-sm text-[var(--text-primary)] font-display group-hover:text-[var(--primary)] transition-colors">
                                                 {item.platform}
-                                            </h4>
+                                            </h3>
                                         </div>
-                                        <p className="text-sm font-bold text-[var(--text-primary)] font-display mb-1 truncate">
+                                        <p className="text-xs sm:text-sm font-bold text-[var(--text-primary)] font-display mb-1 truncate">
                                             {item.handle}
                                         </p>
-                                        <p className="text-xs text-[var(--text-muted)]">
+                                        <p className="text-[11px] sm:text-xs text-[var(--text-muted)] leading-relaxed">
                                             {item.desc}
                                         </p>
                                     </div>
-                                    <ExternalLink className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--primary)] transition-colors mt-1" />
+                                    <ExternalLink className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--primary)] transition-colors mt-1 shrink-0" />
                                 </a>
                             ))}
                         </div>
 
-                        <div className="p-4 rounded-[var(--radius)] bg-[#FFF8E7] border border-[#F0E4B0] text-[#7A5C00] text-xs leading-relaxed">
+                        <div className="p-4 sm:p-5 rounded-xl bg-[#FFF8E7] dark:bg-amber-950/20 border border-[#F0E4B0] dark:border-amber-800/30 text-[#7A5C00] dark:text-amber-300 text-xs leading-relaxed">
                             <strong>Catatan:</strong> Informasi nomor kontak WhatsApp, Instagram, dan Email diperbarui secara berkala sesuai periode kepengurusan yang aktif.
                         </div>
                     </div>
 
-                    <div className="lg:col-span-5 space-y-6">
+                    <div className="lg:col-span-5 space-y-6 pt-4 lg:pt-0">
                         <div>
-                            <span className="section-label mb-2 block">Lokasi Sekretariat</span>
-                            <h2 className="text-2xl sm:text-3xl font-black text-[var(--text-primary)] mb-8 font-display">
-                                Alamat
+                            <span className="text-[10px] sm:text-xs font-bold text-[var(--primary)] tracking-[0.2em] uppercase mb-1.5 block font-display">
+                                Lokasi Sekretariat
+                            </span>
+                            <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-[var(--text-primary)] mb-6 sm:mb-8 font-display tracking-tight">
+                                Alamat Organisasi
                             </h2>
                         </div>
 
-                        <div className="relative rounded-[var(--radius)] overflow-hidden border border-[var(--border)] shadow-sm bg-[var(--surface-2)] aspect-[4/3] sm:aspect-[16/10] lg:aspect-[4/3]">
+                        <div className="relative rounded-2xl overflow-hidden border border-[var(--border)] shadow-sm bg-[var(--surface-2)] aspect-[16/10] sm:aspect-[16/9] lg:aspect-[4/3]">
                             <iframe
                                 title="Lokasi Universitas Muhammadiyah Surabaya"
                                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3957.9405628549337!2d112.79326467588079!3d-7.24759907118939!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd7f9ed5d0a68d7%3A0xb35a0937a03fb7a7!2sUniversitas%20Muhammadiyah%20Surabaya!5e0!3m2!1sid!2sid!4v1710000000000!5m2!1sid!2sid"
@@ -170,26 +172,26 @@ export default function ContactPage() {
                             />
                         </div>
 
-                        <div className="p-6 rounded-[var(--radius)] bg-[var(--surface)] border border-[var(--border)] space-y-4">
+                        <div className="p-5 sm:p-6 rounded-2xl bg-[var(--card)] border border-[var(--border)] space-y-4 shadow-sm">
                             <div className="flex items-start gap-3">
                                 <MapPin className="w-5 h-5 text-[var(--primary)] shrink-0 mt-0.5" />
                                 <div>
-                                    <h4 className="font-bold text-sm text-[var(--text-primary)] font-display mb-1">
+                                    <h3 className="font-bold text-xs sm:text-sm text-[var(--text-primary)] font-display mb-1">
                                         Sekretariat {profile?.short_name || 'PK IMM Kaizen'}
-                                    </h4>
+                                    </h3>
                                     <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
                                         {addressText}
                                     </p>
                                 </div>
                             </div>
 
-                            <div className="border-t border-[var(--border)] pt-4 flex items-center gap-3">
+                            <div className="border-t border-[var(--border)] pt-3.5 flex items-center gap-3">
                                 <Clock className="w-5 h-5 text-[var(--accent)] shrink-0" />
                                 <div>
-                                    <h4 className="font-bold text-xs text-[var(--text-primary)] font-display uppercase tracking-wider">
-                                        Jam Layanan
+                                    <h4 className="font-bold text-[10px] sm:text-xs text-[var(--text-primary)] font-display uppercase tracking-wider">
+                                        Jam Layanan Kontak
                                     </h4>
-                                    <p className="text-xs text-[var(--text-secondary)]">
+                                    <p className="text-xs text-[var(--text-secondary)] mt-0.5">
                                         Senin – Jumat, 09.00 – 17.00 WIB
                                     </p>
                                 </div>

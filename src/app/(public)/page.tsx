@@ -109,8 +109,8 @@ export default function HomePage() {
     }
 
     return (
-        <div className="w-full bg-[var(--surface)]">
-            <section className="relative w-full min-h-[100dvh] flex flex-col items-center justify-center overflow-hidden bg-[#111111] pt-20 pb-16">
+        <div className="w-full bg-[var(--surface)] overflow-x-hidden font-sans selection:bg-[var(--primary)] selection:text-white">
+            <section className="relative w-full min-h-[100dvh] flex flex-col items-center justify-center bg-[#111111] pt-20 sm:pt-24 pb-16 sm:pb-20 px-4 sm:px-6">
                 <div
                     className="absolute inset-0 z-0 bg-cover bg-center opacity-90"
                     style={{
@@ -124,44 +124,44 @@ export default function HomePage() {
                     }}
                 />
 
-                <div className="relative z-10 max-w-4xl mx-auto px-4 flex flex-col items-center text-center w-full mt-8">
-                    <div className="flex items-center justify-center gap-4 mb-4">
+                <div className="relative z-10 max-w-4xl mx-auto flex flex-col items-center text-center w-full mt-4 sm:mt-8">
+                    <div className="flex items-center justify-center gap-2 sm:gap-4 mb-3 sm:mb-4">
                         <div className="h-[1px] w-6 sm:w-12 bg-[var(--accent-light)]" />
-                        <span className="text-xs sm:text-sm font-bold tracking-[0.2em] uppercase text-[var(--accent-light)] font-display">
+                        <span className="text-[10px] sm:text-xs md:text-sm font-bold tracking-[0.2em] uppercase text-[var(--accent-light)] font-display">
                             Pimpinan Komisariat
                         </span>
                         <div className="h-[1px] w-6 sm:w-12 bg-[var(--accent-light)]" />
                     </div>
 
-                    <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-white leading-[1.2] mb-4 tracking-tight font-display">
+                    <h1 className="text-2xl xs:text-3xl sm:text-5xl md:text-6xl font-black text-white leading-[1.15] mb-3 sm:mb-4 tracking-tight font-display">
                         IKATAN MAHASISWA MUHAMMADIYAH <br />
                         <span className="text-[var(--accent)]">KAIZEN</span>
                     </h1>
 
-                    <p className="text-sm sm:text-lg font-bold text-white/90 mb-8 tracking-widest uppercase">
+                    <p className="text-xs sm:text-base md:text-lg font-bold text-white/90 mb-6 sm:mb-8 tracking-widest uppercase">
                         Universitas Muhammadiyah Surabaya
                     </p>
 
-                    <p className="text-sm sm:text-base leading-relaxed text-white/80 max-w-2xl mb-10">
+                    <p className="text-xs sm:text-sm md:text-base leading-relaxed text-white/80 max-w-2xl mb-8 sm:mb-10 px-2">
                         Platform digital resmi IMM Komisariat Kaizen. Bergerak bersama dalam ilmu, iman, dan amal nyata untuk membangun peradaban masyarakat.
                     </p>
 
-                    <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+                    <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full sm:w-auto px-4 xs:px-0">
                         <Link
                             href="/profil"
-                            className="w-full sm:w-auto px-8 py-3.5 bg-[var(--accent)] text-white font-bold rounded-full transition-all hover:bg-[#c96c15] hover:scale-105 shadow-lg shadow-[var(--accent)]/20 font-display flex justify-center text-center"
+                            className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-3.5 bg-[var(--accent)] text-white text-xs sm:text-sm font-bold rounded-full transition-all hover:bg-[#c96c15] hover:scale-105 shadow-lg shadow-[var(--accent)]/20 font-display flex justify-center text-center"
                         >
                             Profil Organisasi
                         </Link>
                         <Link
                             href="/berita"
-                            className="w-full sm:w-auto px-8 py-3.5 bg-transparent border border-white/40 text-white font-bold rounded-full transition-all hover:bg-white/10 font-display flex justify-center text-center"
+                            className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-3.5 bg-transparent border border-white/40 text-white text-xs sm:text-sm font-bold rounded-full transition-all hover:bg-white/10 font-display flex justify-center text-center"
                         >
                             Lihat Berita
                         </Link>
                     </div>
 
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-16 w-full max-w-3xl mt-16 pt-10 border-t border-white/15">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 md:gap-16 w-full max-w-3xl mt-12 sm:mt-16 pt-8 sm:pt-10 border-t border-white/15">
                         {[
                             { label: 'Anggota Aktif', value: '120+' },
                             { label: 'Bidang', value: '10' },
@@ -169,10 +169,10 @@ export default function HomePage() {
                             { label: 'Alumni', value: '300+' },
                         ].map(s => (
                             <div key={s.label} className="flex flex-col items-center">
-                                <div className="text-3xl font-black text-white font-display">
+                                <div className="text-2xl sm:text-3xl font-black text-white font-display">
                                     {s.value}
                                 </div>
-                                <div className="text-xs mt-1 text-white/50 uppercase tracking-wider font-semibold">
+                                <div className="text-[10px] sm:text-xs mt-1 text-white/60 uppercase tracking-wider font-semibold text-center">
                                     {s.label}
                                 </div>
                             </div>
@@ -181,30 +181,31 @@ export default function HomePage() {
                 </div>
             </section>
 
-            <section className="py-24 bg-[var(--background)] border-b border-[var(--border)]">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center mb-24">
-                        <div className="relative aspect-[4/3] lg:aspect-square bg-[#111111] overflow-hidden group rounded-[var(--radius)] border border-[var(--border)]">
+            <section className="py-16 sm:py-20 md:py-24 bg-[var(--background)] border-b border-[var(--border)]">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-12 lg:gap-16 items-center mb-16 sm:mb-24">
+                        <div className="relative aspect-[4/3] lg:aspect-square bg-[#111111] overflow-hidden group rounded-[var(--radius)] border border-[var(--border)] shadow-xl">
                             <img
                                 src="https://pwmu.co/wp-content/uploads/2026/09/konsep-otomatis-V9a3.jpeg"
                                 alt="Profil IMM Kaizen"
                                 className="w-full h-full object-cover grayscale opacity-80 transition-all duration-700 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105"
                             />
-                            <div className="absolute inset-0 border-[8px] border-white/10 mix-blend-overlay"></div>
+                            <div className="absolute inset-0 border-[6px] sm:border-[8px] border-white/10 mix-blend-overlay"></div>
                         </div>
 
                         <div className="flex flex-col justify-center">
-                            <span className="section-label mb-4 block">Tentang Kami</span>
-                            <h2 className="text-4xl sm:text-5xl font-black text-[var(--text-primary)] leading-[1.1] mb-6 tracking-tight font-display">
+                            <span className="section-label mb-3 sm:mb-4 block">Tentang Kami</span>
+                            <h2 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-black text-[var(--text-primary)] leading-[1.15] mb-4 sm:mb-6 tracking-tight font-display">
                                 Melahirkan Pemimpin Masa Depan.
                             </h2>
-                            <p className="text-[var(--text-secondary)] text-lg leading-relaxed mb-8">
+                            <p className="text-[var(--text-secondary)] text-sm sm:text-base md:text-lg leading-relaxed mb-6 sm:mb-8">
                                 IMM Komisariat Kaizen adalah organisasi mahasiswa Islam di bawah Ikatan Mahasiswa Muhammadiyah. Dengan semangat <em className="font-semibold text-[var(--text-primary)]">Kaizen</em> (perbaikan terus-menerus), kami mendorong setiap kader untuk berinovasi, mandiri, dan berkontribusi nyata bagi masyarakat.
                             </p>
                             <div>
                                 <Link
                                     href="/profil"
-                                    className="px-8 py-4 bg-[#111111] text-white text-sm font-bold tracking-widest uppercase hover:bg-[var(--primary)] transition-all flex items-center justify-center gap-3 group w-fit rounded-[var(--radius)] font-display"
+                                    className="px-6 sm:px-8 py-3.5 sm:py-4 bg-[#111111] text-white text-xs sm:text-sm font-bold tracking-widest uppercase hover:bg-[var(--primary)] transition-all flex items-center justify-center gap-3 group w-full sm:w-fit rounded-[var(--radius)] font-display"
                                 >
                                     Profil Selengkapnya
                                     <span className="transition-transform group-hover:translate-x-1">→</span>
@@ -213,16 +214,16 @@ export default function HomePage() {
                         </div>
                     </div>
 
-                    <div className="w-full flex flex-col items-center border-t border-[var(--border)] pt-16">
-                        <div className="flex items-center gap-3 mb-8">
-                            <div className="h-[1px] w-8 sm:w-12 bg-[var(--border-strong)]"></div>
+                    <div className="w-full flex flex-col items-center border-t border-[var(--border)] pt-12 sm:pt-16">
+                        <div className="flex items-center gap-3 mb-6 sm:mb-8">
+                            <div className="h-[1px] w-6 sm:w-12 bg-[var(--border-strong)]"></div>
                             <span className="text-xs sm:text-sm font-bold text-[var(--text-muted)] tracking-[0.2em] uppercase text-center font-display">
                                 Profil Organisasi
                             </span>
-                            <div className="h-[1px] w-8 sm:w-12 bg-[var(--border-strong)]"></div>
+                            <div className="h-[1px] w-6 sm:w-12 bg-[var(--border-strong)]"></div>
                         </div>
 
-                        <div className="w-full max-w-5xl bg-black border border-[var(--border)] overflow-hidden shadow-2xl aspect-[4/5] md:aspect-video relative rounded-[var(--radius)]">
+                        <div className="w-full max-w-5xl bg-black border border-[var(--border)] overflow-hidden shadow-2xl aspect-[16/9] relative rounded-[var(--radius)]">
                             <video
                                 src="/video/profile.mp4"
                                 className="absolute inset-0 w-full h-full object-cover"
@@ -237,69 +238,70 @@ export default function HomePage() {
                             </video>
                         </div>
                     </div>
+
                 </div>
             </section>
 
-            <section className="py-24 bg-[var(--surface)]">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6">
-                    <div className="flex flex-col items-center text-center mb-16">
-                        <span className="text-xs font-bold text-[var(--accent)] tracking-[0.2em] uppercase mb-3 block font-display">Kabar Terkini</span>
-                        <h2 className="text-3xl sm:text-4xl font-black text-[var(--text-primary)] font-display">
+            <section className="py-16 sm:py-20 md:py-24 bg-[var(--surface)]">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex flex-col items-center text-center mb-12 sm:mb-16">
+                        <span className="text-xs font-bold text-[var(--accent)] tracking-[0.2em] uppercase mb-2 sm:mb-3 block font-display">Kabar Terkini</span>
+                        <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-[var(--text-primary)] font-display tracking-tight">
                             Berita & Dokumentasi
                         </h2>
                     </div>
 
                     {isLoadingNews ? (
                         <div className="py-12 text-center w-full">
-                            <span className="text-[var(--text-muted)] animate-pulse font-medium">Memuat berita terbaru...</span>
+                            <span className="text-[var(--text-muted)] text-sm animate-pulse font-medium">Memuat berita terbaru...</span>
                         </div>
                     ) : latestNews.length === 0 ? (
-                        <div className="py-12 text-center w-full bg-[var(--background)] rounded-[var(--radius)] border border-[var(--border)]">
-                            <span className="text-[var(--text-secondary)]">Belum ada berita yang dipublikasikan.</span>
+                        <div className="py-12 text-center w-full bg-[var(--background)] rounded-[var(--radius)] border border-[var(--border)] p-6">
+                            <span className="text-[var(--text-secondary)] text-sm">Belum ada berita yang dipublikasikan.</span>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
                             {latestNews.map((item) => (
                                 <article
                                     key={item.id}
-                                    className="group bg-[var(--card)] border border-[var(--border)] hover:border-[var(--text-primary)] transition-colors flex flex-col h-full rounded-[var(--radius)] overflow-hidden"
+                                    className="group bg-[var(--card)] border border-[var(--border)] hover:border-[var(--text-primary)] transition-colors flex flex-col h-full rounded-[var(--radius)] overflow-hidden shadow-sm"
                                 >
                                     <Link
                                         href={`/berita/${item.id}`}
-                                        className="relative aspect-[4/3] overflow-hidden bg-[var(--surface-2)] block"
+                                        className="relative aspect-[16/10] overflow-hidden bg-[var(--surface-2)] block"
                                     >
                                         <img
                                             src={item.cover}
                                             alt={item.title}
                                             className="w-full h-full object-cover grayscale opacity-90 transition-all duration-700 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105"
                                         />
-                                        <div className="absolute top-4 left-4 bg-[#111111] text-white px-3 py-1.5 rounded-[calc(var(--radius)-2px)]">
-                                            <span className="text-[10px] font-bold uppercase tracking-widest font-display">{item.category}</span>
+                                        <div className="absolute top-3 left-3 bg-[#111111] text-white px-2.5 py-1 rounded-[calc(var(--radius)-2px)]">
+                                            <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest font-display">{item.category}</span>
                                         </div>
                                     </Link>
 
-                                    <div className="p-6 sm:p-8 flex flex-col flex-1">
-                                        <span className="text-xs text-[var(--text-muted)] font-bold tracking-wider uppercase mb-3 block">
+                                    <div className="p-5 sm:p-6 md:p-8 flex flex-col flex-1">
+                                        <span className="text-[11px] sm:text-xs text-[var(--text-muted)] font-bold tracking-wider uppercase mb-2 sm:mb-3 block">
                                             {item.publishDate}
                                         </span>
                                         <Link href={`/berita/${item.id}`}>
-                                            <h3 className="font-black text-xl leading-tight mb-4 text-[var(--text-primary)] group-hover:text-[var(--primary)] transition-colors cursor-pointer font-display">
+                                            <h3 className="font-black text-base sm:text-lg md:text-xl leading-snug mb-3 text-[var(--text-primary)] group-hover:text-[var(--primary)] transition-colors cursor-pointer font-display line-clamp-2">
                                                 {item.title}
                                             </h3>
                                         </Link>
-                                        <p className="text-sm text-[var(--text-secondary)] leading-relaxed line-clamp-3 mb-6">
+                                        <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed line-clamp-3 mb-6">
                                             {item.excerpt}
                                         </p>
 
-                                        <div className="mt-auto pt-4">
+                                        <div className="mt-auto pt-4 border-t border-[var(--border)]">
                                             {item.pwmuUrl && (
                                                 <a
                                                     href={item.pwmuUrl}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-widest border-b-2 border-[var(--text-primary)] pb-1 hover:text-[var(--primary)] hover:border-[var(--primary)] transition-colors inline-flex items-center gap-2 font-display"
+                                                    className="text-[11px] sm:text-xs font-bold text-[var(--text-primary)] uppercase tracking-widest border-b-2 border-[var(--text-primary)] pb-1 hover:text-[var(--primary)] hover:border-[var(--primary)] transition-colors inline-flex items-center gap-1.5 font-display"
                                                 >
-                                                    Baca Selengkapnya di PWMU <span>→</span>
+                                                    Baca di PWMU.CO <span>→</span>
                                                 </a>
                                             )}
                                         </div>
@@ -311,11 +313,11 @@ export default function HomePage() {
                 </div>
             </section>
 
-            <section className="py-24 bg-[var(--background)] border-y border-[var(--border)]">
-                <div className="max-w-4xl mx-auto px-4 sm:px-6">
-                    <div className="flex flex-col items-center text-center mb-16">
-                        <span className="section-label mb-3 block">Kalender Kegiatan</span>
-                        <h2 className="text-3xl sm:text-4xl font-black text-[var(--text-primary)] font-display">
+            <section className="py-16 sm:py-20 md:py-24 bg-[var(--background)] border-y border-[var(--border)]">
+                <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex flex-col items-center text-center mb-12 sm:mb-16">
+                        <span className="section-label mb-2 sm:mb-3 block">Kalender Kegiatan</span>
+                        <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-[var(--text-primary)] font-display tracking-tight">
                             Agenda Yang Akan Datang.
                         </h2>
                     </div>
@@ -323,11 +325,11 @@ export default function HomePage() {
                     <div className="flex flex-col gap-4">
                         {isLoadingAgendas ? (
                             <div className="py-12 text-center">
-                                <span className="text-[var(--text-muted)] animate-pulse font-medium">Memuat jadwal kegiatan...</span>
+                                <span className="text-[var(--text-muted)] text-sm animate-pulse font-medium">Memuat jadwal kegiatan...</span>
                             </div>
                         ) : upcomingAgendas.length === 0 ? (
-                            <div className="py-12 text-center bg-[var(--surface)] rounded-[var(--radius)] border border-[var(--border)]">
-                                <span className="text-[var(--text-secondary)]">Belum ada agenda dalam waktu dekat.</span>
+                            <div className="py-12 text-center bg-[var(--surface)] rounded-[var(--radius)] border border-[var(--border)] p-6">
+                                <span className="text-[var(--text-secondary)] text-sm">Belum ada agenda dalam waktu dekat.</span>
                             </div>
                         ) : (
                             upcomingAgendas.map((agenda) => {
@@ -336,34 +338,34 @@ export default function HomePage() {
                                 return (
                                     <div
                                         key={agenda.id}
-                                        className="group flex flex-col md:flex-row items-start md:items-center p-6 sm:p-8 bg-[var(--surface)] border border-[var(--border)] hover:border-[var(--primary)] transition-colors gap-6 sm:gap-8 rounded-[var(--radius)]"
+                                        className="group flex flex-col sm:flex-row items-start sm:items-center p-5 sm:p-6 md:p-8 bg-[var(--surface)] border border-[var(--border)] hover:border-[var(--primary)] transition-colors gap-4 sm:gap-6 md:gap-8 rounded-[var(--radius)] shadow-sm"
                                     >
-                                        <div className="flex flex-col items-center justify-center min-w-[80px] text-center border-b md:border-b-0 md:border-r border-[var(--border-strong)] pb-4 md:pb-0 md:pr-8 w-full md:w-auto">
+                                        <div className="flex flex-col items-center justify-center min-w-[70px] sm:min-w-[80px] text-center border-b sm:border-b-0 sm:border-r border-[var(--border-strong)] pb-3 sm:pb-0 sm:pr-6 md:pr-8 w-full sm:w-auto">
                                             <span
-                                                className={`${isComingSoon ? 'text-xl sm:text-2xl' : 'text-4xl'} font-black text-[var(--primary)] uppercase font-display`}
+                                                className={`${isComingSoon ? 'text-lg sm:text-2xl' : 'text-3xl sm:text-4xl'} font-black text-[var(--primary)] uppercase font-display`}
                                             >
                                                 {agenda.date || 'TBA'}
                                             </span>
                                             {agenda.month && (
-                                                <span className="text-sm font-bold text-[var(--text-muted)] uppercase tracking-widest mt-1 font-display">
+                                                <span className="text-xs sm:text-sm font-bold text-[var(--text-muted)] uppercase tracking-widest mt-0.5 sm:mt-1 font-display">
                                                     {agenda.month}
                                                 </span>
                                             )}
                                         </div>
-                                        <div className="flex-1">
-                                            <h3 className="text-xl font-bold text-[var(--text-primary)] group-hover:text-[var(--primary)] transition-colors font-display">
+                                        <div className="flex-1 w-full sm:w-auto">
+                                            <h3 className="text-base sm:text-lg md:text-xl font-bold text-[var(--text-primary)] group-hover:text-[var(--primary)] transition-colors font-display leading-snug">
                                                 {agenda.title}
                                             </h3>
                                             {(agenda.location || agenda.time) && (
-                                                <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-[var(--text-secondary)] font-medium mt-2">
+                                                <div className="flex flex-wrap items-center gap-x-4 sm:gap-x-6 gap-y-1 text-xs sm:text-sm text-[var(--text-secondary)] font-medium mt-2">
                                                     {agenda.location && (
-                                                        <span className="flex items-center gap-2">
+                                                        <span className="flex items-center gap-1.5">
                                                             <span className="w-1.5 h-1.5 bg-[var(--text-muted)] rounded-full"></span>
                                                             {agenda.location}
                                                         </span>
                                                     )}
                                                     {agenda.time && (
-                                                        <span className="flex items-center gap-2">
+                                                        <span className="flex items-center gap-1.5">
                                                             <span className="w-1.5 h-1.5 bg-[var(--text-muted)] rounded-full"></span>
                                                             {agenda.time}
                                                         </span>
@@ -379,29 +381,29 @@ export default function HomePage() {
                 </div>
             </section>
 
-            <section className="py-24 bg-[#0a0a0a] text-white">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6">
-                    <div className="mb-16 flex flex-col items-center text-center">
-                        <span className="text-xs font-bold text-[var(--accent-light)] tracking-[0.2em] uppercase mb-3 block font-display">Pimpinan Komisariat</span>
-                        <h2 className="text-3xl sm:text-4xl font-black font-display">Badan Pengurus Harian</h2>
+            <section className="py-16 sm:py-20 md:py-24 bg-[#0a0a0a] text-white">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="mb-12 sm:mb-16 flex flex-col items-center text-center">
+                        <span className="text-xs font-bold text-[var(--accent-light)] tracking-[0.2em] uppercase mb-2 sm:mb-3 block font-display">Pimpinan Komisariat</span>
+                        <h2 className="text-2xl sm:text-3xl md:text-4xl font-black font-display tracking-tight">Badan Pengurus Harian</h2>
                     </div>
 
                     {isLoadingBph ? (
                         <div className="py-12 text-center w-full">
-                            <span className="text-white/50 animate-pulse font-medium">Memuat data BPH...</span>
+                            <span className="text-white/50 text-sm animate-pulse font-medium">Memuat data BPH...</span>
                         </div>
                     ) : bphData.length === 0 ? (
-                        <div className="py-12 text-center w-full border border-white/10 rounded-[var(--radius)]">
-                            <span className="text-white/50">Data kepengurusan belum tersedia.</span>
+                        <div className="py-12 text-center w-full border border-white/10 rounded-[var(--radius)] p-6">
+                            <span className="text-white/50 text-sm">Data kepengurusan belum tersedia.</span>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
                             {bphData.map(bph => (
                                 <div
                                     key={bph.id}
-                                    className="group bg-[#111111] border border-white/10 hover:border-[var(--accent)] transition-colors p-8 flex flex-col items-center text-center rounded-[var(--radius)]"
+                                    className="group bg-[#111111] border border-white/10 hover:border-[var(--accent)] transition-colors p-6 sm:p-8 flex flex-col items-center text-center rounded-[var(--radius)] shadow-lg"
                                 >
-                                    <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full overflow-hidden mb-6 border-2 border-white/10 group-hover:border-[var(--accent)] transition-colors bg-gray-800 flex items-center justify-center">
+                                    <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-full overflow-hidden mb-5 sm:mb-6 border-2 border-white/10 group-hover:border-[var(--accent)] transition-colors bg-gray-800 flex items-center justify-center shrink-0">
                                         {bph.photo ? (
                                             <img
                                                 src={bph.photo}
@@ -409,13 +411,13 @@ export default function HomePage() {
                                                 className="w-full h-full object-cover grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500"
                                             />
                                         ) : (
-                                            <span className="text-xs text-white/40 font-bold uppercase font-display">No Photo</span>
+                                            <span className="text-[10px] text-white/40 font-bold uppercase font-display">No Photo</span>
                                         )}
                                     </div>
-                                    <h4 className="font-bold text-xl sm:text-2xl text-white mb-2 group-hover:text-[var(--accent)] transition-colors font-display">
+                                    <h4 className="font-bold text-lg sm:text-xl text-white mb-1.5 group-hover:text-[var(--accent)] transition-colors font-display">
                                         {bph.name}
                                     </h4>
-                                    <span className="text-xs font-bold tracking-widest uppercase text-[var(--accent-light)] font-display">
+                                    <span className="text-[10px] sm:text-xs font-bold tracking-widest uppercase text-[var(--accent-light)] font-display">
                                         {bph.position}
                                     </span>
                                 </div>
@@ -425,11 +427,11 @@ export default function HomePage() {
                 </div>
             </section>
 
-            <section className="py-24 bg-[var(--background)] border-y border-[var(--border)]">
-                <div className="max-w-3xl mx-auto px-4 sm:px-6">
-                    <div className="flex flex-col items-center text-center mb-16">
-                        <span className="section-label mb-3 block">Pusat Informasi</span>
-                        <h2 className="text-3xl sm:text-4xl font-black text-[var(--text-primary)] font-display">
+            <section className="py-16 sm:py-20 md:py-24 bg-[var(--background)] border-y border-[var(--border)]">
+                <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex flex-col items-center text-center mb-12 sm:mb-16">
+                        <span className="section-label mb-2 sm:mb-3 block">Pusat Informasi</span>
+                        <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-[var(--text-primary)] font-display tracking-tight">
                             Pertanyaan Seputar IMM Kaizen.
                         </h2>
                     </div>
@@ -441,23 +443,23 @@ export default function HomePage() {
                                 <div key={faq.id} className="border-b border-[var(--border)]">
                                     <button
                                         onClick={() => toggleFaq(index)}
-                                        className="w-full flex items-center justify-between py-6 text-left focus:outline-none group"
+                                        className="w-full flex items-center justify-between py-5 sm:py-6 text-left focus:outline-none group gap-4 cursor-pointer"
                                     >
-                                        <h4 className="text-base sm:text-lg font-bold text-[var(--text-primary)] group-hover:text-[var(--primary)] transition-colors pr-8 font-display">
+                                        <h4 className="text-sm sm:text-base md:text-lg font-bold text-[var(--text-primary)] group-hover:text-[var(--primary)] transition-colors font-display leading-snug">
                                             {faq.question}
                                         </h4>
-                                        <div className={`flex-shrink-0 w-8 h-8 flex items-center justify-center border border-[var(--border-strong)] rounded-full transition-transform duration-300 ${isOpen ? 'rotate-180 bg-[var(--text-primary)] border-[var(--text-primary)] text-white' : 'text-[var(--text-muted)] group-hover:border-[var(--text-primary)] group-hover:text-[var(--text-primary)]'}`}>
-                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <div className={`flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center border border-[var(--border-strong)] rounded-full transition-transform duration-300 ${isOpen ? 'rotate-180 bg-[var(--text-primary)] border-[var(--text-primary)] text-white' : 'text-[var(--text-muted)] group-hover:border-[var(--text-primary)] group-hover:text-[var(--text-primary)]'}`}>
+                                            <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                                             </svg>
                                         </div>
                                     </button>
 
                                     <div
-                                        className={`grid transition-all duration-300 ease-in-out ${isOpen ? 'grid-rows-[1fr] opacity-100 pb-6' : 'grid-rows-[0fr] opacity-0'}`}
+                                        className={`grid transition-all duration-300 ease-in-out ${isOpen ? 'grid-rows-[1fr] opacity-100 pb-5 sm:pb-6' : 'grid-rows-[0fr] opacity-0'}`}
                                     >
                                         <div className="overflow-hidden">
-                                            <p className="text-[var(--text-secondary)] text-sm sm:text-base leading-relaxed pr-12">
+                                            <p className="text-[var(--text-secondary)] text-xs sm:text-sm md:text-base leading-relaxed pr-2 sm:pr-8">
                                                 {faq.answer}
                                             </p>
                                         </div>
@@ -469,27 +471,28 @@ export default function HomePage() {
                 </div>
             </section>
 
-            <section className="bg-[var(--primary)] py-12 sm:py-16">
-                <div className="max-w-4xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+            <section className="bg-[var(--primary)] py-10 sm:py-12 md:py-16">
+                <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
                     <div className="max-w-xl">
                         <span className="text-[10px] font-bold text-[var(--accent-light)] tracking-[0.2em] uppercase mb-1 block font-display">
                             Suara Mahasiswa
                         </span>
-                        <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight font-display">
+                        <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-white tracking-tight font-display">
                             SAMPAIKAN ASPIRASIMU!
                         </h3>
-                        <p className="text-white/80 text-xs sm:text-sm mt-1">
+                        <p className="text-white/85 text-xs sm:text-sm mt-1.5 leading-relaxed">
                             Punya ide, kritik, atau saran untuk komisariat? Suaramu sangat berarti untuk perubahan yang lebih baik.
                         </p>
                     </div>
                     <Link
                         href="/aspirasi"
-                        className="whitespace-nowrap px-6 py-3 bg-white text-[var(--primary)] text-xs font-black tracking-widest uppercase hover:bg-[#111111] hover:text-white transition-all shadow-md hover:scale-105 shrink-0 rounded-[var(--radius)] font-display flex items-center justify-center"
+                        className="w-full sm:w-auto whitespace-nowrap px-6 sm:px-8 py-3 sm:py-3.5 bg-white text-[var(--primary)] text-xs font-black tracking-widest uppercase hover:bg-[#111111] hover:text-white transition-all shadow-md hover:scale-105 shrink-0 rounded-[var(--radius)] font-display flex items-center justify-center"
                     >
                         Kirim Aspirasi
                     </Link>
                 </div>
             </section>
+
         </div>
     )
 }
