@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     verification: {
         google: 'dBYMVkOGaSpCQ4wfo-bOkVOFVNJNAAYXq2HPpECeSis',
     },
-    keywords: ['IMM', 'Muhammadiyah', 'Mahasiswa Teknik', 'UMSURA', 'IMM Kaizen', 'Organisasi Mahasiswa'],
+    keywords: ['IMM', 'Muhammadiyah', 'Mahasiswa Teknik', 'UMSURA', 'IMM Kaizen', 'Organisasi Mahasiswa', 'PK IMM Kaizen'],
     icons: {
         icon: '/img/logo/logo.png'
     },
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
         siteName: 'IMM Kaizen',
         images: [
             {
-                url: '/img/og-image.jpg',
+                url: '/img/logo/logo.png',
                 width: 1200,
                 height: 630,
             },

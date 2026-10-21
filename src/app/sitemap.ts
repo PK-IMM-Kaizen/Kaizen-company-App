@@ -12,7 +12,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
         '/alumni',
         '/kaizen-company',
         '/daftar-dad',
-        'aspirasi',
+        '/aspirasi',
     ]
 
     return routes.map((route) => ({
