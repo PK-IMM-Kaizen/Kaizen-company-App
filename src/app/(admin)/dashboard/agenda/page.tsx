@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import {
     Plus, Edit2, Trash2, ArrowLeft, AlertTriangle, Search,
-    RefreshCw, Calendar, MapPin, Clock
+    RefreshCw, MapPin, Clock, Image as ImageIcon, Link as LinkIcon
 } from 'lucide-react'
 import { createBrowserClient } from '@supabase/ssr'
 
@@ -16,6 +16,7 @@ export interface Agenda {
     month: string
     location: string
     time: string
+    image_url?: string
     createdAt?: string
 }
 
@@ -34,7 +35,8 @@ export default function AdminAgendaPage() {
         date: '',
         month: '',
         location: '',
-        time: ''
+        time: '',
+        imageUrl: ''
     })
 
     const supabase = createBrowserClient(
@@ -64,6 +66,7 @@ export default function AdminAgendaPage() {
                     month: item.month || '',
                     location: item.location || '',
                     time: item.time || '',
+                    image_url: item.image_url || '',
                     createdAt: item.created_at
                 }))
                 setItems(formattedData)
@@ -84,7 +87,7 @@ export default function AdminAgendaPage() {
     }, [items, search])
 
     const startCreate = () => {
-        setForm({ title: '', date: '', month: '', location: '', time: '' })
+        setForm({ title: '', date: '', month: '', location: '', time: '', imageUrl: '' })
         setEditItem(null)
         setView('create')
     }
@@ -96,7 +99,8 @@ export default function AdminAgendaPage() {
             date: item.date,
             month: item.month,
             location: item.location,
-            time: item.time
+            time: item.time,
+            imageUrl: item.image_url || ''
         })
         setView('edit')
     }
@@ -114,7 +118,8 @@ export default function AdminAgendaPage() {
                 date: form.date,
                 month: form.month,
                 location: form.location,
-                time: form.time
+                time: form.time,
+                image_url: form.imageUrl
             }
 
             if (view === 'create') {
@@ -163,6 +168,32 @@ export default function AdminAgendaPage() {
 
                 <div className="bg-[var(--card)] rounded-2xl p-4 sm:p-6 md:p-8 border border-[var(--border)] shadow-sm max-w-3xl">
                     <div className="space-y-4 sm:space-y-5">
+
+                        <div className="p-3.5 sm:p-4 bg-[var(--surface-2)] border border-[var(--border)] rounded-xl space-y-3">
+                            <label className="block text-xs font-bold text-[var(--text-secondary)] font-display uppercase tracking-wide flex items-center gap-1.5">
+                                <ImageIcon className="w-4 h-4 text-[var(--primary)] shrink-0" /> Gambar / Flier Kegiatan (URL)
+                            </label>
+                            <div className="relative">
+                                <LinkIcon className="w-4 h-4 text-[var(--text-muted)] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                                <input
+                                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--background)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/50 transition-all text-xs sm:text-sm placeholder-[var(--text-muted)]"
+                                    value={form.imageUrl}
+                                    onChange={e => setForm(f => ({ ...f, imageUrl: e.target.value }))}
+                                    placeholder="https://... (Kosongkan jika tidak ada)"
+                                />
+                            </div>
+                            {form.imageUrl && (
+                                <div className="mt-2 relative w-32 aspect-video sm:w-40 rounded-lg overflow-hidden border border-[var(--border)] bg-[var(--surface)] shadow-sm">
+                                    <img
+                                        src={form.imageUrl}
+                                        alt="Preview Flier"
+                                        className="w-full h-full object-cover"
+                                        onError={(e) => (e.currentTarget.style.display = 'none')}
+                                    />
+                                </div>
+                            )}
+                        </div>
+
                         <div>
                             <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1.5 font-display uppercase tracking-wide">
                                 Judul Kegiatan *
@@ -178,24 +209,24 @@ export default function AdminAgendaPage() {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
                             <div>
                                 <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1.5 font-display uppercase tracking-wide">
-                                    Tanggal / Teks *
+                                    Tanggal / Teks Tampilan *
                                 </label>
                                 <input
                                     className="w-full px-3.5 sm:px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/50 transition-all text-xs sm:text-sm placeholder-[var(--text-muted)]"
                                     value={form.date}
                                     onChange={e => setForm(f => ({ ...f, date: e.target.value }))}
-                                    placeholder="Cth: 15-17 atau Coming Soon"
+                                    placeholder="Cth: 31 atau Coming Soon"
                                 />
                             </div>
                             <div>
                                 <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1.5 font-display uppercase tracking-wide">
-                                    Bulan (Opsional)
+                                    Bulan / Keterangan Tambahan
                                 </label>
                                 <input
                                     className="w-full px-3.5 sm:px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/50 transition-all text-xs sm:text-sm placeholder-[var(--text-muted)]"
                                     value={form.month}
                                     onChange={e => setForm(f => ({ ...f, month: e.target.value }))}
-                                    placeholder="Cth: Okt"
+                                    placeholder="Cth: OKTOBER 2026"
                                 />
                             </div>
                         </div>
@@ -338,10 +369,25 @@ export default function AdminAgendaPage() {
                                     <tr key={m.id} className="border-b border-[var(--border)] hover:bg-[var(--surface)] transition-colors">
                                         <td className="p-3.5 sm:p-4 pl-5 sm:pl-6">
                                             <div className="flex items-center gap-3.5">
-                                                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-[var(--primary)]/10 text-[var(--primary)] flex flex-col items-center justify-center border border-[var(--primary)]/20 shrink-0">
-                                                    <span className="text-base sm:text-lg font-black leading-none">{m.date}</span>
-                                                    {m.month && <span className="text-[9px] sm:text-[10px] font-bold uppercase mt-0.5">{m.month}</span>}
-                                                </div>
+
+                                                {m.image_url ? (
+                                                    <div className="w-14 h-12 sm:w-16 sm:h-14 rounded-xl overflow-hidden border border-[var(--border)] bg-[var(--surface-2)] shrink-0 shadow-sm">
+                                                        <img
+                                                            src={m.image_url}
+                                                            alt={m.title}
+                                                            className="w-full h-full object-cover"
+                                                            onError={(e) => (e.currentTarget.style.display = 'none')}
+                                                        />
+                                                    </div>
+                                                ) : (
+                                                    <div className="w-14 h-12 sm:w-16 sm:h-14 rounded-xl bg-red-50/70 border border-red-200 dark:bg-red-900/10 dark:border-red-900/30 text-[var(--primary)] flex flex-col items-center justify-center p-1 shrink-0 text-center">
+                                                        <span className="text-xs sm:text-sm font-black leading-none uppercase tracking-tight">{m.date}</span>
+                                                        {m.month && (
+                                                            <span className="text-[8px] sm:text-[9px] font-bold uppercase tracking-widest mt-0.5 opacity-90 line-clamp-1">{m.month}</span>
+                                                        )}
+                                                    </div>
+                                                )}
+
                                                 <div>
                                                     <span className="font-bold text-xs sm:text-sm text-[var(--text-primary)] font-display line-clamp-2">{m.title}</span>
                                                 </div>

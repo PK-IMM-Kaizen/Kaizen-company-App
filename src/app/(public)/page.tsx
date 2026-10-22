@@ -11,6 +11,7 @@ interface Agenda {
     month: string
     location: string
     time: string
+    image_url?: string
 }
 
 interface News {
@@ -340,35 +341,53 @@ export default function HomePage() {
                                         key={agenda.id}
                                         className="group flex flex-col sm:flex-row items-start sm:items-center p-5 sm:p-6 md:p-8 bg-[var(--surface)] border border-[var(--border)] hover:border-[var(--primary)] transition-colors gap-4 sm:gap-6 md:gap-8 rounded-[var(--radius)] shadow-sm"
                                     >
-                                        <div className="flex flex-col items-center justify-center min-w-[70px] sm:min-w-[80px] text-center border-b sm:border-b-0 sm:border-r border-[var(--border-strong)] pb-3 sm:pb-0 sm:pr-6 md:pr-8 w-full sm:w-auto">
-                                            <span
-                                                className={`${isComingSoon ? 'text-lg sm:text-2xl' : 'text-3xl sm:text-4xl'} font-black text-[var(--primary)] uppercase font-display`}
-                                            >
-                                                {agenda.date || 'TBA'}
-                                            </span>
-                                            {agenda.month && (
-                                                <span className="text-xs sm:text-sm font-bold text-[var(--text-muted)] uppercase tracking-widest mt-0.5 sm:mt-1 font-display">
-                                                    {agenda.month}
-                                                </span>
-                                            )}
-                                        </div>
+                                        {agenda.image_url ? (
+                                            <div className="w-full sm:w-32 md:w-36 aspect-video sm:aspect-square rounded-xl overflow-hidden border border-[var(--border)] shrink-0 bg-[var(--surface-2)] shadow-sm">
+                                                <img
+                                                    src={agenda.image_url}
+                                                    alt={agenda.title}
+                                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                                    onError={(e) => (e.currentTarget.style.display = 'none')}
+                                                />
+                                            </div>
+                                        ) : (
+                                            <div className="flex flex-col items-center justify-center min-w-[80px] sm:min-w-[100px] text-center border-b sm:border-b-0 sm:border-r border-[var(--border-strong)] pb-3 sm:pb-0 sm:pr-6 md:pr-8 w-full sm:w-auto">
+                                    <span
+                                        className={`${isComingSoon ? 'text-lg sm:text-2xl' : 'text-3xl sm:text-4xl'} font-black text-[var(--primary)] uppercase font-display leading-tight`}
+                                    >
+                                        {agenda.date || 'TBA'}
+                                    </span>
+                                                {agenda.month && (
+                                                    <span className="text-xs sm:text-sm font-bold text-[var(--text-muted)] uppercase tracking-widest mt-0.5 sm:mt-1 font-display">
+                                            {agenda.month}
+                                        </span>
+                                                )}
+                                            </div>
+                                        )}
+
                                         <div className="flex-1 w-full sm:w-auto">
                                             <h3 className="text-base sm:text-lg md:text-xl font-bold text-[var(--text-primary)] group-hover:text-[var(--primary)] transition-colors font-display leading-snug">
                                                 {agenda.title}
                                             </h3>
-                                            {(agenda.location || agenda.time) && (
-                                                <div className="flex flex-wrap items-center gap-x-4 sm:gap-x-6 gap-y-1 text-xs sm:text-sm text-[var(--text-secondary)] font-medium mt-2">
+                                            {(agenda.location || agenda.time || (agenda.image_url && agenda.date)) && (
+                                                <div className="flex flex-wrap items-center gap-x-4 sm:gap-x-6 gap-y-1.5 text-xs sm:text-sm text-[var(--text-secondary)] font-medium mt-2">
+                                                    {agenda.image_url && agenda.date && (
+                                                        <span className="flex items-center gap-1.5 font-bold text-[var(--primary)]">
+                                                <span className="w-1.5 h-1.5 bg-[var(--primary)] rounded-full"></span>
+                                                            {agenda.date} {agenda.month || ''}
+                                            </span>
+                                                    )}
                                                     {agenda.location && (
                                                         <span className="flex items-center gap-1.5">
-                                                            <span className="w-1.5 h-1.5 bg-[var(--text-muted)] rounded-full"></span>
+                                                <span className="w-1.5 h-1.5 bg-[var(--text-muted)] rounded-full"></span>
                                                             {agenda.location}
-                                                        </span>
+                                            </span>
                                                     )}
                                                     {agenda.time && (
                                                         <span className="flex items-center gap-1.5">
-                                                            <span className="w-1.5 h-1.5 bg-[var(--text-muted)] rounded-full"></span>
+                                                <span className="w-1.5 h-1.5 bg-[var(--text-muted)] rounded-full"></span>
                                                             {agenda.time}
-                                                        </span>
+                                            </span>
                                                     )}
                                                 </div>
                                             )}
