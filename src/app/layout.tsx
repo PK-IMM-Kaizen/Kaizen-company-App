@@ -12,7 +12,8 @@ export const metadata: Metadata = {
     },
     keywords: ['IMM', 'Muhammadiyah', 'Mahasiswa Teknik', 'UMSURA', 'IMM Kaizen', 'Organisasi Mahasiswa', 'PK IMM Kaizen'],
     icons: {
-        icon: '/img/logo/logo.png'
+        icon: '/img/logo/logo.png',
+        apple: '/img/logo/logo.png',
     },
     openGraph: {
         title: 'Website Resmi PK IMM Kaizen',
