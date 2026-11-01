@@ -3,7 +3,7 @@ import { MetadataRoute } from 'next'
 export default function sitemap(): MetadataRoute.Sitemap {
     const baseUrl = 'https://www.imm-kaizen.org'
 
-    const routes = [
+    const staticRoutes = [
         '',
         '/profil',
         '/berita',
@@ -15,10 +15,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
         '/aspirasi',
     ]
 
-    return routes.map((route) => ({
+    return staticRoutes.map((route) => ({
         url: `${baseUrl}${route}`,
         lastModified: new Date(),
-        changeFrequency: 'weekly',
+        changeFrequency: 'weekly' as const,
         priority: route === '' ? 1.0 : 0.8,
     }))
 }
