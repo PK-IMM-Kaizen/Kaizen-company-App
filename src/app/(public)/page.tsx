@@ -134,7 +134,7 @@ export default function HomePage() {
                         <div className="h-[1px] w-6 sm:w-12 bg-[var(--accent-light)]" />
                     </div>
 
-                    <h1 className="text-2xl xs:text-3xl sm:text-5xl md:text-6xl font-black text-white leading-[1.15] mb-3 sm:mb-4 tracking-tight font-display">
+                    <h1 className="text-2xl xs:text-3xl sm:text-5xl md:text-1.5xl font-black text-white leading-[1.15] mb-3 sm:mb-4 tracking-tight font-display">
                         IKATAN MAHASISWA MUHAMMADIYAH <br />
                         <span className="text-[var(--accent)]">KAIZEN</span>
                     </h1>

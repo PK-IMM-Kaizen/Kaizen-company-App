@@ -49,7 +49,7 @@ export default function Page({ onNavigate }: ProfileProps) {
 
                             <div className="prose prose-gray max-w-none text-[var(--text-secondary)] leading-relaxed text-xs sm:text-sm md:text-base mb-8 sm:mb-10">
                                 <p>
-                                    Pimpinan Komisariat (PK) Ikatan Mahasiswa Muhammadiyah (IMM) Kaizen adalah basis perkaderan tingkat komisariat di lingkungan Fakultas Teknik Universitas Muhammadiyah Surabaya (UM Surabaya). Bergerak di bawah naungan Pimpinan Cabang (PC) IMM Kota Surabaya dan Koordinator Komisariat (Koorkom) UM Surabaya, IMM Kaizen menjadi wadah perjuangan mahasiswa teknik dalam mengusung nilai-nilai intelektualitas, religiusitas, dan kemanusiaan.
+                                    Pimpinan Komisariat (PK) Ikatan Mahasiswa Muhammadiyah (IMM) Kaizen adalah basis perkaderan tingkat komisariat di lingkungan Fakultas Teknik Universitas Muhammadiyah Surabaya (UMSURA). Bergerak di bawah naungan Pimpinan Cabang (PC) IMM Kota Surabaya dan Koordinator Komisariat (Koorkom) UMSURA, IMM Kaizen menjadi wadah perjuangan mahasiswa teknik dalam mengusung nilai-nilai intelektualitas, religiusitas, dan kemanusiaan.
                                 </p>
                             </div>
 
@@ -110,7 +110,7 @@ export default function Page({ onNavigate }: ProfileProps) {
                             </h2>
                             <div className="relative border-l border-[var(--border-strong)] ml-2.5 sm:ml-4 space-y-8 sm:space-y-10">
                                 {[
-                                    { year: '2017', title: 'Awal Pendirian', event: 'Perintisan wadah gerakan mahasiswa teknik di bawah naungan IMM UM Surabaya.' },
+                                    { year: '2017', title: 'Awal Pendirian', event: 'Perintisan wadah gerakan mahasiswa teknik di bawah naungan IMM UMSURA.' },
                                     { year: '2019', title: 'Teras Perkaderan & DAD', event: 'Dokumentasi kepengurusan aktif (Artansyah Rahmatan Putra) menggelar Teras Perkaderan dan pembekalan materi ideologi kader.' },
                                     { year: '2021', title: 'Pengabdian Masyarakat', event: 'Peningkatan aksi sosial kemasyarakatan (Baksos) hingga ke pelosok daerah Jawa Timur seperti Bangkalan, Madura.' },
                                     { year: '2026', title: 'Era Kader Autentik', event: 'Penguatan branding gerakan melalui tagline #kaderautentik dan #1bytelebihdekat serta optimalisasi wadah digital Kaizen.' },

@@ -85,7 +85,7 @@ export default function AspirasiPage() {
                             Aspirasi Terkirim!
                         </h2>
                         <p className="text-[var(--text-secondary)] text-xs sm:text-sm mb-6 sm:mb-8 leading-relaxed">
-                            Terima kasih atas masukan dan evaluasi yang Anda berikan. Suara Anda sangat berharga untuk kemajuan PK IMM Kaizen UM Surabaya.
+                            Terima kasih atas masukan dan evaluasi yang Anda berikan. Suara Anda sangat berharga untuk kemajuan PK IMM Kaizen UMSURA.
                         </p>
                         <Link
                             href="/"
