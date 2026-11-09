@@ -25,8 +25,7 @@ export interface DadRegistrant {
     namaLengkap: string
     asal: string
     tempatTanggalLahir: string
-    domisili: string
-    asalKomisariat: string
+    alamat_sekarang: string
     prodi: string
     status: 'pending' | 'verified' | 'rejected'
     createdAt: string
@@ -136,8 +135,7 @@ export default function AdminDaftarDadPage() {
                     namaLengkap: item.nama_lengkap || '-',
                     asal: item.asal || '-',
                     tempatTanggalLahir: item.tempat_tanggal_lahir || '-',
-                    domisili: item.domisili || '-',
-                    asalKomisariat: item.asal_komisariat || '-',
+                    alamat_sekarang: item.alamat_sekarang || '-',
                     prodi: item.prodi || '-',
                     status: item.status || 'pending',
                     createdAt: item.created_at
@@ -160,7 +158,6 @@ export default function AdminDaftarDadPage() {
     const filteredList = registrants.filter(item => {
         const matchesSearch =
             item.namaLengkap.toLowerCase().includes(search.toLowerCase()) ||
-            item.asalKomisariat.toLowerCase().includes(search.toLowerCase()) ||
             item.prodi.toLowerCase().includes(search.toLowerCase())
 
         const matchesStatus = statusFilter === 'all' || item.status === statusFilter
@@ -216,11 +213,11 @@ export default function AdminDaftarDadPage() {
     }
 
     const handleExportCSV = () => {
-        const headers = 'ID,Nama Lengkap,Asal,Tempat & Tanggal Lahir,Domisili,Asal Komisariat,Prodi,Status,Tanggal Daftar\n'
+        const headers = 'ID,Nama Lengkap,Asal,Tempat & Tanggal Lahir,Alamat Sekarang,Prodi,Status,Tanggal Daftar\n'
         const rows = filteredList
             .map(
                 r =>
-                    `"${r.id}","${r.namaLengkap}","${r.asal}","${r.tempatTanggalLahir}","${r.domisili}","${r.asalKomisariat}","${r.prodi}","${r.status}","${r.createdAt}"`
+                    `"${r.id}","${r.namaLengkap}","${r.asal}","${r.tempatTanggalLahir}","${r.alamat_sekarang}","${r.prodi}","${r.status}","${r.createdAt}"`
             )
             .join('\n')
 
@@ -315,7 +312,7 @@ export default function AdminDaftarDadPage() {
                         <Search className="w-4 h-4 text-[var(--text-muted)] absolute left-3.5 top-1/2 -translate-y-1/2 group-focus-within:text-[var(--primary)] transition-colors" />
                         <input
                             type="text"
-                            placeholder="Cari nama, prodi, asal..."
+                            placeholder="Cari nama, prodi..."
                             value={search}
                             onChange={e => setSearch(e.target.value)}
                             className="w-full pl-10 pr-4 py-2 sm:py-2.5 rounded-xl border border-[var(--border)] bg-[var(--background)] text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 transition-all text-xs sm:text-sm"
@@ -354,18 +351,17 @@ export default function AdminDaftarDadPage() {
                         <table className="w-full text-left border-collapse min-w-[650px]">
                             <thead>
                             <tr className="bg-[var(--surface-2)] border-b border-[var(--border)] text-[10px] sm:text-xs text-[var(--text-muted)] uppercase tracking-wider font-display">
-                                <th className="p-3.5 sm:p-4 font-bold pl-5 sm:pl-6">Nama Lengkap</th>
-                                <th className="p-3.5 sm:p-4 font-bold">Asal / Domisili</th>
-                                <th className="p-3.5 sm:p-4 font-bold">Asal Komisariat</th>
-                                <th className="p-3.5 sm:p-4 font-bold">Tanggal Daftar</th>
-                                <th className="p-3.5 sm:p-4 font-bold">Status</th>
-                                <th className="p-3.5 sm:p-4 font-bold text-right pr-5 sm:pr-6">Aksi</th>
+                                <th className="p-3.5 sm:p-4 font-bold pl-5 sm:pl-6 w-[30%]">Nama Lengkap</th>
+                                <th className="p-3.5 sm:p-4 font-bold w-[25%]">Asal / Domisili</th>
+                                <th className="p-3.5 sm:p-4 font-bold w-[15%]">Tanggal Daftar</th>
+                                <th className="p-3.5 sm:p-4 font-bold w-[15%]">Status</th>
+                                <th className="p-3.5 sm:p-4 font-bold text-right pr-5 sm:pr-6 w-[15%]">Aksi</th>
                             </tr>
                             </thead>
                             <tbody>
                             {filteredList.map(item => (
                                 <tr key={item.id} className="border-b border-[var(--border)] hover:bg-[var(--surface)] transition-colors group">
-                                    <td className="p-3.5 sm:p-4 pl-5 sm:pl-6">
+                                    <td className="p-3.5 sm:p-4 pl-5 sm:pl-6 align-top">
                                         <div>
                                                 <span className="text-xs sm:text-sm font-bold text-[var(--text-primary)] font-display block">
                                                     {item.namaLengkap}
@@ -375,44 +371,42 @@ export default function AdminDaftarDadPage() {
                                                 </span>
                                         </div>
                                     </td>
-                                    <td className="p-3.5 sm:p-4">
-                                        <div className="flex flex-col gap-0.5 text-[10px] sm:text-[11px]">
-                                                <span className="flex items-center gap-1 text-[var(--text-secondary)]">
-                                                    <Home className="w-3 h-3 text-[var(--text-muted)] shrink-0" /> {item.asal}
+                                    <td className="p-3.5 sm:p-4 align-top">
+                                        <div className="flex flex-col gap-1.5 text-[10px] sm:text-[11px]">
+                                                <span className="flex items-center gap-1.5 text-[var(--text-secondary)]">
+                                                    <Home className="w-3.5 h-3.5 text-[var(--text-muted)] shrink-0" /> {item.asal}
                                                 </span>
-                                            <span className="flex items-center gap-1 text-[var(--text-secondary)]">
-                                                    <MapPin className="w-3 h-3 text-[var(--text-muted)] shrink-0" /> {item.domisili}
+                                            <span className="flex items-start gap-1.5 text-[var(--text-secondary)]">
+                                                    <MapPin className="w-3.5 h-3.5 text-[var(--text-muted)] shrink-0 mt-0.5" />
+                                                    <span className="line-clamp-2">{item.alamat_sekarang}</span>
                                                 </span>
                                         </div>
                                     </td>
-                                    <td className="p-3.5 sm:p-4">
-                                            <span className="text-[9px] sm:text-[10px] font-bold text-[var(--primary)] font-display uppercase tracking-wider bg-[var(--primary)]/10 px-2.5 py-1 rounded-md border border-[var(--primary)]/20 whitespace-nowrap">
-                                                {item.asalKomisariat}
-                                            </span>
-                                    </td>
-                                    <td className="p-3.5 sm:p-4 text-xs text-[var(--text-muted)] font-medium whitespace-nowrap font-display">
-                                            <span className="flex items-center gap-1">
+                                    <td className="p-3.5 sm:p-4 text-[11px] sm:text-xs text-[var(--text-muted)] font-medium whitespace-nowrap font-display align-top">
+                                            <span className="flex items-center gap-1.5 mt-0.5">
                                                 <Calendar className="w-3.5 h-3.5 text-[var(--text-muted)] shrink-0" /> {item.createdAt}
                                             </span>
                                     </td>
-                                    <td className="p-3.5 sm:p-4 whitespace-nowrap">
-                                        {item.status === 'pending' && (
-                                            <span className="px-2.5 py-1 rounded-md text-[9px] sm:text-[10px] font-bold uppercase tracking-widest border bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-500/10 dark:text-orange-400 dark:border-orange-500/20 inline-flex items-center gap-1">
-                                                    <Clock className="w-3 h-3" /> Menunggu
-                                                </span>
-                                        )}
-                                        {item.status === 'verified' && (
-                                            <span className="px-2.5 py-1 rounded-md text-[9px] sm:text-[10px] font-bold uppercase tracking-widest border bg-green-50 text-green-700 border-green-200 dark:bg-green-500/10 dark:text-green-400 dark:border-green-500/20 inline-flex items-center gap-1">
-                                                    <CheckCircle2 className="w-3 h-3" /> Terverifikasi
-                                                </span>
-                                        )}
-                                        {item.status === 'rejected' && (
-                                            <span className="px-2.5 py-1 rounded-md text-[9px] sm:text-[10px] font-bold uppercase tracking-widest border bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20 inline-flex items-center gap-1">
-                                                    <XCircle className="w-3 h-3" /> Ditolak
-                                                </span>
-                                        )}
+                                    <td className="p-3.5 sm:p-4 whitespace-nowrap align-top">
+                                        <div className="mt-0.5">
+                                            {item.status === 'pending' && (
+                                                <span className="px-2.5 py-1 rounded-md text-[9px] sm:text-[10px] font-bold uppercase tracking-widest border bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-500/10 dark:text-orange-400 dark:border-orange-500/20 inline-flex items-center gap-1.5">
+                                                        <Clock className="w-3 h-3" /> Menunggu
+                                                    </span>
+                                            )}
+                                            {item.status === 'verified' && (
+                                                <span className="px-2.5 py-1 rounded-md text-[9px] sm:text-[10px] font-bold uppercase tracking-widest border bg-green-50 text-green-700 border-green-200 dark:bg-green-500/10 dark:text-green-400 dark:border-green-500/20 inline-flex items-center gap-1.5">
+                                                        <CheckCircle2 className="w-3 h-3" /> Terverifikasi
+                                                    </span>
+                                            )}
+                                            {item.status === 'rejected' && (
+                                                <span className="px-2.5 py-1 rounded-md text-[9px] sm:text-[10px] font-bold uppercase tracking-widest border bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20 inline-flex items-center gap-1.5">
+                                                        <XCircle className="w-3 h-3" /> Ditolak
+                                                    </span>
+                                            )}
+                                        </div>
                                     </td>
-                                    <td className="p-3.5 sm:p-4 pr-5 sm:pr-6 text-right">
+                                    <td className="p-3.5 sm:p-4 pr-5 sm:pr-6 text-right align-top">
                                         <div className="flex items-center justify-end gap-1.5">
                                             <button
                                                 onClick={() => setSelectedItem(item)}
@@ -478,14 +472,10 @@ export default function AdminDaftarDadPage() {
                                         <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider block">Asal</span>
                                         <span className="text-xs font-bold text-[var(--text-secondary)] mt-0.5 block">{selectedItem.asal}</span>
                                     </div>
-                                    <div>
-                                        <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider block">Asal Komisariat</span>
-                                        <span className="text-xs font-bold text-[var(--primary)] mt-0.5 block">{selectedItem.asalKomisariat}</span>
-                                    </div>
                                 </div>
                                 <div>
                                     <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider block">Domisili Saat Ini</span>
-                                    <span className="text-xs font-bold text-[var(--text-secondary)] mt-0.5 block">{selectedItem.domisili}</span>
+                                    <span className="text-xs font-bold text-[var(--text-secondary)] mt-0.5 block">{selectedItem.alamat_sekarang}</span>
                                 </div>
                             </div>
                         </div>
