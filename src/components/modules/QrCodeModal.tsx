@@ -16,7 +16,7 @@ export default function QrCodeModal({ isOpen, onClose }: QrCodeModalProps) {
 
     const registrationUrl = typeof window !== 'undefined'
         ? `${window.location.origin}/`
-        : 'https://imm-kaizen.org/'
+        : 'https://imm-kaizen.org/daftar-dad'
 
     const handleDownloadQR = () => {
         const canvas = document.getElementById('dad-qrcode-canvas') as HTMLCanvasElement
