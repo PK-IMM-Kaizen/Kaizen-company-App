@@ -20,12 +20,14 @@ import {
     FileText,
     IdCard,
     ExternalLink,
+    QrCode,
     Image as ImageIcon
 } from 'lucide-react'
 import { createBrowserClient } from '@supabase/ssr'
 import Swal from 'sweetalert2'
 import IdCardResult from '../../../(public)/daftar-dad/IdCardResult'
 import type { IdCardInput } from '../../../(public)/daftar-dad/idCard'
+import QrCodeModal from '../../../../components/modules/QrCodeModal'
 
 export interface DadRegistrant {
     id: string
@@ -335,6 +337,8 @@ export default function AdminDaftarDadPage() {
         fotoUrl: item.fotoUrl
     })
 
+    const [isQrModalOpen, setIsQrModalOpen] = useState<boolean>(false)
+
     return (
         <div className="space-y-4 sm:space-y-6 font-sans">
 
@@ -367,6 +371,13 @@ export default function AdminDaftarDadPage() {
                     </div>
 
                     <div className="h-6 w-px bg-[var(--border)] hidden sm:block"></div>
+
+                    <button
+                        onClick={() => setIsQrModalOpen(true)}
+                        className="flex-1 sm:flex-none py-2 sm:py-2.5 px-3.5 sm:px-4 bg-amber-500/10 border border-amber-500/30 hover:bg-amber-500/20 text-amber-700 dark:text-amber-400 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm font-display cursor-pointer"
+                    >
+                        <QrCode className="w-3.5 h-3.5" /> Cetak QR Code
+                    </button>
 
                     <button
                         onClick={handleExportCSV}
@@ -704,10 +715,14 @@ export default function AdminDaftarDadPage() {
                         >
                             <ExternalLink className="w-4 h-4" /> Buka Ukuran Penuh
                         </a>
+
                     </div>
                 </div>
             )}
-
+            <QrCodeModal
+                isOpen={isQrModalOpen}
+                onClose={() => setIsQrModalOpen(false)}
+            />
         </div>
     )
 }
