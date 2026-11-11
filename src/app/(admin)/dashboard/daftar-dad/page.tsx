@@ -13,12 +13,12 @@ import {
     Calendar,
     RefreshCw,
     Download,
-    AlertTriangle,
     MapPin,
     Home,
     Settings
 } from 'lucide-react'
 import { createBrowserClient } from '@supabase/ssr'
+import Swal from 'sweetalert2'
 
 export interface DadRegistrant {
     id: string
@@ -31,6 +31,18 @@ export interface DadRegistrant {
     createdAt: string
 }
 
+const Toast = Swal.mixin({
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+        toast.addEventListener('mouseenter', Swal.stopTimer)
+        toast.addEventListener('mouseleave', Swal.resumeTimer)
+    }
+})
+
 export default function AdminDaftarDadPage() {
     const [registrants, setRegistrants] = useState<DadRegistrant[]>([])
     const [isLoading, setIsLoading] = useState<boolean>(true)
@@ -42,7 +54,6 @@ export default function AdminDaftarDadPage() {
     const [isToggling, setIsToggling] = useState<boolean>(false)
 
     const [selectedItem, setSelectedItem] = useState<DadRegistrant | null>(null)
-    const [deleteId, setDeleteId] = useState<string | null>(null)
 
     const supabase = createBrowserClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -113,7 +124,7 @@ export default function AdminDaftarDadPage() {
             )
 
         } catch (error: any) {
-            alert(`Gagal mengubah status pendaftaran: ${error.message}`)
+            Toast.fire({ icon: 'error', title: `Gagal mengubah status pendaftaran: ${error.message}` })
         } finally {
             setIsToggling(false)
         }
@@ -186,47 +197,92 @@ export default function AdminDaftarDadPage() {
             if (selectedItem && selectedItem.id === id) {
                 setSelectedItem(prev => (prev ? { ...prev, status: newStatus } : null))
             }
+
+            Toast.fire({ icon: 'success', title: 'Status berhasil diperbarui' })
         } catch (error: any) {
-            alert(`Gagal memperbarui status verifikasi: ${error.message}`)
+            Toast.fire({ icon: 'error', title: `Gagal memperbarui status: ${error.message}` })
         } finally {
             setIsSaving(false)
         }
     }
 
-    const handleDelete = async (id: string) => {
-        try {
-            const itemToDelete = registrants.find(item => item.id === id)
-            const targetName = itemToDelete ? itemToDelete.namaLengkap : 'Data Pendaftar DAD'
+    const handleDelete = async (id: string, namaLengkap: string) => {
+        const confirm = await Swal.fire({
+            title: 'Hapus Pendaftar?',
+            text: `Data ${namaLengkap} akan dihapus secara permanen.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal'
+        })
 
-            const { error } = await supabase.from('dad_registrations').delete().eq('id', id)
+        if (!confirm.isConfirmed) return
+
+        try {
+            const { data, error } = await supabase
+                .from('dad_registrations')
+                .delete()
+                .eq('id', id)
+                .select()
+
             if (error) throw error
 
+            if (!data || data.length === 0) {
+                throw new Error('Akses ditolak oleh RLS Supabase. Tambahkan policy DELETE pada tabel.')
+            }
+
             setRegistrants(prev => prev.filter(item => item.id !== id))
-            setDeleteId(null)
             if (selectedItem?.id === id) setSelectedItem(null)
 
-            await logActivity('menghapus', `Peserta DAD: ${targetName}`, 'users')
+            await logActivity('menghapus', `Peserta DAD: ${namaLengkap}`, 'users')
 
+            Toast.fire({
+                icon: 'success',
+                title: 'Data berhasil dihapus'
+            })
         } catch (error: any) {
-            alert(`Gagal menghapus data pendaftar: ${error.message}`)
+            Toast.fire({
+                icon: 'error',
+                title: `Gagal menghapus data: ${error.message}`
+            })
         }
     }
 
     const handleExportCSV = () => {
-        const headers = 'ID,Nama Lengkap,Asal,Tempat & Tanggal Lahir,Alamat Sekarang,Prodi,Status,Tanggal Daftar\n'
+        const delimiter = ';'
+
+        const headerArray = ['ID', 'Nama Lengkap', 'Asal', 'Tempat & Tanggal Lahir', 'Alamat Sekarang', 'Prodi', 'Status', 'Tanggal Daftar']
+        const headers = headerArray.join(delimiter) + '\n'
+
         const rows = filteredList
-            .map(
-                r =>
-                    `"${r.id}","${r.namaLengkap}","${r.asal}","${r.tempatTanggalLahir}","${r.alamat_sekarang}","${r.prodi}","${r.status}","${r.createdAt}"`
-            )
+            .map(r => {
+                const clean = (text: string) => `"${String(text).replace(/"/g, '""')}"`
+
+                return [
+                    clean(r.id),
+                    clean(r.namaLengkap),
+                    clean(r.asal),
+                    clean(r.tempatTanggalLahir),
+                    clean(r.alamat_sekarang),
+                    clean(r.prodi),
+                    clean(r.status),
+                    clean(r.createdAt)
+                ].join(delimiter)
+            })
             .join('\n')
 
-        const blob = new Blob([headers + rows], { type: 'text/csv' })
+        const blob = new Blob(['\uFEFF' + headers + rows], { type: 'text/csv;charset=utf-8;' })
+
         const url = window.URL.createObjectURL(blob)
         const a = document.createElement('a')
         a.href = url
         a.download = `Pendaftar-DAD-${new Date().toISOString().slice(0, 10)}.csv`
+        document.body.appendChild(a)
         a.click()
+        document.body.removeChild(a)
+        window.URL.revokeObjectURL(url)
     }
 
     return (
@@ -277,34 +333,6 @@ export default function AdminDaftarDadPage() {
                     </button>
                 </div>
             </div>
-
-            {deleteId !== null && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-                    <div className="bg-[var(--card)] rounded-2xl p-6 sm:p-8 max-w-sm w-full border border-[var(--border)] shadow-2xl animate-in fade-in zoom-in-95 duration-200">
-                        <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/20 border border-red-500/20 flex items-center justify-center mb-4">
-                            <AlertTriangle className="w-6 h-6 text-red-500" />
-                        </div>
-                        <h3 className="font-black text-lg font-display text-[var(--text-primary)] mb-1">Hapus Pendaftar?</h3>
-                        <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed mb-6">
-                            Data ini akan dihapus secara permanen dari sistem database.
-                        </p>
-                        <div className="flex gap-3">
-                            <button
-                                onClick={() => setDeleteId(null)}
-                                className="flex-1 py-2.5 sm:py-3 bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text-primary)] text-xs font-bold tracking-widest uppercase rounded-xl hover:bg-[var(--surface)] transition-all cursor-pointer font-display"
-                            >
-                                Batal
-                            </button>
-                            <button
-                                onClick={() => handleDelete(deleteId)}
-                                className="flex-1 py-2.5 sm:py-3 bg-red-600 text-white text-xs font-bold tracking-widest uppercase rounded-xl hover:bg-red-700 transition-all cursor-pointer font-display shadow-md shadow-red-600/20"
-                            >
-                                Hapus
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
 
             <div className="bg-[var(--card)] rounded-2xl border border-[var(--border)] overflow-hidden shadow-sm">
                 <div className="p-3.5 sm:p-4 border-b border-[var(--border)] flex flex-col md:flex-row items-start md:items-center justify-between gap-3 sm:gap-4 bg-[var(--surface)]">
@@ -416,7 +444,7 @@ export default function AdminDaftarDadPage() {
                                                 <Eye className="w-4 h-4" />
                                             </button>
                                             <button
-                                                onClick={() => setDeleteId(item.id)}
+                                                onClick={() => handleDelete(item.id, item.namaLengkap)}
                                                 className="p-1.5 sm:p-2 text-[var(--text-muted)] hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors cursor-pointer"
                                                 title="Hapus Data"
                                             >
@@ -511,7 +539,6 @@ export default function AdminDaftarDadPage() {
                     </div>
                 </div>
             )}
-
         </div>
     )
 }

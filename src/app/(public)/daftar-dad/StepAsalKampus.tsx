@@ -10,13 +10,15 @@ export default function StepAsalKampus({
 }) {
     return (
         <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <Field label="Asal daerah" name="asal" error={errors.asal}>
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                <Field label="NIM" name="nim" error={errors.nim}>
                     <input
                         type="text"
-                        placeholder="Contoh: Surabaya"
-                        className={inputClass(!!errors.asal)}
-                        {...bind('asal')}
+                        inputMode="numeric"
+                        autoComplete="off"
+                        placeholder="Nomor induk mahasiswa"
+                        className={inputClass(!!errors.nim)}
+                        {...bind('nim')}
                     />
                 </Field>
                 <Field label="Program studi" name="prodi" error={errors.prodi}>
@@ -28,6 +30,16 @@ export default function StepAsalKampus({
                     />
                 </Field>
             </div>
+
+            <Field label="Asal daerah" name="asal" error={errors.asal}>
+                <input
+                    type="text"
+                    placeholder="Contoh: Surabaya"
+                    className={inputClass(!!errors.asal)}
+                    {...bind('asal')}
+                />
+            </Field>
+
             <Field
                 label="Alamat tinggal sekarang"
                 name="alamatSekarang"

@@ -4,9 +4,10 @@ export type FieldName =
     | 'namaLengkap'
     | 'tempatLahir'
     | 'tanggalLahir'
+    | 'nim'
+    | 'prodi'
     | 'asal'
     | 'alamatSekarang'
-    | 'prodi'
 
 export type FormValues = Record<FieldName, string>
 export type FieldErrors = Partial<Record<FieldName, string>>
@@ -24,20 +25,26 @@ export type BindFn = (name: FieldName) => FieldBinding
 
 export const steps: { title: string; fields: FieldName[] }[] = [
     { title: 'Data diri', fields: ['namaLengkap', 'tempatLahir', 'tanggalLahir'] },
-    { title: 'Asal dan kampus', fields: ['asal', 'alamatSekarang', 'prodi'] },
-    { title: 'Foto', fields: [] }
+    { title: 'Kampus', fields: ['nim', 'prodi', 'asal', 'alamatSekarang'] },
+    { title: 'Foto', fields: [] },
+    { title: 'Pembayaran', fields: [] }
 ]
 
-export const LastStep = steps.length - 1
-export const MaxFileSize = 10 * 1024 * 1024
+export const stepFoto = 2
+export const stepBayar = 3
+export const lastStep = steps.length - 1
 
-export const InitialValues: FormValues = {
+export const maxFotoSize = 10 * 1024 * 1024
+export const maxBuktiSize = 5 * 1024 * 1024
+
+export const initialValues: FormValues = {
     namaLengkap: '',
     tempatLahir: '',
     tanggalLahir: '',
+    nim: '',
+    prodi: '',
     asal: '',
-    alamatSekarang: '',
-    prodi: ''
+    alamatSekarang: ''
 }
 
 export const validators: Record<FieldName, (v: string) => string> = {
@@ -51,8 +58,9 @@ export const validators: Record<FieldName, (v: string) => string> = {
             return 'Tanggal lahir tidak valid.'
         return ''
     },
+    nim: v => (/^[A-Za-z0-9.\-]{5,20}$/.test(v.trim()) ? '' : 'NIM tidak valid, periksa lagi (5 sampai 20 karakter).'),
+    prodi: v => (!v.trim() ? 'Isi program studimu.' : ''),
     asal: v => (!v.trim() ? 'Isi daerah asalmu.' : ''),
     alamatSekarang: v =>
-        v.trim().length < 5 ? 'Tulis alamat tinggal atau kos dengan lebih lengkap.' : '',
-    prodi: v => (!v.trim() ? 'Isi program studimu.' : '')
+        v.trim().length < 5 ? 'Tulis alamat tinggal atau kos dengan lebih lengkap.' : ''
 }
