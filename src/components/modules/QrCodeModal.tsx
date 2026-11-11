@@ -15,7 +15,7 @@ export default function QrCodeModal({ isOpen, onClose }: QrCodeModalProps) {
     if (!isOpen) return null
 
     const registrationUrl = typeof window !== 'undefined'
-        ? `${window.location.origin}/`
+        ? `${window.location.origin}/daftar-dad`
         : 'https://imm-kaizen.org/daftar-dad'
 
     const handleDownloadQR = () => {
