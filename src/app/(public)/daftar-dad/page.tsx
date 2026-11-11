@@ -243,6 +243,7 @@ export default function DaftarDADPage() {
             const { error: insertError } = await supabase.from('dad_registrations').insert([
                 {
                     nama_lengkap: values.namaLengkap.trim(),
+                    nomor_hp: values.nomorHp.trim(),
                     tempat_tanggal_lahir: `${values.tempatLahir.trim()}, ${formatTanggal(values.tanggalLahir)}`,
                     nim: values.nim.trim(),
                     asal: values.asal.trim(),
@@ -289,17 +290,17 @@ export default function DaftarDADPage() {
         <PageShell>
             <StatusOverlay isChecking={isCheckingStatus} isOpen={isRegistrationOpen} />
 
-            <main className="mx-auto w-full max-w-6xl flex-1 px-4 pb-12 pt-2 sm:px-6 sm:pt-6">
+            <main className="mx-auto w-full max-w-6xl flex-1 px-3 pb-12 pt-2 sm:px-6 sm:pt-6">
                 <PageHero />
 
-                <div className="mt-10">
+                <div className="mt-6 sm:mt-10">
                     <Timeline />
                 </div>
 
-                <div className="mt-12 grid items-start gap-12 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] lg:gap-14">
+                <div className="mt-8 grid items-start gap-8 sm:mt-12 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] lg:gap-14">
                     <div
                         ref={formTopRef}
-                        className={`min-w-0 scroll-mt-4 transition-opacity duration-300 ${
+                        className={`min-w-0 scroll-mt-20 transition-opacity duration-300 sm:scroll-mt-6 ${
                             formDisabled ? 'pointer-events-none select-none opacity-40' : ''
                         }`}
                         aria-hidden={formDisabled}
@@ -310,7 +311,7 @@ export default function DaftarDADPage() {
                             <form onSubmit={handleSubmit} noValidate>
                                 <div
                                     key={step}
-                                    className="space-y-5 animate-in fade-in slide-in-from-right-3 duration-200 motion-reduce:animate-none"
+                                    className="space-y-4 sm:space-y-5 animate-in fade-in slide-in-from-right-3 duration-200 motion-reduce:animate-none"
                                 >
                                     {step === 0 && (
                                         <StepDataDiri bind={bind} errors={errors} maxDate={todayStr} />
@@ -341,19 +342,19 @@ export default function DaftarDADPage() {
                                 {submitError && (
                                     <p
                                         role="alert"
-                                        className="mt-5 rounded-xl border border-red-500/40 bg-red-50 px-4 py-3 text-sm text-red-700"
+                                        className="mt-4 rounded-xl border border-red-500/40 bg-red-50 px-3.5 py-3 text-xs sm:text-sm text-red-700"
                                     >
                                         {submitError}
                                     </p>
                                 )}
 
-                                <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row">
+                                <div className="mt-6 flex flex-col-reverse gap-3 sm:mt-8 sm:flex-row">
                                     {step > 0 && (
                                         <button
                                             type="button"
                                             onClick={() => goTo(step - 1)}
                                             disabled={isSubmitting}
-                                            className={`${secondaryBtn} w-full sm:w-auto`}
+                                            className={`${secondaryBtn} min-h-[44px] w-full justify-center sm:w-auto`}
                                         >
                                             <ArrowLeft className="h-4 w-4" /> Kembali
                                         </button>
@@ -362,7 +363,7 @@ export default function DaftarDADPage() {
                                     <button
                                         type="submit"
                                         disabled={isSubmitting || formDisabled}
-                                        className={`${primaryBtn} flex-1`}
+                                        className={`${primaryBtn} min-h-[44px] w-full flex-1 justify-center`}
                                     >
                                         {isSubmitting ? (
                                             <>
@@ -380,7 +381,7 @@ export default function DaftarDADPage() {
                                     </button>
                                 </div>
 
-                                <p className="mt-5 flex items-center justify-center gap-1.5 text-center text-xs leading-normal text-[#7d6b68]">
+                                <p className="mt-4 flex items-center justify-center gap-1.5 text-center text-[11px] leading-normal text-[#7d6b68] sm:mt-5 sm:text-xs">
                                     <ShieldCheck className="h-3.5 w-3.5 shrink-0" />
                                     Datamu hanya dipakai untuk verifikasi pendaftaran DAD.
                                 </p>

@@ -21,18 +21,32 @@ async function imageUrlToBase64(url: string): Promise<string> {
 
 function getNameFontSize(nama: string): string {
     const len = nama.trim().length
-    if (len > 32) return 'text-[6.5px] sm:text-[7.5px]'
-    if (len > 24) return 'text-[7.5px] sm:text-[8.5px]'
-    if (len > 18) return 'text-[8.5px] sm:text-[9.5px]'
+    if (len > 30) return 'text-[6.5px] sm:text-[7.5px] leading-tight'
+    if (len > 22) return 'text-[7.5px] sm:text-[8.5px] leading-tight'
+    if (len > 15) return 'text-[8.5px] sm:text-[9.5px] leading-snug'
+    return 'text-[10px] sm:text-[11.5px] leading-snug'
+}
+
+function getProdiFontSize(prodi: string): string {
+    const len = prodi.trim().length
+    if (len > 25) return 'text-[7.5px] sm:text-[8.5px]'
+    if (len > 16) return 'text-[8.5px] sm:text-[9.5px]'
     return 'text-[9.5px] sm:text-[11px]'
 }
 
 function getAlamatFontSize(alamat: string): string {
     const len = alamat.trim().length
     if (len > 50) return 'text-[6px] sm:text-[7px]'
-    if (len > 35) return 'text-[7px] sm:text-[8px]'
+    if (len > 32) return 'text-[7px] sm:text-[8px]'
     if (len > 20) return 'text-[8px] sm:text-[9px]'
     return 'text-[8.5px] sm:text-[10px]'
+}
+
+function getTtlFontSize(ttl: string): string {
+    const len = ttl.trim().length
+    if (len > 30) return 'text-[8px] sm:text-[8px]'
+    if (len > 22) return 'text-[9px] sm:text-[9px]'
+    return 'text-[9.5px] sm:text-[10px]'
 }
 
 export default function IdCardResult({ data }: { data: IdCardInput }) {
@@ -77,7 +91,7 @@ export default function IdCardResult({ data }: { data: IdCardInput }) {
             const dataUrl = await toPng(cardRef.current, {
                 cacheBust: false,
                 pixelRatio: 3,
-                skipFonts: true,
+                skipFonts: false,
             })
 
             const link = document.createElement('a')
@@ -97,7 +111,7 @@ export default function IdCardResult({ data }: { data: IdCardInput }) {
             <div className="overflow-hidden rounded-3xl bg-white/10 shadow-[0_24px_50px_-14px_rgba(0,0,0,0.6)] ring-4 ring-white">
                 <div
                     ref={cardRef}
-                    className="relative aspect-[2207/3125] w-full overflow-hidden bg-white text-black font-sans select-none"
+                    className="font-card relative aspect-[2207/3125] w-full overflow-hidden bg-white text-[#2b1010] select-none"
                 >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
@@ -106,7 +120,7 @@ export default function IdCardResult({ data }: { data: IdCardInput }) {
                         className="absolute inset-0 h-full w-full object-cover pointer-events-none"
                     />
 
-                    <div className="absolute top-[32.4%] left-[14%] w-[23.7%] h-[24.4%] rounded-[16px] overflow-hidden  bg-gray-200">
+                    <div className="absolute top-[32%] left-[14%] w-[23.6%] h-[24.4%] overflow-hidden rounded-[10px] sm:rounded-[12px] bg-gray-200">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                             src={fotoBase64 || data.fotoUrl}
@@ -115,28 +129,33 @@ export default function IdCardResult({ data }: { data: IdCardInput }) {
                         />
                     </div>
 
-                    <div className="absolute top-[38.1%] left-[40.8%] right-[9.0%] h-[5.1%] flex items-center px-4 font-black uppercase tracking-wide text-black">
-                        <span className={`w-full truncate ${getNameFontSize(data.nama)}`}>
+
+                    <div className="absolute top-[37.8%] left-[40.8%] right-[9.0%] h-[5.6%] flex items-center px-3.5 font-extrabold uppercase tracking-wide text-[#2b1010]">
+                        <span className={`w-full leading-tight ${getNameFontSize(data.nama)}`}>
                             {data.nama}
                         </span>
                     </div>
 
-                    <div className="absolute top-[48.7%] left-[40.8%] right-[9.0%] h-[5.1%] flex items-center px-4 text-[9px] sm:text-[10.5px] font-black tracking-wider text-black">
+                    <div className="absolute top-[48.7%] left-[40.8%] right-[9.0%] h-[5.1%] flex items-center px-3.5 text-[9px] sm:text-[10.5px] font-extrabold tracking-wider text-[#2b1010]">
                         <span className="w-full truncate">{data.nim}</span>
                     </div>
 
-                    <div className="absolute top-[60.7%] left-[13.9%] right-[9.0%] h-[5.1%] flex items-center px-5 text-[8.5px] sm:text-[10px] font-black tracking-tight text-black">
-                        <span className="w-full truncate">{data.prodi}</span>
+                    <div className="absolute top-[60.7%] left-[13.9%] right-[9.0%] h-[5.1%] flex items-center px-4 font-extrabold tracking-tight text-[#2b1010]">
+                        <span className={`w-full truncate ${getProdiFontSize(data.prodi)}`}>
+                            {data.prodi}
+                        </span>
                     </div>
 
-                    <div className="absolute top-[71.3%] left-[13.9%] right-[9.0%] h-[5.1%] flex items-center px-5 font-black text-black">
+                    <div className="absolute top-[71.3%] left-[13.9%] right-[9.0%] h-[5.1%] flex items-center px-4 font-extrabold text-[#2b1010]">
                         <span className={`w-full truncate ${getAlamatFontSize(data.alamat)}`}>
                             {data.alamat}
                         </span>
                     </div>
 
-                    <div className="absolute top-[81.9%] left-[13.9%] right-[9.0%] h-[5.1%] flex items-center px-5 text-[8px] sm:text-[9.5px] font-black tracking-tight text-black">
-                        <span className="w-full truncate">{data.ttl}</span>
+                    <div className="absolute top-[81.9%] left-[13.9%] right-[9.0%] h-[5.1%] flex items-center px-4 font-extrabold tracking-tight text-[#2b1010]">
+                        <span className={`w-full truncate ${getTtlFontSize(data.ttl)}`}>
+                            {data.ttl}
+                        </span>
                     </div>
                 </div>
             </div>

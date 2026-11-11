@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
-import Logo from '../../../components/common/Logo'
 import Decor from './Decor'
 import styles from '../../Dad.module.css'
 
@@ -11,9 +10,6 @@ export default function PageShell({ children }: { children: ReactNode }) {
             <Decor />
 
             <header className="relative z-10 mx-auto flex w-full max-w-6xl items-center justify-between gap-3 p-4 sm:p-6">
-                <div className="rounded-full bg-white px-4 py-2 shadow-lg">
-                    <Logo size="md" />
-                </div>
                 <Link
                     href="/"
                     className="flex items-center gap-1.5 text-xs font-bold text-white/80 transition-colors hover:text-[#f4b82e] sm:text-sm"

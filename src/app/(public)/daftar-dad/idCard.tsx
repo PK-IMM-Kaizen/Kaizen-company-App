@@ -12,7 +12,7 @@ type FieldSpec = {
     uppercase: boolean
 }
 
-const TEXT_COLOR = '#2b1010'
+const textColor = '#2b1010'
 
 const field = (box: Box, over: Partial<FieldSpec> = {}): FieldSpec => ({
     box,
@@ -20,8 +20,8 @@ const field = (box: Box, over: Partial<FieldSpec> = {}): FieldSpec => ({
     padY: 14,
     fontSize: 58,
     minFontSize: 28,
-    color: TEXT_COLOR,
-    maxLines: 2,
+    color: textColor,
+    maxLines: 1,
     lineHeight: 1.15,
     uppercase: false,
     ...over
@@ -35,37 +35,36 @@ export const ID_CARD_CONFIG = {
     fontWeight: '500',
     fontFallback: 'system-ui, -apple-system, "Segoe UI", sans-serif',
 
-    // Aktifkan sementara untuk melihat garis panduan koordinat
-    debug: true,
+    debug: false,
 
     photo: {
-        x: 500,
-        y: 690,       // Jarak dari atas ke kotak foto
-        width: 320,   // Lebar kotak foto
-        height: 800,  // Tinggi kotak foto
-        radius: 28    // Kelengkungan sudut foto
+        x: 308,
+        y: 934,
+        width: 520,
+        height: 760,
+        radius: 36
     } as Box & { radius: number },
 
     fields: {
         nama: field(
-            { x: 505, y: 775, width: 760, height: 100 },
-            { fontSize: 40, padX: 20, padY: 10, uppercase: true }
+            { x: 900, y: 1190, width: 1120, height: 160 },
+            { fontSize: 52, minFontSize: 24, padX: 30, padY: 15, uppercase: true }
         ),
         nim: field(
-            { x: 505, y: 985, width: 760, height: 100 },
-            { fontSize: 38, padX: 20, padY: 10, maxLines: 1 }
+            { x: 900, y: 1520, width: 1120, height: 160 },
+            { fontSize: 48, minFontSize: 24, padX: 30, padY: 15 }
         ),
         prodi: field(
-            { x: 145, y: 1240, width: 1120, height: 100 },
-            { fontSize: 36, padX: 25, padY: 10 }
+            { x: 308, y: 1895, width: 1712, height: 160 },
+            { fontSize: 44, minFontSize: 22, padX: 40, padY: 15 }
         ),
         alamat: field(
-            { x: 145, y: 1450, width: 1120, height: 100 },
-            { fontSize: 32, padX: 25, padY: 10 }
+            { x: 308, y: 2225, width: 1712, height: 160 },
+            { fontSize: 40, minFontSize: 20, padX: 40, padY: 15 }
         ),
         ttl: field(
-            { x: 145, y: 1660, width: 1120, height: 100 },
-            { fontSize: 32, padX: 25, padY: 10 }
+            { x: 308, y: 2555, width: 1712, height: 160 },
+            { fontSize: 40, minFontSize: 20, padX: 40, padY: 15 }
         )
     }
 }
@@ -112,6 +111,7 @@ async function ensureFont() {
         }
         await document.fonts.ready
     } catch {
+        // Fallback ke font bawaan jika gagal memuat font khusus
     }
 }
 

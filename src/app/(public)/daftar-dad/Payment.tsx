@@ -1,5 +1,5 @@
 export const paymentConfig = {
-    amount: 100.000,
+    amount: 100000,
     methods: [
         {
             name: 'BRI',
@@ -12,8 +12,4 @@ export const paymentConfig = {
 }
 
 export const formatRupiah = (n: number) =>
-    new Intl.NumberFormat('id-ID', {
-        style: 'currency',
-        currency: 'IDR',
-        maximumFractionDigits: 100.000
-    }).format(n)
+    `Rp.${n.toLocaleString('id-ID')}`

@@ -15,18 +15,32 @@ import {
     Download,
     MapPin,
     Home,
-    Settings
+    Settings,
+    Phone,
+    FileText,
+    IdCard,
+    ExternalLink,
+    Image as ImageIcon
 } from 'lucide-react'
 import { createBrowserClient } from '@supabase/ssr'
 import Swal from 'sweetalert2'
+import IdCardResult from '../../../(public)/daftar-dad/IdCardResult'
+import type { IdCardInput } from '../../../(public)/daftar-dad/idCard'
 
 export interface DadRegistrant {
     id: string
     namaLengkap: string
+    nomorHp: string
     asal: string
+    tempatLahir: string
+    tanggalLahir: string
     tempatTanggalLahir: string
+    nim: string
     alamat_sekarang: string
     prodi: string
+    fotoUrl: string
+    buktiPembayaranPath: string
+    buktiPembayaranUrl: string | null
     status: 'pending' | 'verified' | 'rejected'
     createdAt: string
 }
@@ -54,6 +68,8 @@ export default function AdminDaftarDadPage() {
     const [isToggling, setIsToggling] = useState<boolean>(false)
 
     const [selectedItem, setSelectedItem] = useState<DadRegistrant | null>(null)
+    const [idCardItem, setIdCardItem] = useState<DadRegistrant | null>(null)
+    const [previewImage, setPreviewImage] = useState<{ url: string; title: string } | null>(null)
 
     const supabase = createBrowserClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -130,6 +146,13 @@ export default function AdminDaftarDadPage() {
         }
     }
 
+    const getPublicUrl = (bucket: string, path: string) => {
+        if (!path) return ''
+        if (path.startsWith('http://') || path.startsWith('https://')) return path
+        const { data } = supabase.storage.from(bucket).getPublicUrl(path)
+        return data.publicUrl
+    }
+
     const fetchRegistrants = async () => {
         setIsLoading(true)
         try {
@@ -141,22 +164,36 @@ export default function AdminDaftarDadPage() {
             if (error) throw error
 
             if (data) {
-                const formattedData: DadRegistrant[] = data.map((item: any) => ({
-                    id: item.id,
-                    namaLengkap: item.nama_lengkap || '-',
-                    asal: item.asal || '-',
-                    tempatTanggalLahir: item.tempat_tanggal_lahir || '-',
-                    alamat_sekarang: item.alamat_sekarang || '-',
-                    prodi: item.prodi || '-',
-                    status: item.status || 'pending',
-                    createdAt: item.created_at
-                        ? new Date(item.created_at).toLocaleDateString('id-ID', {
-                            day: 'numeric',
-                            month: 'long',
-                            year: 'numeric'
-                        })
-                        : '-'
-                }))
+                const formattedData: DadRegistrant[] = data.map((item: any) => {
+                    const fotoUrl = item.foto_url ? getPublicUrl('dad_photos', item.foto_url) : ''
+                    const buktiUrl = item.bukti_pembayaran_path ? getPublicUrl('dad_payments', item.bukti_pembayaran_path) : null
+
+                    return {
+                        id: item.id,
+                        namaLengkap: item.nama_lengkap || '-',
+                        nomorHp: item.nomor_hp || '-',
+                        asal: item.asal || '-',
+                        tempatLahir: item.tempat_lahir || '',
+                        tanggalLahir: item.tanggal_lahir || '',
+                        tempatTanggalLahir: item.tempat_lahir && item.tanggal_lahir
+                            ? `${item.tempat_lahir}, ${item.tanggal_lahir}`
+                            : item.tempat_tanggal_lahir || '-',
+                        nim: item.nim || '-',
+                        alamat_sekarang: item.alamat_sekarang || '-',
+                        prodi: item.prodi || '-',
+                        fotoUrl: fotoUrl,
+                        buktiPembayaranPath: item.bukti_pembayaran_path || '',
+                        buktiPembayaranUrl: buktiUrl,
+                        status: item.status || 'pending',
+                        createdAt: item.created_at
+                            ? new Date(item.created_at).toLocaleDateString('id-ID', {
+                                day: 'numeric',
+                                month: 'long',
+                                year: 'numeric'
+                            })
+                            : '-'
+                    }
+                })
                 setRegistrants(formattedData)
             }
         } catch (error: any) {
@@ -169,6 +206,8 @@ export default function AdminDaftarDadPage() {
     const filteredList = registrants.filter(item => {
         const matchesSearch =
             item.namaLengkap.toLowerCase().includes(search.toLowerCase()) ||
+            item.nim.toLowerCase().includes(search.toLowerCase()) ||
+            item.nomorHp.toLowerCase().includes(search.toLowerCase()) ||
             item.prodi.toLowerCase().includes(search.toLowerCase())
 
         const matchesStatus = statusFilter === 'all' || item.status === statusFilter
@@ -253,7 +292,7 @@ export default function AdminDaftarDadPage() {
     const handleExportCSV = () => {
         const delimiter = ';'
 
-        const headerArray = ['ID', 'Nama Lengkap', 'Asal', 'Tempat & Tanggal Lahir', 'Alamat Sekarang', 'Prodi', 'Status', 'Tanggal Daftar']
+        const headerArray = ['ID', 'Nama Lengkap', 'No. WhatsApp/HP', 'NIM', 'Asal', 'Tempat & Tanggal Lahir', 'Alamat Sekarang', 'Prodi', 'Status', 'Tanggal Daftar']
         const headers = headerArray.join(delimiter) + '\n'
 
         const rows = filteredList
@@ -263,6 +302,8 @@ export default function AdminDaftarDadPage() {
                 return [
                     clean(r.id),
                     clean(r.namaLengkap),
+                    clean(r.nomorHp),
+                    clean(r.nim),
                     clean(r.asal),
                     clean(r.tempatTanggalLahir),
                     clean(r.alamat_sekarang),
@@ -284,6 +325,15 @@ export default function AdminDaftarDadPage() {
         document.body.removeChild(a)
         window.URL.revokeObjectURL(url)
     }
+
+    const getIdCardData = (item: DadRegistrant): IdCardInput => ({
+        nama: item.namaLengkap,
+        nim: item.nim,
+        prodi: item.prodi,
+        alamat: item.alamat_sekarang,
+        ttl: item.tempatTanggalLahir,
+        fotoUrl: item.fotoUrl
+    })
 
     return (
         <div className="space-y-4 sm:space-y-6 font-sans">
@@ -340,7 +390,7 @@ export default function AdminDaftarDadPage() {
                         <Search className="w-4 h-4 text-[var(--text-muted)] absolute left-3.5 top-1/2 -translate-y-1/2 group-focus-within:text-[var(--primary)] transition-colors" />
                         <input
                             type="text"
-                            placeholder="Cari nama, prodi..."
+                            placeholder="Cari nama, NIM, no. HP, prodi..."
                             value={search}
                             onChange={e => setSearch(e.target.value)}
                             className="w-full pl-10 pr-4 py-2 sm:py-2.5 rounded-xl border border-[var(--border)] bg-[var(--background)] text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 transition-all text-xs sm:text-sm"
@@ -376,66 +426,93 @@ export default function AdminDaftarDadPage() {
                             <p className="text-xs sm:text-sm text-[var(--text-muted)] font-medium">Tidak ada data pendaftar DAD yang ditemukan.</p>
                         </div>
                     ) : (
-                        <table className="w-full text-left border-collapse min-w-[650px]">
+                        <table className="w-full text-left border-collapse min-w-[750px]">
                             <thead>
                             <tr className="bg-[var(--surface-2)] border-b border-[var(--border)] text-[10px] sm:text-xs text-[var(--text-muted)] uppercase tracking-wider font-display">
-                                <th className="p-3.5 sm:p-4 font-bold pl-5 sm:pl-6 w-[30%]">Nama Lengkap</th>
-                                <th className="p-3.5 sm:p-4 font-bold w-[25%]">Asal / Domisili</th>
-                                <th className="p-3.5 sm:p-4 font-bold w-[15%]">Tanggal Daftar</th>
-                                <th className="p-3.5 sm:p-4 font-bold w-[15%]">Status</th>
-                                <th className="p-3.5 sm:p-4 font-bold text-right pr-5 sm:pr-6 w-[15%]">Aksi</th>
+                                <th className="p-3.5 sm:p-4 font-bold pl-5 sm:pl-6 w-[28%]">Nama & Kontak</th>
+                                <th className="p-3.5 sm:p-4 font-bold w-[22%]">Kampus & Asal</th>
+                                <th className="p-3.5 sm:p-4 font-bold w-[16%]">Tanggal Daftar</th>
+                                <th className="p-3.5 sm:p-4 font-bold w-[16%]">Status</th>
+                                <th className="p-3.5 sm:p-4 font-bold text-right pr-5 sm:pr-6 w-[18%]">Aksi</th>
                             </tr>
                             </thead>
                             <tbody>
                             {filteredList.map(item => (
                                 <tr key={item.id} className="border-b border-[var(--border)] hover:bg-[var(--surface)] transition-colors group">
                                     <td className="p-3.5 sm:p-4 pl-5 sm:pl-6 align-top">
-                                        <div>
+                                        <div className="flex items-start gap-3">
+                                            {item.fotoUrl ? (
+                                                <img
+                                                    src={item.fotoUrl}
+                                                    alt={item.namaLengkap}
+                                                    className="w-9 h-9 rounded-xl object-cover shrink-0 border border-[var(--border)] shadow-sm"
+                                                />
+                                            ) : (
+                                                <div className="w-9 h-9 rounded-xl bg-[var(--surface-2)] flex items-center justify-center shrink-0 border border-[var(--border)] text-[var(--text-muted)] font-bold text-xs">
+                                                    {item.namaLengkap.charAt(0)}
+                                                </div>
+                                            )}
+                                            <div>
                                                 <span className="text-xs sm:text-sm font-bold text-[var(--text-primary)] font-display block">
                                                     {item.namaLengkap}
                                                 </span>
-                                            <span className="text-[10px] sm:text-[11px] text-[var(--text-muted)] mt-0.5 block">
-                                                    Prodi: {item.prodi}
-                                                </span>
+                                                <a
+                                                    href={`https://wa.me/${item.nomorHp.replace(/\D/g, '')}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-[10px] sm:text-[11px] text-green-600 dark:text-green-400 font-semibold hover:underline flex items-center gap-1 mt-0.5"
+                                                >
+                                                    <Phone className="w-3 h-3" /> {item.nomorHp}
+                                                </a>
+                                            </div>
                                         </div>
                                     </td>
                                     <td className="p-3.5 sm:p-4 align-top">
-                                        <div className="flex flex-col gap-1.5 text-[10px] sm:text-[11px]">
-                                                <span className="flex items-center gap-1.5 text-[var(--text-secondary)]">
-                                                    <Home className="w-3.5 h-3.5 text-[var(--text-muted)] shrink-0" /> {item.asal}
-                                                </span>
-                                            <span className="flex items-start gap-1.5 text-[var(--text-secondary)]">
-                                                    <MapPin className="w-3.5 h-3.5 text-[var(--text-muted)] shrink-0 mt-0.5" />
-                                                    <span className="line-clamp-2">{item.alamat_sekarang}</span>
-                                                </span>
+                                        <div className="flex flex-col gap-1 text-[10px] sm:text-[11px]">
+                                            <span className="font-bold text-[var(--text-primary)]">
+                                                NIM: {item.nim}
+                                            </span>
+                                            <span className="text-[var(--text-secondary)]">
+                                                Prodi: {item.prodi}
+                                            </span>
+                                            <span className="flex items-center gap-1 text-[var(--text-muted)]">
+                                                <Home className="w-3 h-3 shrink-0" /> {item.asal}
+                                            </span>
                                         </div>
                                     </td>
                                     <td className="p-3.5 sm:p-4 text-[11px] sm:text-xs text-[var(--text-muted)] font-medium whitespace-nowrap font-display align-top">
-                                            <span className="flex items-center gap-1.5 mt-0.5">
-                                                <Calendar className="w-3.5 h-3.5 text-[var(--text-muted)] shrink-0" /> {item.createdAt}
-                                            </span>
+                                        <span className="flex items-center gap-1.5 mt-0.5">
+                                            <Calendar className="w-3.5 h-3.5 text-[var(--text-muted)] shrink-0" /> {item.createdAt}
+                                        </span>
                                     </td>
                                     <td className="p-3.5 sm:p-4 whitespace-nowrap align-top">
                                         <div className="mt-0.5">
                                             {item.status === 'pending' && (
                                                 <span className="px-2.5 py-1 rounded-md text-[9px] sm:text-[10px] font-bold uppercase tracking-widest border bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-500/10 dark:text-orange-400 dark:border-orange-500/20 inline-flex items-center gap-1.5">
-                                                        <Clock className="w-3 h-3" /> Menunggu
-                                                    </span>
+                                                    <Clock className="w-3 h-3" /> Menunggu
+                                                </span>
                                             )}
                                             {item.status === 'verified' && (
                                                 <span className="px-2.5 py-1 rounded-md text-[9px] sm:text-[10px] font-bold uppercase tracking-widest border bg-green-50 text-green-700 border-green-200 dark:bg-green-500/10 dark:text-green-400 dark:border-green-500/20 inline-flex items-center gap-1.5">
-                                                        <CheckCircle2 className="w-3 h-3" /> Terverifikasi
-                                                    </span>
+                                                    <CheckCircle2 className="w-3 h-3" /> Terverifikasi
+                                                </span>
                                             )}
                                             {item.status === 'rejected' && (
                                                 <span className="px-2.5 py-1 rounded-md text-[9px] sm:text-[10px] font-bold uppercase tracking-widest border bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20 inline-flex items-center gap-1.5">
-                                                        <XCircle className="w-3 h-3" /> Ditolak
-                                                    </span>
+                                                    <XCircle className="w-3 h-3" /> Ditolak
+                                                </span>
                                             )}
                                         </div>
                                     </td>
                                     <td className="p-3.5 sm:p-4 pr-5 sm:pr-6 text-right align-top">
-                                        <div className="flex items-center justify-end gap-1.5">
+                                        <div className="flex items-center justify-end gap-1">
+                                            <button
+                                                onClick={() => setIdCardItem(item)}
+                                                className="p-1.5 sm:p-2 text-[var(--text-muted)] hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-500/10 rounded-lg transition-colors cursor-pointer"
+                                                title="Lihat ID Card"
+                                            >
+                                                <IdCard className="w-4 h-4" />
+                                            </button>
                                             <button
                                                 onClick={() => setSelectedItem(item)}
                                                 className="p-1.5 sm:p-2 text-[var(--text-muted)] hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-lg transition-colors cursor-pointer"
@@ -462,9 +539,9 @@ export default function AdminDaftarDadPage() {
 
             {selectedItem && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-                    <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl max-w-lg w-full p-5 sm:p-6 md:p-8 shadow-2xl relative space-y-4 sm:space-y-5 animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto scrollbar-none">
+                    <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl relative space-y-4 animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto scrollbar-none">
 
-                        <div className="flex items-center justify-between pb-3 sm:pb-4 border-b border-[var(--border)]">
+                        <div className="flex items-center justify-between pb-3 border-b border-[var(--border)]">
                             <div>
                                 <h3 className="text-sm sm:text-base font-black text-[var(--text-primary)] font-display uppercase tracking-wider">Detail Calon Peserta DAD</h3>
                             </div>
@@ -476,45 +553,86 @@ export default function AdminDaftarDadPage() {
                             </button>
                         </div>
 
-                        <div className="space-y-3 sm:space-y-4">
-                            <div className="bg-[var(--surface)] p-3.5 sm:p-4 rounded-xl border border-[var(--border)] space-y-2.5 sm:space-y-3 font-display">
-                                <div>
-                                    <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider block">Nama Lengkap</span>
-                                    <span className="text-xs sm:text-sm font-bold text-[var(--text-primary)]">{selectedItem.namaLengkap}</span>
+                        <div className="flex items-center gap-4 bg-[var(--surface)] p-3.5 rounded-xl border border-[var(--border)] font-display">
+                            {selectedItem.fotoUrl ? (
+                                <img
+                                    src={selectedItem.fotoUrl}
+                                    alt={selectedItem.namaLengkap}
+                                    className="w-16 h-20 rounded-lg object-cover cursor-pointer border border-[var(--border)] shadow-sm hover:opacity-90"
+                                    onClick={() => setPreviewImage({ url: selectedItem.fotoUrl, title: `Foto ${selectedItem.namaLengkap}` })}
+                                />
+                            ) : (
+                                <div className="w-16 h-20 rounded-lg bg-[var(--surface-2)] flex items-center justify-center text-[var(--text-muted)] font-bold">
+                                    No Photo
                                 </div>
+                            )}
+                            <div className="space-y-1 min-w-0 flex-1">
+                                <span className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider block">Nama Lengkap</span>
+                                <span className="text-sm font-black text-[var(--text-primary)] truncate block">{selectedItem.namaLengkap}</span>
+                                <span className="text-xs font-semibold text-green-600 dark:text-green-400 flex items-center gap-1">
+                                    <Phone className="w-3.5 h-3.5" /> {selectedItem.nomorHp}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className="space-y-3 font-display">
+                            <div className="bg-[var(--surface)] p-3.5 rounded-xl border border-[var(--border)] space-y-2.5">
                                 <div className="grid grid-cols-2 gap-3">
                                     <div>
-                                        <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider block">Tempat, Tanggal Lahir</span>
-                                        <span className="text-xs font-bold text-[var(--text-secondary)] mt-0.5 block">{selectedItem.tempatTanggalLahir}</span>
+                                        <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider block">NIM</span>
+                                        <span className="text-xs font-bold text-[var(--text-primary)] mt-0.5 block">{selectedItem.nim}</span>
                                     </div>
                                     <div>
                                         <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider block">Program Studi</span>
-                                        <span className="text-xs font-bold text-[var(--text-secondary)] mt-0.5 block">{selectedItem.prodi}</span>
+                                        <span className="text-xs font-bold text-[var(--text-primary)] mt-0.5 block">{selectedItem.prodi}</span>
                                     </div>
+                                </div>
+                                <div>
+                                    <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider block">Tempat, Tanggal Lahir</span>
+                                    <span className="text-xs font-bold text-[var(--text-secondary)] mt-0.5 block">{selectedItem.tempatTanggalLahir}</span>
                                 </div>
                             </div>
 
-                            <div className="bg-[var(--surface)] p-3.5 sm:p-4 rounded-xl border border-[var(--border)] space-y-2.5 sm:space-y-3 font-display">
-                                <div className="grid grid-cols-2 gap-3">
-                                    <div>
-                                        <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider block">Asal</span>
-                                        <span className="text-xs font-bold text-[var(--text-secondary)] mt-0.5 block">{selectedItem.asal}</span>
-                                    </div>
+                            <div className="bg-[var(--surface)] p-3.5 rounded-xl border border-[var(--border)] space-y-2.5">
+                                <div>
+                                    <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider block">Asal Daerah</span>
+                                    <span className="text-xs font-bold text-[var(--text-secondary)] mt-0.5 block">{selectedItem.asal}</span>
                                 </div>
                                 <div>
                                     <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider block">Domisili Saat Ini</span>
                                     <span className="text-xs font-bold text-[var(--text-secondary)] mt-0.5 block">{selectedItem.alamat_sekarang}</span>
                                 </div>
                             </div>
+
+                            <div className="bg-[var(--surface)] p-3.5 rounded-xl border border-[var(--border)] space-y-2 font-display">
+                                <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider block">Bukti Pembayaran</span>
+                                {selectedItem.buktiPembayaranUrl ? (
+                                    <div className="flex items-center justify-between bg-[var(--background)] p-2.5 rounded-lg border border-[var(--border)]">
+                                        <span className="text-xs font-medium text-[var(--text-primary)] flex items-center gap-2 truncate">
+                                            <FileText className="w-4 h-4 text-amber-500 shrink-0" />
+                                            Bukti Transfer Rp 100.000
+                                        </span>
+                                        <button
+                                            type="button"
+                                            onClick={() => setPreviewImage({ url: selectedItem.buktiPembayaranUrl!, title: `Bukti Pembayaran - ${selectedItem.namaLengkap}` })}
+                                            className="px-2.5 py-1 bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 text-xs font-bold rounded-md transition-colors flex items-center gap-1 shrink-0 cursor-pointer"
+                                        >
+                                            <ImageIcon className="w-3.5 h-3.5" /> Lihat Bukti
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <span className="text-xs text-[var(--text-muted)] italic block">Belum mengunggah bukti pembayaran</span>
+                                )}
+                            </div>
                         </div>
 
-                        <div className="pt-2 border-t border-[var(--border)]">
-                            <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase block mb-2 sm:mb-3 font-display tracking-wide">Verifikasi Kelayakan Peserta:</span>
+                        <div className="pt-2 border-t border-[var(--border)] font-display">
+                            <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase block mb-2 tracking-wide">Verifikasi Kelayakan Peserta:</span>
                             <div className="flex gap-2">
                                 <button
                                     onClick={() => handleUpdateStatus(selectedItem.id, 'verified')}
                                     disabled={isSaving}
-                                    className={`flex-1 py-2 sm:py-2.5 px-3 text-xs font-bold rounded-xl border transition-all cursor-pointer font-display flex items-center justify-center gap-1.5 ${
+                                    className={`flex-1 py-2.5 px-3 text-xs font-bold rounded-xl border transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                                         selectedItem.status === 'verified'
                                             ? 'bg-green-600 text-white border-green-600 shadow-sm'
                                             : 'bg-[var(--surface-2)] text-[var(--text-primary)] border-[var(--border)] hover:bg-[var(--surface)]'
@@ -525,7 +643,7 @@ export default function AdminDaftarDadPage() {
                                 <button
                                     onClick={() => handleUpdateStatus(selectedItem.id, 'rejected')}
                                     disabled={isSaving}
-                                    className={`flex-1 py-2 sm:py-2.5 px-3 text-xs font-bold rounded-xl border transition-all cursor-pointer font-display flex items-center justify-center gap-1.5 ${
+                                    className={`flex-1 py-2.5 px-3 text-xs font-bold rounded-xl border transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                                         selectedItem.status === 'rejected'
                                             ? 'bg-red-600 text-white border-red-600 shadow-sm'
                                             : 'bg-[var(--surface-2)] text-[var(--text-primary)] border-[var(--border)] hover:bg-[var(--surface)]'
@@ -539,6 +657,57 @@ export default function AdminDaftarDadPage() {
                     </div>
                 </div>
             )}
+
+            {idCardItem && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+                    <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl max-w-sm w-full p-5 shadow-2xl relative space-y-4 animate-in fade-in zoom-in-95 duration-200">
+                        <div className="flex items-center justify-between pb-3 border-b border-[var(--border)] font-display">
+                            <div>
+                                <h3 className="text-sm font-black text-[var(--text-primary)] uppercase tracking-wider">Pratinjau ID Card Peserta</h3>
+                                <p className="text-[11px] text-[var(--text-muted)] mt-0.5">{idCardItem.namaLengkap}</p>
+                            </div>
+                            <button
+                                onClick={() => setIdCardItem(null)}
+                                className="p-1.5 text-[var(--text-muted)] hover:text-[var(--text-primary)] rounded-lg hover:bg-[var(--surface-2)] transition-colors cursor-pointer"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        <div className="py-2">
+                            <IdCardResult data={getIdCardData(idCardItem)} />
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {previewImage && (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+                    <div className="relative max-w-2xl w-full flex flex-col items-center">
+                        <button
+                            onClick={() => setPreviewImage(null)}
+                            className="absolute -top-10 right-0 p-2 text-white/80 hover:text-white transition-colors cursor-pointer"
+                        >
+                            <X className="w-6 h-6" />
+                        </button>
+                        <h4 className="text-white text-sm font-bold mb-3 font-display">{previewImage.title}</h4>
+                        <img
+                            src={previewImage.url}
+                            alt={previewImage.title}
+                            className="max-h-[80vh] w-auto max-w-full rounded-2xl object-contain border border-white/20 shadow-2xl"
+                        />
+                        <a
+                            href={previewImage.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="mt-4 px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded-xl transition-colors flex items-center gap-2 font-display"
+                        >
+                            <ExternalLink className="w-4 h-4" /> Buka Ukuran Penuh
+                        </a>
+                    </div>
+                </div>
+            )}
+
         </div>
     )
 }

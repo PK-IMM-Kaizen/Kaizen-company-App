@@ -2,6 +2,7 @@ import type { ChangeEvent } from 'react'
 
 export type FieldName =
     | 'namaLengkap'
+    | 'nomorHp'
     | 'tempatLahir'
     | 'tanggalLahir'
     | 'nim'
@@ -24,7 +25,7 @@ export type FieldBinding = {
 export type BindFn = (name: FieldName) => FieldBinding
 
 export const steps: { title: string; fields: FieldName[] }[] = [
-    { title: 'Data diri', fields: ['namaLengkap', 'tempatLahir', 'tanggalLahir'] },
+    { title: 'Data diri', fields: ['namaLengkap', 'nomorHp', 'tempatLahir', 'tanggalLahir'] },
     { title: 'Kampus', fields: ['nim', 'prodi', 'asal', 'alamatSekarang'] },
     { title: 'Foto', fields: [] },
     { title: 'Pembayaran', fields: [] }
@@ -39,6 +40,7 @@ export const maxBuktiSize = 5 * 1024 * 1024
 
 export const initialValues: FormValues = {
     namaLengkap: '',
+    nomorHp: '',
     tempatLahir: '',
     tanggalLahir: '',
     nim: '',
@@ -50,6 +52,13 @@ export const initialValues: FormValues = {
 export const validators: Record<FieldName, (v: string) => string> = {
     namaLengkap: v =>
         v.trim().length < 3 ? 'Tulis nama lengkap sesuai identitas, minimal 3 huruf.' : '',
+    nomorHp: v => {
+        const cleaned = v.replace(/\D/g, '')
+        if (!cleaned) return 'Isi nomor WhatsApp/HP aktif.'
+        if (cleaned.length < 10 || cleaned.length > 14)
+            return 'Nomor HP tidak valid (minimal 10 dan maksimal 14 digit).'
+        return ''
+    },
     tempatLahir: v => (!v.trim() ? 'Isi kota tempat kamu lahir.' : ''),
     tanggalLahir: v => {
         if (!v) return 'Pilih tanggal lahir.'

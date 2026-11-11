@@ -3,6 +3,16 @@ import PaymentInfo from './PaymentInfo'
 import ReviewSummary from './ReviewSummary'
 import type { FormValues } from './Form'
 
+interface StepPembayaranProps {
+    values: FormValues
+    bukti: File | null
+    buktiUrl: string | null
+    buktiError: string
+    onPick: (file?: File) => void
+    onRemove: () => void
+    onEditData: () => void
+}
+
 export default function StepPembayaran({
                                            values,
                                            bukti,
@@ -11,18 +21,11 @@ export default function StepPembayaran({
                                            onPick,
                                            onRemove,
                                            onEditData
-                                       }: {
-    values: FormValues
-    bukti: File | null
-    buktiUrl: string | null
-    buktiError: string
-    onPick: (file?: File) => void
-    onRemove: () => void
-    onEditData: () => void
-}) {
+                                       }: StepPembayaranProps) {
     return (
-        <>
+        <div className="space-y-5 sm:space-y-6">
             <PaymentInfo />
+
             <FileDropzone
                 id="bukti"
                 title="Unggah bukti pembayaran"
@@ -35,7 +38,8 @@ export default function StepPembayaran({
                 onPick={onPick}
                 onRemove={onRemove}
             />
+
             <ReviewSummary values={values} onEdit={onEditData} />
-        </>
+        </div>
     )
 }
