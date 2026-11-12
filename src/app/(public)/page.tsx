@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import { createBrowserClient } from '@supabase/ssr'
 
@@ -32,6 +32,37 @@ interface BPH {
     photo: string
 }
 
+const BG_GRID = {
+    backgroundImage:
+        'linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(180deg,#701b1b,#561212)',
+    backgroundSize: '56px 56px,56px 56px,100% 100%'
+}
+
+const PAPER =
+    'rounded-[28px] bg-white text-[#2b1414] p-5 sm:p-8 md:p-10 shadow-[8px_-8px_0_0_#f6c244,0_24px_50px_-14px_rgba(0,0,0,0.5)] sm:shadow-[14px_-14px_0_0_#f6c244,0_24px_50px_-14px_rgba(0,0,0,0.5)]'
+
+const CHIP =
+    'inline-block rounded bg-[#f4b82e] px-2.5 py-0.5 text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#4d1010] font-display'
+
+const BTN =
+    'mb-1 inline-flex items-center justify-center gap-2 rounded-full px-6 sm:px-8 py-3 sm:py-3.5 text-xs sm:text-sm font-bold font-display transition active:translate-y-[3px] motion-reduce:transition-none'
+const BTN_GOLD = `${BTN} bg-[#f4b82e] text-[#4d1010] shadow-[0_5px_0_rgba(0,0,0,0.35)] hover:bg-[#ffc845] active:shadow-[0_2px_0_rgba(0,0,0,0.35)]`
+const BTN_MAROON = `${BTN} bg-[#6b1b1b] text-white shadow-[0_5px_0_#f4b82e] hover:bg-[#561212] active:shadow-[0_2px_0_#f4b82e]`
+const BTN_LINE = `${BTN} border-2 border-white/50 text-white hover:bg-white/10`
+
+const STARS = [
+    '-left-10 top-[14%] h-32 w-32 blur-[3px] animate-[spin_90s_linear_infinite]',
+    '-right-8 top-[6%] h-28 w-28 blur-[2px] animate-[spin_70s_linear_infinite_reverse]',
+    'right-[5%] top-[46%] hidden h-40 w-40 blur-[5px] lg:block',
+    '-left-14 top-[72%] h-44 w-44 blur-[6px]'
+]
+
+const FAQ_DATA = [
+    { id: 1, question: 'Bagaimana cara bergabung dengan IMM Kaizen?', answer: 'Mahasiswa Universitas Muhammadiyah Surabaya dapat bergabung melalui kegiatan Darul Arqam Dasar (DAD) yang rutin kami selenggarakan di awal semester.' },
+    { id: 2, question: 'Apa saja fokus kegiatan di IMM?', answer: 'Kami bergerak di tiga ranah utama (Tri Kompetensi Dasar): Keagamaan, Kemahasiswaan, dan Kemasyarakatan. Mulai dari kajian, diskusi publik, hingga aksi sosial.' },
+    { id: 3, question: 'Apakah mahasiswa non-Muhammadiyah bisa bergabung?', answer: 'Tentu. Ikatan Mahasiswa Muhammadiyah sangat inklusif. Kami menerima siapapun yang memiliki visi selaras untuk belajar dan berproses bersama.' }
+]
+
 export default function HomePage() {
     const [openFaq, setOpenFaq] = useState<number | null>(null)
 
@@ -43,53 +74,35 @@ export default function HomePage() {
     const [isLoadingNews, setIsLoadingNews] = useState(true)
     const [isLoadingBph, setIsLoadingBph] = useState(true)
 
-    const supabase = createBrowserClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    const supabase = useMemo(
+        () =>
+            createBrowserClient(
+                process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+            ),
+        []
     )
 
     useEffect(() => {
         const fetchAllData = async () => {
             try {
-                const agendasPromise = supabase
-                    .from('agendas')
-                    .select('*')
-                    .order('created_at', { ascending: false })
-                    .limit(3)
-
-                const newsPromise = supabase
-                    .from('news')
-                    .select('*')
-                    .eq('status', 'published')
-                    .order('created_at', { ascending: false })
-                    .limit(3)
-
-                const bphPromise = supabase
-                    .from('pengurus')
-                    .select('*')
-                    .eq('division', 'BPH')
-                    .order('created_at', { ascending: true })
-
                 const [agendasRes, newsRes, bphRes] = await Promise.all([
-                    agendasPromise,
-                    newsPromise,
-                    bphPromise
+                    supabase.from('agendas').select('*').order('created_at', { ascending: false }).limit(3),
+                    supabase.from('news').select('*').eq('status', 'published').order('created_at', { ascending: false }).limit(3),
+                    supabase.from('pengurus').select('*').eq('division', 'BPH').order('created_at', { ascending: true })
                 ])
 
                 if (agendasRes.error) console.error('Error fetching agendas:', agendasRes.error)
                 else if (agendasRes.data) setUpcomingAgendas(agendasRes.data)
-                setIsLoadingAgendas(false)
 
                 if (newsRes.error) console.error('Error fetching news:', newsRes.error)
                 else if (newsRes.data) setLatestNews(newsRes.data)
-                setIsLoadingNews(false)
 
                 if (bphRes.error) console.error('Error fetching BPH:', JSON.stringify(bphRes.error, null, 2))
                 else if (bphRes.data) setBphData(bphRes.data)
-                setIsLoadingBph(false)
-
             } catch (error) {
                 console.error('Unexpected error fetching data:', error)
+            } finally {
                 setIsLoadingAgendas(false)
                 setIsLoadingNews(false)
                 setIsLoadingBph(false)
@@ -99,135 +112,101 @@ export default function HomePage() {
         fetchAllData()
     }, [supabase])
 
-    const faqData = [
-        { id: 1, question: 'Bagaimana cara bergabung dengan IMM Kaizen?', answer: 'Mahasiswa Universitas Muhammadiyah Surabaya dapat bergabung melalui kegiatan Darul Arqam Dasar (DAD) yang rutin kami selenggarakan di awal semester.' },
-        { id: 2, question: 'Apa saja fokus kegiatan di IMM?', answer: 'Kami bergerak di tiga ranah utama (Tri Kompetensi Dasar): Keagamaan, Kemahasiswaan, dan Kemasyarakatan. Mulai dari kajian, diskusi publik, hingga aksi sosial.' },
-        { id: 3, question: 'Apakah mahasiswa non-Muhammadiyah bisa bergabung?', answer: 'Tentu. Ikatan Mahasiswa Muhammadiyah sangat inklusif. Kami menerima siapapun yang memiliki visi selaras untuk belajar dan berproses bersama.' },
-    ]
-
-    const toggleFaq = (index: number) => {
-        setOpenFaq(openFaq === index ? null : index)
-    }
-
     return (
-        <div className="w-full bg-[var(--surface)] overflow-x-hidden font-sans selection:bg-[var(--primary)] selection:text-white">
-            <section className="relative w-full min-h-[100dvh] flex flex-col items-center justify-center bg-[#111111] pt-20 sm:pt-24 pb-16 sm:pb-20 px-4 sm:px-6">
+        <div
+            style={BG_GRID}
+            className="relative w-full overflow-x-hidden bg-[#5a1313] font-sans text-white selection:bg-[#f4b82e] selection:text-[#4d1010]"
+        >
+            {STARS.map(c => (
                 <div
-                    className="absolute inset-0 z-0 bg-cover bg-center opacity-90"
-                    style={{
-                        backgroundImage: `url('/img/bg-hero.webp')`,
-                    }}
+                    key={c}
+                    aria-hidden
+                    className={`pointer-events-none absolute rotate-12 rounded-[38%] bg-gradient-to-br from-[#ffd567] to-[#e9a010] motion-reduce:animate-none ${c}`}
                 />
+            ))}
+
+            <section className="relative flex min-h-[100dvh] w-full flex-col items-center justify-center px-4 pb-16 pt-24 sm:px-6 sm:pb-20">
                 <div
-                    className="absolute inset-0 z-0 opacity-90"
-                    style={{
-                        background: `linear-gradient(to bottom, rgba(204, 16, 33, 0.8), rgba(17, 17, 17, 0.85), #111111)`
-                    }}
+                    className="absolute inset-0 bg-cover bg-center opacity-20"
+                    style={{ backgroundImage: `url('/img/bg-hero.webp')` }}
                 />
 
-                <div className="relative z-10 max-w-4xl mx-auto flex flex-col items-center text-center w-full mt-4 sm:mt-8">
-                    <div className="flex items-center justify-center gap-2 sm:gap-4 mb-3 sm:mb-4">
-                        <div className="h-[1px] w-6 sm:w-12 bg-[var(--accent-light)]" />
-                        <span className="text-[10px] sm:text-xs md:text-sm font-bold tracking-[0.2em] uppercase text-[var(--accent-light)] font-display">
-                            Pimpinan Komisariat
+                <div className="relative z-10 mx-auto mt-4 flex w-full max-w-4xl flex-col items-center text-center sm:mt-8">
+                    <span className={`${CHIP} mb-5`}>Pimpinan Komisariat</span>
+
+                    <h1 className="mb-4 font-display font-black leading-[1.1]">
+                        <span className="block text-lg tracking-tight text-white sm:text-3xl">
+                            IKATAN MAHASISWA MUHAMMADIYAH
                         </span>
-                        <div className="h-[1px] w-6 sm:w-12 bg-[var(--accent-light)]" />
-                    </div>
-
-                    <h1 className="text-2xl xs:text-3xl sm:text-5xl md:text-1.5xl font-black text-white leading-[1.15] mb-3 sm:mb-4 tracking-tight font-display">
-                        IKATAN MAHASISWA MUHAMMADIYAH <br />
-                        <span className="text-[var(--accent)]">KAIZEN</span>
+                        <span
+                            aria-label="Kaizen"
+                            className="mt-2 grid text-6xl uppercase drop-shadow-[0_6px_0_rgba(0,0,0,0.25)] sm:text-8xl [&>span]:[grid-area:1/1]"
+                        >
+                            <span aria-hidden className="text-white [-webkit-text-stroke:0.2em_#fff] [stroke-linejoin:round]">Kaizen</span>
+                            <span aria-hidden className="bg-gradient-to-b from-[#6b1b1b] to-[#c4585f] bg-clip-text text-transparent">Kaizen</span>
+                        </span>
                     </h1>
 
-                    <p className="text-xs sm:text-base md:text-lg font-bold text-white/90 mb-6 sm:mb-8 tracking-widest uppercase">
+                    <p className="mb-6 text-xs font-bold uppercase tracking-widest text-white/90 sm:mb-8 sm:text-base md:text-lg">
                         Universitas Muhammadiyah Surabaya
                     </p>
 
-                    <p className="text-xs sm:text-sm md:text-base leading-relaxed text-white/80 max-w-2xl mb-8 sm:mb-10 px-2">
+                    <p className="mb-8 max-w-2xl px-2 text-xs leading-relaxed text-white/80 sm:mb-10 sm:text-sm md:text-base">
                         Platform digital resmi IMM Komisariat Kaizen. Bergerak bersama dalam ilmu, iman, dan amal nyata untuk membangun peradaban masyarakat.
                     </p>
 
-                    <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full sm:w-auto px-4 xs:px-0">
-                        <Link
-                            href="/profil"
-                            className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-3.5 bg-[var(--accent)] text-white text-xs sm:text-sm font-bold rounded-full transition-all hover:bg-[#c96c15] hover:scale-105 shadow-lg shadow-[var(--accent)]/20 font-display flex justify-center text-center"
-                        >
-                            Profil Organisasi
-                        </Link>
-                        <Link
-                            href="/berita"
-                            className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-3.5 bg-transparent border border-white/40 text-white text-xs sm:text-sm font-bold rounded-full transition-all hover:bg-white/10 font-display flex justify-center text-center"
-                        >
-                            Lihat Berita
-                        </Link>
+                    <div className="flex w-full flex-col items-center gap-3 px-4 sm:w-auto sm:flex-row sm:gap-4 sm:px-0">
+                        <Link href="/profil" className={`${BTN_GOLD} w-full sm:w-auto`}>Profil Organisasi</Link>
+                        <Link href="/berita" className={`${BTN_LINE} w-full sm:w-auto`}>Lihat Berita</Link>
                     </div>
 
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 md:gap-16 w-full max-w-3xl mt-12 sm:mt-16 pt-8 sm:pt-10 border-t border-white/15">
+                    <div className="mt-12 grid w-full max-w-3xl grid-cols-2 gap-6 border-t border-white/15 pt-8 sm:mt-16 sm:gap-8 sm:pt-10 md:grid-cols-4 md:gap-16">
                         {[
                             { label: 'Anggota Aktif', value: '120+' },
                             { label: 'Bidang', value: '10' },
                             { label: 'Tahun Berdiri', value: '2017' },
-                            { label: 'Alumni', value: '300+' },
+                            { label: 'Alumni', value: '300+' }
                         ].map(s => (
                             <div key={s.label} className="flex flex-col items-center">
-                                <div className="text-2xl sm:text-3xl font-black text-white font-display">
-                                    {s.value}
-                                </div>
-                                <div className="text-[10px] sm:text-xs mt-1 text-white/60 uppercase tracking-wider font-semibold text-center">
-                                    {s.label}
-                                </div>
+                                <div className="font-display text-2xl font-black text-[#f4b82e] sm:text-3xl">{s.value}</div>
+                                <div className="mt-1 text-center text-[10px] font-semibold uppercase tracking-wider text-white/70 sm:text-xs">{s.label}</div>
                             </div>
                         ))}
                     </div>
                 </div>
             </section>
 
-            <section className="py-16 sm:py-20 md:py-24 bg-[var(--background)] border-b border-[var(--border)]">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-12 lg:gap-16 items-center mb-16 sm:mb-24">
-                        <div className="relative aspect-[4/3] lg:aspect-square bg-[#111111] overflow-hidden group rounded-[var(--radius)] border border-[var(--border)] shadow-xl">
+            <section className="relative px-4 py-16 sm:px-6 sm:py-20 md:py-24 lg:px-8">
+                <div className="mx-auto max-w-7xl">
+                    <div className={`${PAPER} grid grid-cols-1 items-center gap-8 lg:grid-cols-2 lg:gap-14`}>
+                        <div className="group relative aspect-[4/3] overflow-hidden rounded-2xl bg-[#111] lg:aspect-square">
                             <img
                                 src="https://pwmu.co/wp-content/uploads/2026/09/konsep-otomatis-V9a3.jpeg"
                                 alt="Profil IMM Kaizen"
-                                className="w-full h-full object-cover grayscale opacity-80 transition-all duration-700 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105"
+                                className="h-full w-full object-cover grayscale opacity-80 transition-all duration-700 group-hover:scale-105 group-hover:grayscale-0 group-hover:opacity-100"
                             />
-                            <div className="absolute inset-0 border-[6px] sm:border-[8px] border-white/10 mix-blend-overlay"></div>
                         </div>
 
-                        <div className="flex flex-col justify-center">
-                            <span className="section-label mb-3 sm:mb-4 block">Tentang Kami</span>
-                            <h2 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-black text-[var(--text-primary)] leading-[1.15] mb-4 sm:mb-6 tracking-tight font-display">
+                        <div className="flex flex-col items-start justify-center">
+                            <span className={`${CHIP} mb-4`}>Tentang Kami</span>
+                            <h2 className="mb-4 font-display text-2xl font-black leading-[1.15] tracking-tight text-[#6b1b1b] sm:mb-6 sm:text-4xl md:text-5xl">
                                 Melahirkan Pemimpin Masa Depan.
                             </h2>
-                            <p className="text-[var(--text-secondary)] text-sm sm:text-base md:text-lg leading-relaxed mb-6 sm:mb-8">
-                                IMM Komisariat Kaizen adalah organisasi mahasiswa Islam di bawah Ikatan Mahasiswa Muhammadiyah. Dengan semangat <em className="font-semibold text-[var(--text-primary)]">Kaizen</em> (perbaikan terus-menerus), kami mendorong setiap kader untuk berinovasi, mandiri, dan berkontribusi nyata bagi masyarakat.
+                            <p className="mb-6 text-sm leading-relaxed text-[#5b4a47] sm:mb-8 sm:text-base md:text-lg">
+                                IMM Komisariat Kaizen adalah organisasi mahasiswa Islam di bawah Ikatan Mahasiswa Muhammadiyah. Dengan semangat <em className="font-semibold text-[#2b1414]">Kaizen</em> (perbaikan terus-menerus), kami mendorong setiap kader untuk berinovasi, mandiri, dan berkontribusi nyata bagi masyarakat.
                             </p>
-                            <div>
-                                <Link
-                                    href="/profil"
-                                    className="px-6 sm:px-8 py-3.5 sm:py-4 bg-[#111111] text-white text-xs sm:text-sm font-bold tracking-widest uppercase hover:bg-[var(--primary)] transition-all flex items-center justify-center gap-3 group w-full sm:w-fit rounded-[var(--radius)] font-display"
-                                >
-                                    Profil Selengkapnya
-                                    <span className="transition-transform group-hover:translate-x-1">→</span>
-                                </Link>
-                            </div>
+                            <Link href="/profil" className={`${BTN_MAROON} w-full sm:w-auto`}>
+                                Profil Selengkapnya <span aria-hidden>→</span>
+                            </Link>
                         </div>
                     </div>
 
-                    <div className="w-full flex flex-col items-center border-t border-[var(--border)] pt-12 sm:pt-16">
-                        <div className="flex items-center gap-3 mb-6 sm:mb-8">
-                            <div className="h-[1px] w-6 sm:w-12 bg-[var(--border-strong)]"></div>
-                            <span className="text-xs sm:text-sm font-bold text-[var(--text-muted)] tracking-[0.2em] uppercase text-center font-display">
-                                Profil Organisasi
-                            </span>
-                            <div className="h-[1px] w-6 sm:w-12 bg-[var(--border-strong)]"></div>
-                        </div>
-
-                        <div className="w-full max-w-5xl bg-black border border-[var(--border)] overflow-hidden shadow-2xl aspect-[16/9] relative rounded-[var(--radius)]">
+                    <div className="mt-16 flex flex-col items-center sm:mt-20">
+                        <span className={`${CHIP} mb-6`}>Video Profil</span>
+                        <div className="relative aspect-[16/9] w-full max-w-5xl overflow-hidden rounded-3xl bg-black shadow-2xl ring-4 ring-white">
                             <video
                                 src="/video/profile.mp4"
-                                className="absolute inset-0 w-full h-full object-cover"
+                                className="absolute inset-0 h-full w-full object-cover"
                                 controls
                                 autoPlay
                                 muted
@@ -239,73 +218,57 @@ export default function HomePage() {
                             </video>
                         </div>
                     </div>
-
                 </div>
             </section>
 
-            <section className="py-16 sm:py-20 md:py-24 bg-[var(--surface)]">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex flex-col items-center text-center mb-12 sm:mb-16">
-                        <span className="text-xs font-bold text-[var(--accent)] tracking-[0.2em] uppercase mb-2 sm:mb-3 block font-display">Kabar Terkini</span>
-                        <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-[var(--text-primary)] font-display tracking-tight">
-                            Berita & Dokumentasi
-                        </h2>
+            <section className="relative px-4 py-16 sm:px-6 sm:py-20 md:py-24 lg:px-8">
+                <div className="mx-auto max-w-7xl">
+                    <div className="mb-12 flex flex-col items-center text-center sm:mb-16">
+                        <span className={`${CHIP} mb-3`}>Kabar Terkini</span>
+                        <h2 className="font-display text-2xl font-black tracking-tight sm:text-3xl md:text-4xl">Berita & Dokumentasi</h2>
                     </div>
 
                     {isLoadingNews ? (
-                        <div className="py-12 text-center w-full">
-                            <span className="text-[var(--text-muted)] text-sm animate-pulse font-medium">Memuat berita terbaru...</span>
-                        </div>
+                        <p className="animate-pulse py-12 text-center text-sm text-white/70">Memuat berita terbaru...</p>
                     ) : latestNews.length === 0 ? (
-                        <div className="py-12 text-center w-full bg-[var(--background)] rounded-[var(--radius)] border border-[var(--border)] p-6">
-                            <span className="text-[var(--text-secondary)] text-sm">Belum ada berita yang dipublikasikan.</span>
-                        </div>
+                        <p className="rounded-2xl border border-white/20 p-6 py-12 text-center text-sm text-white/70">Belum ada berita yang dipublikasikan.</p>
                     ) : (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-                            {latestNews.map((item) => (
+                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 lg:grid-cols-3">
+                            {latestNews.map(item => (
                                 <article
                                     key={item.id}
-                                    className="group bg-[var(--card)] border border-[var(--border)] hover:border-[var(--text-primary)] transition-colors flex flex-col h-full rounded-[var(--radius)] overflow-hidden shadow-sm"
+                                    className="group flex h-full flex-col overflow-hidden rounded-3xl bg-white text-[#2b1414] shadow-lg transition duration-200 hover:-translate-y-1 hover:ring-4 hover:ring-[#f4b82e] motion-reduce:transition-none"
                                 >
-                                    <Link
-                                        href={`/berita/${item.id}`}
-                                        className="relative aspect-[16/10] overflow-hidden bg-[var(--surface-2)] block"
-                                    >
+                                    <Link href={`/berita/${item.id}`} className="relative block aspect-[16/10] overflow-hidden bg-[#eee]">
                                         <img
                                             src={item.cover}
                                             alt={item.title}
-                                            className="w-full h-full object-cover grayscale opacity-90 transition-all duration-700 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105"
+                                            className="h-full w-full object-cover grayscale opacity-90 transition-all duration-700 group-hover:scale-105 group-hover:grayscale-0 group-hover:opacity-100"
                                         />
-                                        <div className="absolute top-3 left-3 bg-[#111111] text-white px-2.5 py-1 rounded-[calc(var(--radius)-2px)]">
-                                            <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest font-display">{item.category}</span>
-                                        </div>
+                                        <span className="absolute left-3 top-3 rounded bg-[#6b1b1b] px-2.5 py-1 font-display text-[9px] font-bold uppercase tracking-widest text-white sm:text-[10px]">
+                                            {item.category}
+                                        </span>
                                     </Link>
 
-                                    <div className="p-5 sm:p-6 md:p-8 flex flex-col flex-1">
-                                        <span className="text-[11px] sm:text-xs text-[var(--text-muted)] font-bold tracking-wider uppercase mb-2 sm:mb-3 block">
-                                            {item.publishDate}
-                                        </span>
+                                    <div className="flex flex-1 flex-col p-5 sm:p-6">
+                                        <span className="mb-2 block text-[11px] font-bold uppercase tracking-wider text-[#7d6b68] sm:text-xs">{item.publishDate}</span>
                                         <Link href={`/berita/${item.id}`}>
-                                            <h3 className="font-black text-base sm:text-lg md:text-xl leading-snug mb-3 text-[var(--text-primary)] group-hover:text-[var(--primary)] transition-colors cursor-pointer font-display line-clamp-2">
+                                            <h3 className="mb-3 line-clamp-2 font-display text-base font-black leading-snug transition-colors group-hover:text-[#6b1b1b] sm:text-lg md:text-xl">
                                                 {item.title}
                                             </h3>
                                         </Link>
-                                        <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed line-clamp-3 mb-6">
-                                            {item.excerpt}
-                                        </p>
+                                        <p className="mb-6 line-clamp-3 text-xs leading-relaxed text-[#5b4a47] sm:text-sm">{item.excerpt}</p>
 
-                                        <div className="mt-auto pt-4 border-t border-[var(--border)]">
-                                            {item.pwmuUrl && (
-                                                <a
-                                                    href={item.pwmuUrl}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="text-[11px] sm:text-xs font-bold text-[var(--text-primary)] uppercase tracking-widest border-b-2 border-[var(--text-primary)] pb-1 hover:text-[var(--primary)] hover:border-[var(--primary)] transition-colors inline-flex items-center gap-1.5 font-display"
-                                                >
-                                                    Baca di PWMU.CO <span>→</span>
-                                                </a>
-                                            )}
-                                        </div>
+                                        {item.pwmuUrl && (
+                                            <a
+                                                href={item.pwmuUrl}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="mt-auto inline-flex items-center gap-1.5 self-start border-b-2 border-[#6b1b1b] pb-1 font-display text-[11px] font-bold uppercase tracking-widest text-[#6b1b1b] transition-colors hover:border-[#f4b82e] sm:text-xs"
+                                            >
+                                                Baca di PWMU.CO <span aria-hidden>→</span>
+                                            </a>
+                                        )}
                                     </div>
                                 </article>
                             ))}
@@ -314,129 +277,105 @@ export default function HomePage() {
                 </div>
             </section>
 
-            <section className="py-16 sm:py-20 md:py-24 bg-[var(--background)] border-y border-[var(--border)]">
-                <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex flex-col items-center text-center mb-12 sm:mb-16">
-                        <span className="section-label mb-2 sm:mb-3 block">Kalender Kegiatan</span>
-                        <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-[var(--text-primary)] font-display tracking-tight">
-                            Agenda Yang Akan Datang.
-                        </h2>
+            <section className="relative px-4 py-16 sm:px-6 sm:py-20 md:py-24 lg:px-8">
+                <div className={`${PAPER} mx-auto max-w-4xl`}>
+                    <div className="mb-10 flex flex-col items-center text-center sm:mb-12">
+                        <span className={`${CHIP} mb-3`}>Kalender Kegiatan</span>
+                        <h2 className="font-display text-2xl font-black tracking-tight text-[#6b1b1b] sm:text-3xl md:text-4xl">Agenda Yang Akan Datang.</h2>
                     </div>
 
                     <div className="flex flex-col gap-4">
                         {isLoadingAgendas ? (
-                            <div className="py-12 text-center">
-                                <span className="text-[var(--text-muted)] text-sm animate-pulse font-medium">Memuat jadwal kegiatan...</span>
-                            </div>
+                            <p className="animate-pulse py-12 text-center text-sm text-[#7d6b68]">Memuat jadwal kegiatan...</p>
                         ) : upcomingAgendas.length === 0 ? (
-                            <div className="py-12 text-center bg-[var(--surface)] rounded-[var(--radius)] border border-[var(--border)] p-6">
-                                <span className="text-[var(--text-secondary)] text-sm">Belum ada agenda dalam waktu dekat.</span>
-                            </div>
+                            <p className="rounded-2xl border border-[#e9ddd7] bg-[#fcf8f5] p-6 py-12 text-center text-sm text-[#5b4a47]">Belum ada agenda dalam waktu dekat.</p>
                         ) : (
-                            upcomingAgendas.map((agenda) => {
-                                const isComingSoon = !agenda.month || (agenda.date && agenda.date.toLowerCase().includes('soon'));
+                            upcomingAgendas.map(agenda => {
+                                const isComingSoon = !agenda.month || (agenda.date && agenda.date.toLowerCase().includes('soon'))
 
                                 return (
                                     <div
                                         key={agenda.id}
-                                        className="group flex flex-col sm:flex-row items-start sm:items-center p-5 sm:p-6 md:p-8 bg-[var(--surface)] border border-[var(--border)] hover:border-[var(--primary)] transition-colors gap-4 sm:gap-6 md:gap-8 rounded-[var(--radius)] shadow-sm"
+                                        className="group flex flex-col items-start gap-4 rounded-2xl border border-[#e9ddd7] bg-[#fcf8f5] p-5 transition-colors hover:border-[#6b1b1b] sm:flex-row sm:items-center sm:gap-6 sm:p-6"
                                     >
                                         {agenda.image_url ? (
-                                            <div className="w-full sm:w-32 md:w-36 aspect-video sm:aspect-square rounded-xl overflow-hidden border border-[var(--border)] shrink-0 bg-[var(--surface-2)] shadow-sm">
+                                            <div className="aspect-video w-full shrink-0 overflow-hidden rounded-xl bg-[#eee] sm:aspect-square sm:w-32 md:w-36">
                                                 <img
                                                     src={agenda.image_url}
                                                     alt={agenda.title}
-                                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                                    onError={(e) => (e.currentTarget.style.display = 'none')}
+                                                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                                    onError={e => (e.currentTarget.style.display = 'none')}
                                                 />
                                             </div>
                                         ) : (
-                                            <div className="flex flex-col items-center justify-center min-w-[80px] sm:min-w-[100px] text-center border-b sm:border-b-0 sm:border-r border-[var(--border-strong)] pb-3 sm:pb-0 sm:pr-6 md:pr-8 w-full sm:w-auto">
-                                    <span
-                                        className={`${isComingSoon ? 'text-lg sm:text-2xl' : 'text-3xl sm:text-4xl'} font-black text-[var(--primary)] uppercase font-display leading-tight`}
-                                    >
-                                        {agenda.date || 'TBA'}
-                                    </span>
+                                            <div className="flex w-full min-w-[80px] flex-col items-center justify-center border-b border-[#e9ddd7] pb-3 text-center sm:w-auto sm:min-w-[100px] sm:border-b-0 sm:border-r sm:pb-0 sm:pr-6">
+                                                <span className={`${isComingSoon ? 'text-lg sm:text-2xl' : 'text-3xl sm:text-4xl'} font-display font-black uppercase leading-tight text-[#6b1b1b]`}>
+                                                    {agenda.date || 'TBA'}
+                                                </span>
                                                 {agenda.month && (
-                                                    <span className="text-xs sm:text-sm font-bold text-[var(--text-muted)] uppercase tracking-widest mt-0.5 sm:mt-1 font-display">
-                                            {agenda.month}
-                                        </span>
+                                                    <span className="mt-0.5 font-display text-xs font-bold uppercase tracking-widest text-[#7d6b68] sm:text-sm">{agenda.month}</span>
                                                 )}
                                             </div>
                                         )}
 
-                                        <div className="flex-1 w-full sm:w-auto">
-                                            <h3 className="text-base sm:text-lg md:text-xl font-bold text-[var(--text-primary)] group-hover:text-[var(--primary)] transition-colors font-display leading-snug">
+                                        <div className="w-full flex-1 sm:w-auto">
+                                            <h3 className="font-display text-base font-bold leading-snug text-[#2b1414] transition-colors group-hover:text-[#6b1b1b] sm:text-lg md:text-xl">
                                                 {agenda.title}
                                             </h3>
-                                            {(agenda.location || agenda.time || (agenda.image_url && agenda.date)) && (
-                                                <div className="flex flex-wrap items-center gap-x-4 sm:gap-x-6 gap-y-1.5 text-xs sm:text-sm text-[var(--text-secondary)] font-medium mt-2">
-                                                    {agenda.image_url && agenda.date && (
-                                                        <span className="flex items-center gap-1.5 font-bold text-[var(--primary)]">
-                                                <span className="w-1.5 h-1.5 bg-[var(--primary)] rounded-full"></span>
-                                                            {agenda.date} {agenda.month || ''}
-                                            </span>
-                                                    )}
-                                                    {agenda.location && (
-                                                        <span className="flex items-center gap-1.5">
-                                                <span className="w-1.5 h-1.5 bg-[var(--text-muted)] rounded-full"></span>
-                                                            {agenda.location}
-                                            </span>
-                                                    )}
-                                                    {agenda.time && (
-                                                        <span className="flex items-center gap-1.5">
-                                                <span className="w-1.5 h-1.5 bg-[var(--text-muted)] rounded-full"></span>
-                                                            {agenda.time}
-                                            </span>
-                                                    )}
-                                                </div>
-                                            )}
+                                            <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs font-medium text-[#5b4a47] sm:text-sm">
+                                                {agenda.image_url && agenda.date && (
+                                                    <span className="flex items-center gap-1.5 font-bold text-[#6b1b1b]">
+                                                        <span className="h-1.5 w-1.5 rounded-full bg-[#f4b82e]" />
+                                                        {agenda.date} {agenda.month || ''}
+                                                    </span>
+                                                )}
+                                                {[agenda.location, agenda.time].filter(Boolean).map(v => (
+                                                    <span key={v} className="flex items-center gap-1.5">
+                                                        <span className="h-1.5 w-1.5 rounded-full bg-[#b3a29d]" />
+                                                        {v}
+                                                    </span>
+                                                ))}
+                                            </div>
                                         </div>
                                     </div>
-                                );
+                                )
                             })
                         )}
                     </div>
                 </div>
             </section>
 
-            <section className="py-16 sm:py-20 md:py-24 bg-[#0a0a0a] text-white">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="mb-12 sm:mb-16 flex flex-col items-center text-center">
-                        <span className="text-xs font-bold text-[var(--accent-light)] tracking-[0.2em] uppercase mb-2 sm:mb-3 block font-display">Pimpinan Komisariat</span>
-                        <h2 className="text-2xl sm:text-3xl md:text-4xl font-black font-display tracking-tight">Badan Pengurus Harian</h2>
+            <section className="relative px-4 py-16 sm:px-6 sm:py-20 md:py-24 lg:px-8">
+                <div className="mx-auto max-w-7xl">
+                    <div className="mb-12 flex flex-col items-center text-center sm:mb-16">
+                        <span className={`${CHIP} mb-3`}>Pimpinan Komisariat</span>
+                        <h2 className="font-display text-2xl font-black tracking-tight sm:text-3xl md:text-4xl">Badan Pengurus Harian</h2>
                     </div>
 
                     {isLoadingBph ? (
-                        <div className="py-12 text-center w-full">
-                            <span className="text-white/50 text-sm animate-pulse font-medium">Memuat data BPH...</span>
-                        </div>
+                        <p className="animate-pulse py-12 text-center text-sm text-white/70">Memuat data BPH...</p>
                     ) : bphData.length === 0 ? (
-                        <div className="py-12 text-center w-full border border-white/10 rounded-[var(--radius)] p-6">
-                            <span className="text-white/50 text-sm">Data kepengurusan belum tersedia.</span>
-                        </div>
+                        <p className="rounded-2xl border border-white/20 p-6 py-12 text-center text-sm text-white/70">Data kepengurusan belum tersedia.</p>
                     ) : (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 lg:grid-cols-3">
                             {bphData.map(bph => (
                                 <div
                                     key={bph.id}
-                                    className="group bg-[#111111] border border-white/10 hover:border-[var(--accent)] transition-colors p-6 sm:p-8 flex flex-col items-center text-center rounded-[var(--radius)] shadow-lg"
+                                    className="group flex flex-col items-center rounded-3xl border border-white/15 bg-white/10 p-6 text-center backdrop-blur-sm transition duration-200 hover:-translate-y-1 hover:border-[#f4b82e] motion-reduce:transition-none sm:p-8"
                                 >
-                                    <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-full overflow-hidden mb-5 sm:mb-6 border-2 border-white/10 group-hover:border-[var(--accent)] transition-colors bg-gray-800 flex items-center justify-center shrink-0">
+                                    <div className="mb-5 flex h-28 w-28 shrink-0 items-center justify-center overflow-hidden rounded-full border-4 border-white bg-[#4d1010] sm:mb-6 sm:h-36 sm:w-36">
                                         {bph.photo ? (
                                             <img
                                                 src={bph.photo}
                                                 alt={bph.name}
-                                                className="w-full h-full object-cover grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500"
+                                                className="h-full w-full object-cover grayscale opacity-80 transition-all duration-500 group-hover:grayscale-0 group-hover:opacity-100"
                                             />
                                         ) : (
-                                            <span className="text-[10px] text-white/40 font-bold uppercase font-display">No Photo</span>
+                                            <span className="font-display text-[10px] font-bold uppercase text-white/50">No Photo</span>
                                         )}
                                     </div>
-                                    <h4 className="font-bold text-lg sm:text-xl text-white mb-1.5 group-hover:text-[var(--accent)] transition-colors font-display">
-                                        {bph.name}
-                                    </h4>
-                                    <span className="text-[10px] sm:text-xs font-bold tracking-widest uppercase text-[var(--accent-light)] font-display">
+                                    <h4 className="mb-1.5 font-display text-lg font-bold text-white sm:text-xl">{bph.name}</h4>
+                                    <span className="rounded bg-[#f4b82e] px-2 py-0.5 font-display text-[10px] font-bold uppercase tracking-widest text-[#4d1010] sm:text-xs">
                                         {bph.position}
                                     </span>
                                 </div>
@@ -446,41 +385,36 @@ export default function HomePage() {
                 </div>
             </section>
 
-            <section className="py-16 sm:py-20 md:py-24 bg-[var(--background)] border-y border-[var(--border)]">
-                <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex flex-col items-center text-center mb-12 sm:mb-16">
-                        <span className="section-label mb-2 sm:mb-3 block">Pusat Informasi</span>
-                        <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-[var(--text-primary)] font-display tracking-tight">
-                            Pertanyaan Seputar IMM Kaizen.
-                        </h2>
+            <section className="relative px-4 py-16 sm:px-6 sm:py-20 md:py-24 lg:px-8">
+                <div className={`${PAPER} mx-auto max-w-3xl`}>
+                    <div className="mb-8 flex flex-col items-center text-center sm:mb-12">
+                        <span className={`${CHIP} mb-3`}>Pusat Informasi</span>
+                        <h2 className="font-display text-2xl font-black tracking-tight text-[#6b1b1b] sm:text-3xl md:text-4xl">Pertanyaan Seputar IMM Kaizen.</h2>
                     </div>
 
-                    <div className="flex flex-col border-t border-[var(--border)]">
-                        {faqData.map((faq, index) => {
-                            const isOpen = openFaq === index;
+                    <div className="flex flex-col border-t border-[#e9ddd7]">
+                        {FAQ_DATA.map((faq, index) => {
+                            const isOpen = openFaq === index
                             return (
-                                <div key={faq.id} className="border-b border-[var(--border)]">
+                                <div key={faq.id} className="border-b border-[#e9ddd7]">
                                     <button
-                                        onClick={() => toggleFaq(index)}
-                                        className="w-full flex items-center justify-between py-5 sm:py-6 text-left focus:outline-none group gap-4 cursor-pointer"
+                                        onClick={() => setOpenFaq(isOpen ? null : index)}
+                                        aria-expanded={isOpen}
+                                        className="group flex w-full cursor-pointer items-center justify-between gap-4 py-5 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#6b1b1b]/40 sm:py-6"
                                     >
-                                        <h4 className="text-sm sm:text-base md:text-lg font-bold text-[var(--text-primary)] group-hover:text-[var(--primary)] transition-colors font-display leading-snug">
+                                        <h4 className="font-display text-sm font-bold leading-snug text-[#2b1414] transition-colors group-hover:text-[#6b1b1b] sm:text-base md:text-lg">
                                             {faq.question}
                                         </h4>
-                                        <div className={`flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center border border-[var(--border-strong)] rounded-full transition-transform duration-300 ${isOpen ? 'rotate-180 bg-[var(--text-primary)] border-[var(--text-primary)] text-white' : 'text-[var(--text-muted)] group-hover:border-[var(--text-primary)] group-hover:text-[var(--text-primary)]'}`}>
-                                            <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border transition-transform duration-300 sm:h-8 sm:w-8 ${isOpen ? 'rotate-180 border-[#6b1b1b] bg-[#6b1b1b] text-white' : 'border-[#d9c9c1] text-[#7d6b68] group-hover:border-[#6b1b1b]'}`}>
+                                            <svg className="h-3.5 w-3.5 sm:h-4 sm:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                                             </svg>
-                                        </div>
+                                        </span>
                                     </button>
 
-                                    <div
-                                        className={`grid transition-all duration-300 ease-in-out ${isOpen ? 'grid-rows-[1fr] opacity-100 pb-5 sm:pb-6' : 'grid-rows-[0fr] opacity-0'}`}
-                                    >
+                                    <div className={`grid transition-all duration-300 ease-in-out ${isOpen ? 'grid-rows-[1fr] pb-5 opacity-100 sm:pb-6' : 'grid-rows-[0fr] opacity-0'}`}>
                                         <div className="overflow-hidden">
-                                            <p className="text-[var(--text-secondary)] text-xs sm:text-sm md:text-base leading-relaxed pr-2 sm:pr-8">
-                                                {faq.answer}
-                                            </p>
+                                            <p className="pr-2 text-xs leading-relaxed text-[#5b4a47] sm:pr-8 sm:text-sm md:text-base">{faq.answer}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -490,28 +424,20 @@ export default function HomePage() {
                 </div>
             </section>
 
-            <section className="bg-[var(--primary)] py-10 sm:py-12 md:py-16">
-                <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+            <section className="relative bg-[#f4b82e] py-10 text-[#4d1010] sm:py-12 md:py-16">
+                <div className="mx-auto flex max-w-4xl flex-col items-center justify-between gap-6 px-4 text-center sm:px-6 md:flex-row md:text-left lg:px-8">
                     <div className="max-w-xl">
-                        <span className="text-[10px] font-bold text-[var(--accent-light)] tracking-[0.2em] uppercase mb-1 block font-display">
-                            Suara Mahasiswa
-                        </span>
-                        <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-white tracking-tight font-display">
-                            SAMPAIKAN ASPIRASIMU!
-                        </h3>
-                        <p className="text-white/85 text-xs sm:text-sm mt-1.5 leading-relaxed">
+                        <span className="mb-1 block font-display text-[10px] font-bold uppercase tracking-[0.2em]">Suara Mahasiswa</span>
+                        <h3 className="font-display text-xl font-black tracking-tight sm:text-2xl md:text-3xl">SAMPAIKAN ASPIRASIMU!</h3>
+                        <p className="mt-1.5 text-xs leading-relaxed sm:text-sm">
                             Punya ide, kritik, atau saran untuk komisariat? Suaramu sangat berarti untuk perubahan yang lebih baik.
                         </p>
                     </div>
-                    <Link
-                        href="/aspirasi"
-                        className="w-full sm:w-auto whitespace-nowrap px-6 sm:px-8 py-3 sm:py-3.5 bg-white text-[var(--primary)] text-xs font-black tracking-widest uppercase hover:bg-[#111111] hover:text-white transition-all shadow-md hover:scale-105 shrink-0 rounded-[var(--radius)] font-display flex items-center justify-center"
-                    >
+                    <Link href="/aspirasi" className={`${BTN_MAROON} w-full shrink-0 whitespace-nowrap uppercase tracking-widest sm:w-auto`}>
                         Kirim Aspirasi
                     </Link>
                 </div>
             </section>
-
         </div>
     )
 }
