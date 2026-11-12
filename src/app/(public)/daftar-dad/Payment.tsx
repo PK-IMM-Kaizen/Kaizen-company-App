@@ -1,5 +1,5 @@
 export const paymentConfig = {
-    amount: 100000,
+    amount: 85000,
     methods: [
         {
             name: 'BRI',
