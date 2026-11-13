@@ -26,7 +26,7 @@ export default function PageShell({ children }: { children: ReactNode }) {
                 <p className="flex items-center gap-3 rounded-full bg-white px-5 py-2 text-xs font-bold text-[#4d1010] shadow-lg sm:text-sm">
                     <span>@IMM Kaizen UMSURA</span>
                     <span aria-hidden className="h-4 w-px bg-[#4d1010]/40" />
-                    <span>Bidang Kader</span>
+                    <span>Bidang Kaderisasi</span>
                 </p>
             </footer>
         </div>

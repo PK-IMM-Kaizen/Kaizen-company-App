@@ -1,11 +1,12 @@
 export const timeline: { date: string; label: string }[] = [
-    { date: '12 Nov 2026', label: 'Pendaftaran dibuka' },
-    { date: '26 Nov 2026', label: 'Pendaftaran ditutup' },
-    { date: '26 Nov 2026', label: 'Pra-DAD 2026' },
-    { date: '27 Nov 2026', label: 'Seleksi berkas' },
-    { date: '28-30 Nov 2026', label: 'Screening' },
-    { date: '31 Nov 2026', label: 'Pengumuman' },
-    { date: '4-6 Des 2026', label: 'DAD 2026' }
+    { date: '12 Nov', label: 'Pendaftaran dibuka' },
+    { date: '15 Nov', label: 'Pendaftaran ditutup' },
+    { date: '16-18 Nov', label: 'Screening Batch 1' },
+    { date: '26 Nov', label: 'Pra-DAD 2026' },
+    { date: '27-29 Nov', label: 'Screening Batch 2' },
+    { date: '30 Nov', label: 'Seleksi Berkas' },
+    { date: '1 Des', label: 'Pengumuman' },
+    { date: '4-6 Des', label: 'Pelaksanaan DAD 2026' }
 ]
 
 export const contacts: { name: string; display: string; wa: string }[] = [
@@ -14,19 +15,22 @@ export const contacts: { name: string; display: string; wa: string }[] = [
 ]
 
 export const registrationOpen = new Date('2026-11-12T00:00:00+07:00')
-export const registrationClose = new Date('2026-11-26T23:59:59+07:00')
+export const registrationClose = new Date('2026-11-15T23:59:59+07:00')
+
+export const formatDate = (d: Date) =>
+    d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' })
 
 export type RegistrationPhase =
     | { kind: 'before'; days: number }
     | { kind: 'open'; days: number }
     | { kind: 'closed' }
 
-const DAY = 86_400_000
+const day = 86_400_000
 
 export function getRegistrationPhase(now: Date): RegistrationPhase {
     if (now < registrationOpen)
-        return { kind: 'before', days: Math.ceil((registrationOpen.getTime() - now.getTime()) / DAY) }
+        return { kind: 'before', days: Math.ceil((registrationOpen.getTime() - now.getTime()) / day) }
     if (now <= registrationClose)
-        return { kind: 'open', days: Math.ceil((registrationClose.getTime() - now.getTime()) / DAY) }
+        return { kind: 'open', days: Math.ceil((registrationClose.getTime() - now.getTime()) / day) }
     return { kind: 'closed' }
 }

@@ -293,7 +293,7 @@ export default function DaftarDADPage() {
             <main className="mx-auto w-full max-w-6xl flex-1 px-3 pb-12 pt-2 sm:px-6 sm:pt-6">
                 <PageHero />
 
-                <div className="mt-6 sm:mt-10">
+                <div className="mx-auto mt-6 max-w-6xl sm:mt-10">
                     <Timeline />
                 </div>
 
