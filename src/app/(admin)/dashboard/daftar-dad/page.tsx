@@ -621,7 +621,7 @@ export default function AdminDaftarDadPage() {
                                     <div className="flex items-center justify-between bg-[var(--background)] p-2.5 rounded-lg border border-[var(--border)]">
                                         <span className="text-xs font-medium text-[var(--text-primary)] flex items-center gap-2 truncate">
                                             <FileText className="w-4 h-4 text-amber-500 shrink-0" />
-                                            Bukti Transfer Rp 100.000
+                                            Bukti Transfer Pembayaran
                                         </span>
                                         <button
                                             type="button"

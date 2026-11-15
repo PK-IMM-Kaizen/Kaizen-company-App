@@ -94,21 +94,41 @@ export default function IdCardResult({ data }: { data: IdCardInput }) {
                 skipFonts: false,
             })
 
-            const link = document.createElement('a')
-            link.download = `kartu-dad-${slugify(data.nama)}.png`
-            link.href = dataUrl
-            link.click()
+            const filename = `kartu-dad-${slugify(data.nama)}.png`
+
+            const res = await fetch(dataUrl)
+            const blob = await res.blob()
+            const file = new File([blob], filename, { type: 'image/png' })
+
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                await navigator.share({
+                    files: [file],
+                    title: 'ID Card DAD',
+                })
+            } else {
+                const objectUrl = URL.createObjectURL(blob)
+                const link = document.createElement('a')
+                link.href = objectUrl
+                link.download = filename
+                document.body.appendChild(link)
+                link.click()
+                document.body.removeChild(link)
+                URL.revokeObjectURL(objectUrl)
+            }
         } catch (err: any) {
-            console.error('Gagal mengunduh kartu:', err?.message || err)
-            alert('Gagal mengunduh kartu. Silakan coba lagi.')
+            // Abaikan error jika pengguna menekan tombol "Batal" saat menu Share muncul
+            if (err.name !== 'AbortError') {
+                console.error('Gagal mengunduh kartu:', err?.message || err)
+                alert('Gagal mengunduh kartu. Silakan coba lagi.')
+            }
         } finally {
             setIsDownloading(false)
         }
     }
 
     return (
-        <div className="mx-auto w-full max-w-xs sm:max-w-sm">
-            <div className="overflow-hidden rounded-3xl bg-white/10 shadow-[0_24px_50px_-14px_rgba(0,0,0,0.6)] ring-4 ring-white">
+        <div className="mx-auto w-full max-w-xs sm:max-w-sm flex flex-col items-center">
+            <div className="w-full overflow-hidden rounded-3xl bg-white/10 shadow-[0_24px_50px_-14px_rgba(0,0,0,0.6)] ring-4 ring-white relative z-10">
                 <div
                     ref={cardRef}
                     className="font-card relative aspect-[2207/3125] w-full overflow-hidden bg-white text-[#2b1010] select-none"
@@ -128,7 +148,6 @@ export default function IdCardResult({ data }: { data: IdCardInput }) {
                             className="h-full w-full object-cover"
                         />
                     </div>
-
 
                     <div className="absolute top-[37.8%] left-[40.8%] right-[9.0%] h-[5.6%] flex items-center px-3.5 font-extrabold uppercase tracking-wide text-[#2b1010]">
                         <span className={`w-full leading-tight ${getNameFontSize(data.nama)}`}>
@@ -164,7 +183,7 @@ export default function IdCardResult({ data }: { data: IdCardInput }) {
                 type="button"
                 onClick={handleDownload}
                 disabled={isDownloading}
-                className={`${goldBtn} mt-5 w-full justify-center disabled:opacity-50 cursor-pointer`}
+                className={`${goldBtn} mt-5 w-full justify-center disabled:opacity-50 cursor-pointer relative z-20`}
             >
                 {isDownloading ? (
                     <>

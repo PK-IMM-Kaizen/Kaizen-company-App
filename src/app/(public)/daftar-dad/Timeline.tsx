@@ -6,17 +6,23 @@ const rows = [timeline.slice(0, 4), timeline.slice(4)]
 export default function Timeline() {
     return (
         <Paper clip>
-            <h2 className="text-2xl font-bold text-[#6b1b1b] sm:text-4xl">
-                <span className="bg-[linear-gradient(transparent_62%,#f4b82e_62%)] px-1">Timeline</span>
-                <br />
-                Pendaftaran
-            </h2>
+            <div className="mb-8">
+                <h2 className="text-2xl font-bold text-[#6b1b1b] sm:text-4xl">
+                    <span className="bg-[linear-gradient(transparent_62%,#f4b82e_62%)] px-1">Timeline</span>
+                    <br />
+                    Pendaftaran
+                </h2>
 
-            <div className="mt-8 space-y-8">
+                <p className="mt-3 rounded-md bg-yellow-50 px-3 py-2 text-xs font-medium text-[#6b1b1b] sm:text-sm">
+                    *Note: Anda masih bisa mendaftar selagi sebelum pelaksanaan DAD (Pendaftaran ditutup 3 Desember 2026).
+                </p>
+            </div>
+
+            <div className="space-y-8">
                 {rows.map((row, r) => (
-                    <ol key={r} className="grid grid-cols-4">
+                    <ol key={r} className="flex w-full justify-center">
                         {row.map((item, i) => (
-                            <li key={item.label} className="group flex flex-col items-center text-center">
+                            <li key={item.label} className="group flex w-1/4 flex-col items-center text-center">
                                 <span className="whitespace-nowrap rounded bg-[#f4b82e] px-1.5 py-0.5 text-[10px] font-bold text-[#4d1010] sm:px-2 sm:text-xs">
                                     {item.date}
                                     <span className="hidden sm:inline"> 2026</span>

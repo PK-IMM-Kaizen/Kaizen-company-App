@@ -1,6 +1,5 @@
 export const timeline: { date: string; label: string }[] = [
     { date: '12 Nov', label: 'Pendaftaran dibuka' },
-    { date: '15 Nov', label: 'Pendaftaran ditutup' },
     { date: '16-18 Nov', label: 'Screening Batch 1' },
     { date: '26 Nov', label: 'Pra-DAD 2026' },
     { date: '27-29 Nov', label: 'Screening Batch 2' },
@@ -15,7 +14,7 @@ export const contacts: { name: string; display: string; wa: string }[] = [
 ]
 
 export const registrationOpen = new Date('2026-11-12T00:00:00+07:00')
-export const registrationClose = new Date('2026-11-15T23:59:59+07:00')
+export const registrationClose = new Date('2026-12-03T23:59:59+07:00')
 
 export const formatDate = (d: Date) =>
     d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' })
@@ -30,7 +29,9 @@ const day = 86_400_000
 export function getRegistrationPhase(now: Date): RegistrationPhase {
     if (now < registrationOpen)
         return { kind: 'before', days: Math.ceil((registrationOpen.getTime() - now.getTime()) / day) }
+
     if (now <= registrationClose)
         return { kind: 'open', days: Math.ceil((registrationClose.getTime() - now.getTime()) / day) }
+
     return { kind: 'closed' }
 }
