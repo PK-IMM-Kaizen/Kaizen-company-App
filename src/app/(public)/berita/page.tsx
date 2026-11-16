@@ -9,7 +9,7 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 const supabase = createClient(supabaseUrl, supabaseKey)
 
-const categories = ['Semua', 'Bidang HPKP', 'Bidang Kader', 'Organisasi', 'Medkom', 'Kewirausahaan', 'Keilmuan']
+const categories = ['Semua', 'Bidang HPKP', 'Bidang Kader', 'Organisasi']
 
 export interface NewsArticle {
     id: number
@@ -77,79 +77,74 @@ export default function BeritaPage() {
     })
 
     return (
-        <div className="bg-[var(--background)] min-h-screen w-full font-sans selection:bg-[var(--primary)] selection:text-white">
+        <div className="w-full mk-dark mk-bg-dark min-h-screen selection:bg-[var(--mk-yellow)] selection:text-[var(--mk-maroon-deep)] font-sans pb-24 relative">
+            <div className="bg-[var(--mk-maroon-deep)] mk-curve-bottom relative pt-28 pb-20 md:pb-24 overflow-hidden z-10 border-b-4 border-[var(--mk-yellow)]">
+                <div className="mk-decor pointer-events-none">
+                    <div className="mk-halftone mk-halftone--bl opacity-20"></div>
+                    <div className="mk-star mk-star--lg mk-star--spin -right-8 top-10 opacity-30"></div>
+                </div>
 
-            <div className="relative bg-[var(--primary-dark)] pt-28 sm:pt-32 pb-16 sm:pb-20 overflow-hidden">
-                <div
-                    className="absolute top-0 left-0 w-full h-1"
-                    style={{
-                        background: 'linear-gradient(to right, var(--primary), var(--accent), var(--accent-light))'
-                    }}
-                />
-                <div
-                    className="absolute top-0 right-0 w-1/2 h-full opacity-10 pointer-events-none"
-                    style={{
-                        background: 'linear-gradient(to left, var(--primary), transparent)'
-                    }}
-                />
-
-                <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
-                        <div className="w-6 sm:w-8 h-[1px] bg-[var(--accent)]"></div>
-                        <span className="text-[var(--accent)] text-[10px] sm:text-xs md:text-sm font-bold tracking-[0.2em] uppercase font-display">
+                <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 text-center flex flex-col items-center">
+                    <div className="flex items-center gap-3 mb-5 md:mb-6">
+                        <div className="w-6 sm:w-10 h-[2px] bg-[var(--mk-orange)]"></div>
+                        <span className="mk-chip bg-[var(--mk-yellow)] text-[var(--mk-ink)] shadow-none text-[10px] sm:text-xs md:text-sm font-black px-3 py-1.5">
                             Pusat Informasi
                         </span>
+                        <div className="w-6 sm:w-10 h-[2px] bg-[var(--mk-orange)]"></div>
                     </div>
-                    <h1 className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl font-black text-white tracking-tight font-display">
-                        Berita & Publikasi
+
+                    <h1 className="mk-sticker-gradient text-[var(--mk-maroon)] text-4xl sm:text-5xl md:text-6xl lg:text-[5rem] xl:text-[5.5rem] tracking-tight relative flex justify-center w-full px-2 sm:px-4">
+                        <span aria-hidden="true" className="mk-sticker-stroke absolute text-transparent text-center leading-tight">Berita Publikasi</span>
+                        <span className="mk-sticker-fill relative text-center leading-tight">Berita Publikasi</span>
                     </h1>
                 </div>
             </div>
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
-
-                <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 mb-8 sm:mb-12 justify-between items-stretch lg:items-center">
-
-                    <div className="flex gap-2 overflow-x-auto pb-2 lg:pb-0 scrollbar-none shrink-0 -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap">
-                        {categories.map(cat => (
-                            <button
-                                key={cat}
-                                onClick={() => setActiveCategory(cat)}
-                                className={`text-[11px] sm:text-xs px-4 sm:px-5 py-2 sm:py-2.5 font-bold uppercase tracking-wider transition-all rounded-xl font-display shrink-0 cursor-pointer ${
-                                    activeCategory === cat
-                                        ? 'bg-[var(--primary)] text-white shadow-md shadow-[var(--primary)]/20'
-                                        : 'bg-[var(--surface)] text-[var(--text-secondary)] border border-[var(--border)] hover:bg-[var(--surface-2)] hover:text-[var(--text-primary)]'
-                                }`}
-                            >
-                                {cat}
-                            </button>
-                        ))}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 lg:py-16 relative z-0">
+                <div className="flex flex-col lg:flex-row gap-5 lg:gap-6 mb-10 sm:mb-14 justify-between items-stretch lg:items-center bg-white p-4 sm:p-5 lg:p-6 rounded-2xl border-2 border-[var(--mk-ink)] shadow-[4px_4px_0_var(--mk-ink)] sm:shadow-[6px_6px_0_var(--mk-ink)]">
+                    <div className="flex gap-2.5 sm:gap-3 overflow-x-auto lg:overflow-visible lg:flex-wrap pb-2 lg:pb-0 scrollbar-none shrink-0 -mx-4 px-4 sm:mx-0 sm:px-0 flex-1">
+                        {categories.map(cat => {
+                            const isActive = activeCategory === cat;
+                            return (
+                                <button
+                                    key={cat}
+                                    onClick={() => setActiveCategory(cat)}
+                                    className={`text-[11px] sm:text-xs px-4 sm:px-5 py-2.5 font-black uppercase tracking-wider transition-all rounded-xl font-display shrink-0 cursor-pointer border-2 ${
+                                        isActive
+                                            ? 'bg-[var(--mk-yellow)] text-[var(--mk-ink)] border-[var(--mk-ink)] shadow-[2px_2px_0_var(--mk-ink)] translate-y-0.5 translate-x-0.5'
+                                            : 'bg-white text-[var(--mk-ink)] border-[var(--mk-ink)] hover:bg-[var(--mk-orange)] hover:text-white shadow-[4px_4px_0_var(--mk-ink)] hover:shadow-[2px_2px_0_var(--mk-ink)] hover:translate-y-0.5 hover:translate-x-0.5'
+                                    }`}
+                                >
+                                    {cat}
+                                </button>
+                            )
+                        })}
                     </div>
 
-                    <div className="w-full lg:w-80 relative shrink-0">
-                        <Search className="w-4 h-4 text-[var(--text-muted)] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <div className="w-full lg:w-72 xl:w-80 relative shrink-0">
+                        <Search className="w-5 h-5 text-[var(--mk-ink)] absolute left-3.5 top-1/2 -translate-y-1/2 font-bold" />
                         <input
                             type="text"
                             placeholder="Cari berita..."
                             value={search}
                             onChange={e => setSearch(e.target.value)}
-                            className="w-full bg-[var(--surface)] border border-[var(--border)] text-xs sm:text-sm pl-10 pr-4 py-2.5 sm:py-3 rounded-xl text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--primary)] focus:bg-[var(--background)] transition-colors"
+                            className="w-full bg-[var(--mk-light)] border-2 border-[var(--mk-ink)] text-sm font-bold pl-11 pr-4 py-3 rounded-xl text-[var(--mk-ink)] placeholder-[var(--mk-ink)]/50 focus:outline-none focus:bg-[var(--mk-yellow)] focus:shadow-[4px_4px_0_var(--mk-ink)] transition-all font-sans"
                         />
                     </div>
                 </div>
 
                 {isLoading ? (
-                    <div className="text-center py-16 sm:py-24 border border-dashed border-[var(--border-strong)] rounded-2xl bg-[var(--surface)] p-6">
-                        <RefreshCw className="w-8 h-8 text-[var(--primary)] animate-spin mx-auto mb-3" />
-                        <p className="text-[var(--text-muted)] font-medium text-xs sm:text-sm font-display">
-                            Memuat berita dari Supabase...
+                    <div className="flex flex-col items-center justify-center py-24 bg-[var(--mk-dark)] rounded-3xl border-2 border-dashed border-[#374151]">
+                        <div className="w-10 h-10 border-4 border-[var(--mk-yellow)] border-t-transparent rounded-full animate-spin mb-4"></div>
+                        <p className="text-sm font-bold text-white/70 font-display tracking-widest uppercase animate-pulse">
+                            Menjemput Berita...
                         </p>
                     </div>
                 ) : filtered.length === 0 ? (
-                    <div className="text-center py-16 sm:py-24 border border-dashed border-[var(--border-strong)] rounded-2xl bg-[var(--surface)] p-6">
-                        <Newspaper className="w-10 h-10 text-[var(--text-muted)] mx-auto mb-3 opacity-50" />
-                        <p className="text-[var(--text-muted)] font-medium text-xs sm:text-sm">
-                            Tidak ada berita publikasi yang ditemukan.
+                    <div className="text-center py-24 border-2 border-dashed border-[#e5e7eb] rounded-3xl mk-bg-light p-6">
+                        <Newspaper className="w-12 h-12 text-[var(--mk-ink)]/30 mx-auto mb-4" />
+                        <p className="text-[var(--mk-ink)] font-bold font-display uppercase tracking-wider opacity-70 text-sm md:text-base">
+                            Berita Tidak Ditemukan.
                         </p>
                     </div>
                 ) : (
@@ -158,40 +153,40 @@ export default function BeritaPage() {
                             <Link
                                 key={item.id}
                                 href={`/berita/${item.id}`}
-                                className="group cursor-pointer flex flex-col h-full border border-[var(--border)] hover:border-[var(--primary)] transition-all duration-300 bg-[var(--card)] rounded-2xl overflow-hidden shadow-sm hover:shadow-xl"
+                                className="group cursor-pointer flex flex-col h-full bg-white border-2 border-[var(--mk-ink)] rounded-2xl overflow-hidden shadow-[4px_4px_0_var(--mk-ink)] sm:shadow-[6px_6px_0_var(--mk-ink)] hover:shadow-[6px_6px_0_var(--mk-orange)] md:hover:shadow-[8px_8px_0_var(--mk-orange)] hover:-translate-y-1.5 transition-all duration-300"
                             >
-                                <div className="relative aspect-[16/10] sm:aspect-[16/9] overflow-hidden bg-[#111111]">
+                                <div className="relative aspect-[4/3] overflow-hidden bg-[var(--mk-ink)] border-b-2 border-[var(--mk-ink)]">
                                     {item.cover ? (
                                         <img
                                             src={item.cover}
                                             alt={item.title}
-                                            className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-700 transform group-hover:scale-105 opacity-90 group-hover:opacity-100"
+                                            className="w-full h-full object-cover transition-all duration-500 grayscale-0 lg:grayscale group-hover:grayscale-0"
                                         />
                                     ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-white/30 text-xs font-bold uppercase tracking-wider">
-                                            Tanpa Cover
+                                        <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                                            <Newspaper className="w-10 h-10 text-[var(--mk-ink)]/20" />
                                         </div>
                                     )}
-                                    <div className="absolute top-3 left-3 sm:top-4 sm:left-4 bg-[var(--primary)] text-white text-[9px] sm:text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md font-display shadow-md">
+                                    <div className="absolute top-3 left-3 bg-[var(--mk-yellow)] text-[var(--mk-ink)] border-2 border-[var(--mk-ink)] shadow-[2px_2px_0_var(--mk-ink)] text-[9px] sm:text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md font-display">
                                         {item.category}
                                     </div>
                                 </div>
 
-                                <div className="p-5 sm:p-6 flex flex-col flex-grow">
-                                    <div className="text-[11px] sm:text-xs text-[var(--text-muted)] font-medium mb-2.5 flex items-center gap-1.5 font-display">
-                                        <Calendar className="w-3.5 h-3.5 text-[var(--primary)]" />
+                                <div className="p-4 sm:p-5 lg:p-6 flex flex-col flex-grow relative bg-white mk-bg-light">
+                                    <div className="text-[10px] sm:text-[11px] text-[var(--mk-ink)]/60 font-black uppercase tracking-widest mb-2.5 flex items-center gap-1.5 font-display">
+                                        <Calendar className="w-3.5 h-3.5 text-[var(--mk-orange)]" />
                                         <span>Rilis: {item.publishDate || '-'}</span>
                                     </div>
-                                    <h3 className="font-black text-[var(--text-primary)] text-base sm:text-lg leading-snug mb-2.5 group-hover:text-[var(--primary)] transition-colors font-display line-clamp-2">
+                                    <h3 className="font-black font-display text-[var(--mk-ink)] text-lg sm:text-xl lg:text-2xl leading-tight mb-3 group-hover:text-[var(--mk-orange)] transition-colors uppercase tracking-tight line-clamp-2">
                                         {item.title}
                                     </h3>
-                                    <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed line-clamp-3 mb-6">
+                                    <p className="text-xs sm:text-sm text-[var(--mk-ink)] font-medium leading-relaxed line-clamp-3 mb-5 lg:mb-6 opacity-80">
                                         {item.excerpt}
                                     </p>
 
-                                    <div className="mt-auto pt-4 border-t border-[var(--border)]">
-                                        <span className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-widest group-hover:text-[var(--primary)] transition-colors flex items-center gap-2 font-display">
-                                            Lihat Ringkasan <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
+                                    <div className="mt-auto pt-4 border-t-2 border-dashed border-[var(--mk-ink)]/30">
+                                        <span className="text-[10px] sm:text-xs font-black text-[var(--mk-ink)] uppercase tracking-widest group-hover:text-[var(--mk-orange)] transition-colors flex items-center gap-2 font-display">
+                                            Baca Selengkapnya <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform group-hover:translate-x-1.5" />
                                         </span>
                                     </div>
                                 </div>
