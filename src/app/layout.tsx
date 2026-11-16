@@ -1,9 +1,38 @@
 import type { Metadata } from 'next'
+import { Poppins, Montserrat, Inter, Plus_Jakarta_Sans } from 'next/font/google'
 import './globals.css'
+import './feed.css'
+
+const poppins = Poppins({
+    subsets: ['latin'],
+    weight: ['400', '500', '700', '800'],
+    variable: '--font-poppins',
+    display: 'swap',
+})
+
+const montserrat = Montserrat({
+    subsets: ['latin'],
+    weight: ['400', '700', '800'],
+    variable: '--font-montserrat',
+    display: 'swap',
+})
+
+const inter = Inter({
+    subsets: ['latin'],
+    weight: ['400', '500', '600', '700'],
+    variable: '--font-inter',
+    display: 'swap',
+})
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+    subsets: ['latin'],
+    weight: ['400', '500', '600', '700', '800'],
+    variable: '--font-plus-jakarta',
+    display: 'swap',
+})
 
 export const metadata: Metadata = {
     metadataBase: new URL('https://www.imm-kaizen.org'),
-
     title: {
         template: '%s | IMM Komisariat Kaizen',
         default: 'Website Resmi PK IMM Kaizen - Fakultas Teknik UMSURA',
@@ -47,22 +76,22 @@ export default function RootLayout({
     children: React.ReactNode
 }) {
     return (
-        <html lang="id" data-scroll-behavior="smooth">
-        <body>
-        <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{
-                __html: JSON.stringify({
-                    "@context": "https://schema.org",
-                    "@type": "WebSite",
-                    "name": "IMM Kaizen",
-                    "alternateName": ["PK IMM Kaizen", "IMM Komisariat Kaizen"],
-                    "url": "https://www.imm-kaizen.org/"
-                }),
-            }}
-        />
-        {children}
-        </body>
-        </html>
-    )
+    <html lang="id" data-scroll-behavior="smooth" className={`${poppins.variable} ${montserrat.variable} ${inter.variable} ${plusJakartaSans.variable}`}>
+    <body>
+    <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "WebSite",
+                "name": "IMM Kaizen",
+                "alternateName": ["PK IMM Kaizen", "IMM Komisariat Kaizen"],
+                "url": "https://www.imm-kaizen.org/"
+            }),
+        }}
+    />
+    {children}
+    </body>
+    </html>
+)
 }

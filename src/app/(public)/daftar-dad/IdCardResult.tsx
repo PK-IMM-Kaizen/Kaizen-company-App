@@ -98,29 +98,18 @@ export default function IdCardResult({ data }: { data: IdCardInput }) {
 
             const res = await fetch(dataUrl)
             const blob = await res.blob()
-            const file = new File([blob], filename, { type: 'image/png' })
+            const objectUrl = URL.createObjectURL(blob)
 
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                await navigator.share({
-                    files: [file],
-                    title: 'ID Card DAD',
-                })
-            } else {
-                const objectUrl = URL.createObjectURL(blob)
-                const link = document.createElement('a')
-                link.href = objectUrl
-                link.download = filename
-                document.body.appendChild(link)
-                link.click()
-                document.body.removeChild(link)
-                URL.revokeObjectURL(objectUrl)
-            }
+            const link = document.createElement('a')
+            link.href = objectUrl
+            link.download = filename
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link)
+            URL.revokeObjectURL(objectUrl)
         } catch (err: any) {
-            // Abaikan error jika pengguna menekan tombol "Batal" saat menu Share muncul
-            if (err.name !== 'AbortError') {
-                console.error('Gagal mengunduh kartu:', err?.message || err)
-                alert('Gagal mengunduh kartu. Silakan coba lagi.')
-            }
+            console.error('Gagal mengunduh kartu:', err?.message || err)
+            alert('Gagal mengunduh kartu. Silakan coba lagi.')
         } finally {
             setIsDownloading(false)
         }
