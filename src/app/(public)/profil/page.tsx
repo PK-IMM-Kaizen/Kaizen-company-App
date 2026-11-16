@@ -17,9 +17,13 @@ export default function ProfilePage({ onNavigate }: ProfileProps) {
                 </div>
 
                 <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 text-center flex flex-col items-center">
-                    <span className="mk-chip bg-[var(--mk-orange)] text-white mb-6 shadow-none">
-                        Tentang Kami
-                    </span>
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="w-6 sm:w-8 h-[2px] bg-[var(--mk-orange)]"></div>
+                        <span className="mk-chip bg-[var(--mk-yellow)] text-[var(--mk-ink)] shadow-none text-xs md:text-sm">
+                            Tentang Kami
+                        </span>
+                        <div className="w-6 sm:w-8 h-[2px] bg-[var(--mk-orange)]"></div>
+                    </div>
                     <h1 className="mk-sticker-gradient text-[var(--mk-maroon)] text-5xl md:text-6xl lg:text-7xl tracking-tight relative flex justify-center w-full">
                         <span aria-hidden="true" className="mk-sticker-stroke absolute text-transparent">Profil Organisasi</span>
                         <span className="mk-sticker-fill relative text-center">Profil Organisasi</span>

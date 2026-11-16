@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import type { Metadata } from 'next' // <-- Tambahkan import Metadata
+import type { Metadata } from 'next'
 import { createClient } from '@supabase/supabase-js'
 import { ArrowLeft, Calendar, Newspaper, ExternalLink, ChevronRight } from 'lucide-react'
 
