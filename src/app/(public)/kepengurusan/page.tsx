@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@supabase/supabase-js'
-import { Layers, ChevronRight, Users } from 'lucide-react'
+import { Layers, Users, ChevronUp, Star, X } from 'lucide-react'
 
 export interface Management {
     id: string
@@ -19,7 +19,7 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 const divisionOrder = [
-    'BPH',
+    'Polum',
     'Organisasi',
     'Perkaderan',
     'Hikmah Politik & Kebijakan Publik',
@@ -33,9 +33,12 @@ const divisionOrder = [
 ]
 
 export default function PengurusPage() {
-    const [activeTab, setActiveTab] = useState<string>('ALL')
+    const [activeTab, setActiveTab] = useState<string>('Polum')
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false)
     const [managementData, setManagementData] = useState<Management[]>([])
     const [isLoading, setIsLoading] = useState<boolean>(true)
+
+    const contentRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
         const fetchPengurus = async () => {
@@ -45,16 +48,14 @@ export default function PengurusPage() {
                     .select('*')
                     .order('created_at', { ascending: true })
 
-                if (error) {
-                    throw error
-                }
+                if (error) throw error
 
                 if (data) {
                     const formattedData: Management[] = data.map((item: any) => ({
                         id: item.id,
                         name: item.name,
                         position: item.position,
-                        division: item.division,
+                        division: item.division === 'BPH' ? 'Polum' : item.division,
                         isLeader: item.is_leader,
                         photo: item.photo,
                         createdAt: item.created_at
@@ -62,7 +63,7 @@ export default function PengurusPage() {
                     setManagementData(formattedData)
                 }
             } catch (error) {
-                console.error('Error fetching pengurus dari Supabase:', error)
+                console.error('Error fetching pengurus:', error)
             } finally {
                 setIsLoading(false)
             }
@@ -71,107 +72,75 @@ export default function PengurusPage() {
         fetchPengurus()
     }, [])
 
+    useEffect(() => {
+        if (isMobileMenuOpen) {
+            document.body.style.overflow = 'hidden'
+        } else {
+            document.body.style.overflow = 'auto'
+        }
+        return () => {
+            document.body.style.overflow = 'auto'
+        }
+    }, [isMobileMenuOpen])
+
+    const handleTabChange = (divName: string) => {
+        setActiveTab(divName)
+        setIsMobileMenuOpen(false)
+
+        if (contentRef.current) {
+            const yOffset = -80;
+            const element = contentRef.current;
+            const y = element.getBoundingClientRect().top + window.scrollY + yOffset;
+
+            window.scrollTo({ top: y, behavior: 'smooth' });
+        } else {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
+
     const grouped: Record<string, Management[]> = {}
     managementData.forEach(m => {
         if (!grouped[m.division]) grouped[m.division] = []
         grouped[m.division].push(m)
     })
 
-    const displayedDivisions = activeTab === 'ALL'
-        ? divisionOrder.filter(divName => grouped[divName] && grouped[divName].length > 0)
-        : divisionOrder.filter(div => div === activeTab)
+    const activeMembers = grouped[activeTab] || []
 
     return (
-        <div className="bg-[var(--background)] min-h-screen font-sans selection:bg-[var(--primary)] selection:text-white">
+        <div className="w-full mk-dark mk-bg-dark min-h-screen selection:bg-[var(--mk-yellow)] selection:text-[var(--mk-maroon-deep)] font-sans pb-24 md:pb-16 relative">
+            <div className="bg-[var(--mk-maroon-deep)] mk-curve-bottom relative pt-24 pb-20 overflow-hidden z-10 border-b-4 border-[var(--mk-yellow)]">
+                <div className="mk-decor pointer-events-none">
+                    <div className="mk-halftone mk-halftone--bl opacity-20"></div>
+                    <div className="mk-star mk-star--lg mk-star--spin -right-8 top-10 opacity-30"></div>
+                </div>
 
-            <div className="relative bg-[var(--primary-dark)] pt-32 sm:pt-36 md:pt-40 lg:pt-44 pb-14 sm:pb-16 overflow-hidden">
-                <div
-                    className="absolute top-0 left-0 w-full h-1"
-                    style={{
-                        background: 'linear-gradient(to right, var(--primary), var(--accent), var(--accent-light))'
-                    }}
-                />
-                <div
-                    className="absolute top-0 right-0 w-1/2 h-full opacity-10 pointer-events-none"
-                    style={{
-                        background: 'linear-gradient(to left, var(--primary), transparent)'
-                    }}
-                />
-
-                <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center gap-3 mb-3">
-                        <div className="w-6 sm:w-8 h-[2px] bg-[var(--accent)]"></div>
-                        <span className="text-[var(--accent)] text-[11px] sm:text-xs md:text-sm font-bold tracking-[0.2em] uppercase font-display">
+                <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 text-center flex flex-col items-center">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="w-6 sm:w-8 h-[2px] bg-[var(--mk-orange)]"></div>
+                        <span className="mk-chip bg-[var(--mk-yellow)] text-[var(--mk-ink)] shadow-none">
                             Periode 2026 - 2027
                         </span>
+                        <div className="w-6 sm:w-8 h-[2px] bg-[var(--mk-orange)]"></div>
                     </div>
-                    <h1 className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl font-black text-white tracking-tight font-display leading-tight">
-                        Struktur Kepengurusan
+                    <h1 className="mk-sticker-gradient text-[var(--mk-maroon)] text-4xl sm:text-5xl md:text-7xl lg:text-8xl tracking-tight relative flex justify-center w-full">
+                        <span aria-hidden="true" className="mk-sticker-stroke absolute text-transparent">Struktur Pengurus</span>
+                        <span className="mk-sticker-fill relative text-center">Struktur Pengurus</span>
                     </h1>
                 </div>
             </div>
 
-            <div className="lg:hidden bg-[var(--surface)] border-b border-[var(--border)] sticky top-[64px] sm:top-[72px] z-20 shadow-sm backdrop-blur-md bg-opacity-95">
-                <div className="px-4 py-3">
-                    <div className="flex items-center gap-2 overflow-x-auto scrollbar-none -mx-4 px-4">
-                        <button
-                            onClick={() => setActiveTab('ALL')}
-                            className={`whitespace-nowrap px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all font-display shrink-0 cursor-pointer ${
-                                activeTab === 'ALL'
-                                    ? 'bg-[var(--primary)] text-white shadow-sm shadow-[var(--primary)]/20'
-                                    : 'bg-[var(--background)] text-[var(--text-secondary)] border border-[var(--border)] hover:bg-[var(--surface-2)]'
-                            }`}
-                        >
-                            Semua Bidang
-                        </button>
-                        {divisionOrder.map((divName) => {
-                            if (!grouped[divName] || grouped[divName].length === 0) return null
-                            const isActive = activeTab === divName
-                            return (
-                                <button
-                                    key={divName}
-                                    onClick={() => setActiveTab(divName)}
-                                    className={`whitespace-nowrap px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all font-display shrink-0 cursor-pointer ${
-                                        isActive
-                                            ? 'bg-[var(--primary)] text-white shadow-sm shadow-[var(--primary)]/20'
-                                            : 'bg-[var(--background)] text-[var(--text-secondary)] border border-[var(--border)] hover:bg-[var(--surface-2)]'
-                                    }`}
-                                >
-                                    {divName === 'BPH' ? 'BPH / Pimpinan' : divName}
-                                </button>
-                            )
-                        })}
-                    </div>
-                </div>
-            </div>
-
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 lg:py-16">
+            <div ref={contentRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 lg:py-16 relative z-0">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 xl:gap-12 items-start">
-
-                    <div className="hidden lg:block lg:col-span-4 xl:col-span-3 sticky top-24 lg:top-28 space-y-4">
-                        <div className="bg-[var(--card)] rounded-2xl border border-[var(--border)] p-4 shadow-sm space-y-1.5">
-                            <div className="flex items-center gap-2 px-3 py-2 text-xs font-black uppercase tracking-widest text-[var(--text-muted)] font-display border-b border-[var(--border)] mb-2">
-                                <Layers className="w-4 h-4 text-[var(--primary)] shrink-0" /> Navigasi Bidang
+                    <div className="hidden lg:block lg:col-span-4 xl:col-span-3 sticky top-24 lg:top-28 space-y-4 z-10">
+                        <div className="mk-paper p-4 space-y-2 border-2 border-[var(--mk-ink)]">
+                            <div className="flex items-center gap-2 px-3 py-2 text-xs font-black uppercase tracking-widest text-[var(--mk-ink)] font-display border-b-2 border-dashed border-[#d1d5db] mb-4">
+                                <Layers className="w-4 h-4 text-[var(--mk-orange)] shrink-0" /> Pilih Bidang
                             </div>
-
-                            <button
-                                onClick={() => setActiveTab('ALL')}
-                                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold font-display uppercase tracking-wider transition-all text-left cursor-pointer ${
-                                    activeTab === 'ALL'
-                                        ? 'bg-[var(--primary)] text-white shadow-md shadow-[var(--primary)]/20'
-                                        : 'text-[var(--text-secondary)] hover:bg-[var(--surface-2)] hover:text-[var(--text-primary)]'
-                                }`}
-                            >
-                                <span>Semua Bidang</span>
-                                <span className={`text-[10px] px-2 py-0.5 rounded-md font-bold ${activeTab === 'ALL' ? 'bg-white/20 text-white' : 'bg-[var(--surface-2)] text-[var(--text-muted)]'}`}>
-                                    {managementData.length}
-                                </span>
-                            </button>
 
                             {isLoading ? (
                                 <div className="space-y-2 py-2">
-                                    {[1, 2, 3, 4, 5].map(i => (
-                                        <div key={i} className="h-9 bg-[var(--surface-2)] rounded-xl animate-pulse"></div>
+                                    {[1, 2, 3, 4, 5, 6].map(i => (
+                                        <div key={i} className="h-11 bg-gray-200 rounded-xl animate-pulse"></div>
                                     ))}
                                 </div>
                             ) : (
@@ -183,22 +152,19 @@ export default function PengurusPage() {
                                     return (
                                         <button
                                             key={divName}
-                                            onClick={() => setActiveTab(divName)}
-                                            className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold font-display uppercase tracking-wider transition-all text-left cursor-pointer group ${
+                                            onClick={() => handleTabChange(divName)} /* 4. Gunakan fungsi baru */
+                                            className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-xs font-bold font-display uppercase tracking-wider transition-all text-left cursor-pointer border-2 ${
                                                 isActive
-                                                    ? 'bg-[var(--primary)] text-white shadow-md shadow-[var(--primary)]/20'
-                                                    : 'text-[var(--text-secondary)] hover:bg-[var(--surface-2)] hover:text-[var(--text-primary)]'
+                                                    ? 'bg-[var(--mk-yellow)] text-[var(--mk-ink)] border-[var(--mk-ink)] shadow-[2px_2px_0_var(--mk-ink)] translate-x-2'
+                                                    : 'bg-white text-[var(--mk-ink)] opacity-70 border-transparent hover:border-[var(--mk-ink)] hover:opacity-100 hover:translate-x-1'
                                             }`}
                                         >
-                                            <span className="truncate">
-                                                {divName === 'BPH' ? 'BPH / Pimpinan' : divName}
+                                            <span className="truncate pr-2">
+                                                {divName === 'Polum' ? 'Polisi Umum' : divName}
                                             </span>
-                                            <div className="flex items-center gap-1.5 shrink-0">
-                                                <span className={`text-[10px] px-2 py-0.5 rounded-md font-bold ${isActive ? 'bg-white/20 text-white' : 'bg-[var(--surface-2)] text-[var(--text-muted)]'}`}>
-                                                    {members.length}
-                                                </span>
-                                                <ChevronRight className={`w-3.5 h-3.5 transition-transform ${isActive ? 'translate-x-0.5 text-white' : 'opacity-0 group-hover:opacity-100 text-[var(--text-muted)]'}`} />
-                                            </div>
+                                            <span className={`shrink-0 text-[10px] px-2.5 py-1 rounded-md font-bold ${isActive ? 'bg-[var(--mk-ink)] text-white' : 'bg-gray-200 text-[var(--mk-ink)]'}`}>
+                                                {members.length}
+                                            </span>
                                         </button>
                                     )
                                 })
@@ -206,96 +172,141 @@ export default function PengurusPage() {
                         </div>
                     </div>
 
-                    <div className="lg:col-span-8 xl:col-span-9 space-y-12 sm:space-y-16 lg:space-y-20">
+                    <div className="lg:col-span-8 xl:col-span-9">
                         {isLoading ? (
-                            <div className="flex flex-col items-center justify-center py-16 sm:py-20">
-                                <div className="w-8 h-8 sm:w-10 sm:h-10 border-4 border-[var(--primary)] border-t-transparent rounded-full animate-spin mb-4"></div>
-                                <p className="text-xs sm:text-sm font-bold text-[var(--text-muted)] font-display tracking-widest uppercase animate-pulse">
-                                    Memuat Struktur Kepengurusan...
+                            <div className="flex flex-col items-center justify-center py-20 bg-[var(--mk-dark)] rounded-2xl border-2 border-dashed border-[#374151]">
+                                <div className="w-10 h-10 border-4 border-[var(--mk-yellow)] border-t-transparent rounded-full animate-spin mb-4"></div>
+                                <p className="text-sm font-bold text-white/70 font-display tracking-widest uppercase animate-pulse">
+                                    Memuat Data Pengurus...
                                 </p>
                             </div>
-                        ) : managementData.length === 0 ? (
-                            <div className="text-center py-16 sm:py-24 border border-dashed border-[var(--border-strong)] rounded-2xl bg-[var(--surface)] p-6">
-                                <Users className="w-10 h-10 text-[var(--text-muted)] mx-auto mb-3 opacity-40" />
-                                <p className="text-[var(--text-muted)] font-medium text-xs sm:text-sm">
-                                    Belum ada data pengurus yang dipublikasikan.
+                        ) : activeMembers.length === 0 ? (
+                            <div className="text-center py-24 border-2 border-dashed border-[#e5e7eb] rounded-2xl mk-bg-light p-6">
+                                <Users className="w-12 h-12 text-[#9ca3af] mx-auto mb-4 opacity-40" />
+                                <p className="text-[var(--mk-ink)] font-medium text-sm opacity-70">
+                                    Belum ada data pengurus di bidang ini.
                                 </p>
                             </div>
                         ) : (
-                            displayedDivisions.map((divName) => {
-                                const members = grouped[divName]
-                                if (!members || members.length === 0) return null
+                            <div className="mk-outline-box mk-bg-light relative overflow-hidden">
+                                <div className="absolute -right-4 -top-6 text-[var(--mk-yellow)] opacity-30 font-black text-6xl md:text-8xl select-none pointer-events-none font-display">
+                                    {activeMembers.length}
+                                </div>
 
-                                const isPimpinan = divName === 'BPH'
-
-                                return (
-                                    <div key={divName} className="relative scroll-mt-32" id={`bidang-${divName.replace(/\s+/g, '-').toLowerCase()}`}>
-                                        <div className="flex flex-col xs:flex-row xs:items-end justify-between mb-6 sm:mb-8 pb-3 border-b-2 border-[var(--text-primary)] gap-2">
-                                            <div>
-                                                <h2 className="text-lg xs:text-xl sm:text-2xl md:text-3xl font-black text-[var(--text-primary)] uppercase tracking-tight font-display">
-                                                    {isPimpinan ? 'Badan Pengurus Harian (BPH)' : `Bidang ${divName}`}
-                                                </h2>
-                                            </div>
-                                            <div className="text-[10px] sm:text-xs font-bold text-[var(--text-muted)] tracking-[0.2em] uppercase font-display shrink-0">
-                                                {members.length} Personil
-                                            </div>
-                                        </div>
-
-                                        <div
-                                            className={`grid gap-4 sm:gap-6 md:gap-8 ${
-                                                isPimpinan
-                                                    ? 'grid-cols-2 sm:grid-cols-3'
-                                                    : 'grid-cols-2 sm:grid-cols-3 xl:grid-cols-4'
-                                            }`}
-                                        >
-                                            {members.map((m, index) => (
-                                                <div key={m.id} className="group cursor-pointer">
-                                                    <div className="relative aspect-[3/4] bg-[#111111] overflow-hidden mb-3 sm:mb-4 border border-[var(--border)] rounded-2xl shadow-sm hover:shadow-xl transition-all">
-                                                        {m.photo ? (
-                                                            <img
-                                                                src={m.photo}
-                                                                alt={m.name}
-                                                                className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
-                                                            />
-                                                        ) : (
-                                                            <div className="w-full h-full flex flex-col items-center justify-center bg-[#181818] text-[var(--text-muted)] p-4 text-center">
-                                                                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-white/10 flex items-center justify-center mb-2">
-                                                                    <svg className="w-5 h-5 sm:w-6 sm:h-6 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                                                    </svg>
-                                                                </div>
-                                                                <span className="text-[9px] sm:text-[10px] font-bold tracking-widest uppercase font-display text-white/40">
-                                                                    No Image
-                                                                </span>
-                                                            </div>
-                                                        )}
-
-                                                        <div className="absolute bottom-0 left-0 w-full h-1 bg-[var(--primary)] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
-
-                                                        <div className="absolute top-2 right-2.5 sm:top-2 sm:right-3 text-white text-opacity-40 font-black text-xl sm:text-2xl md:text-3xl mix-blend-overlay font-display pointer-events-none select-none">
-                                                            {String(index + 1).padStart(2, '0')}
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="text-left border-l-2 border-transparent group-hover:border-[var(--primary)] pl-2 sm:pl-2.5 transition-all duration-300 transform group-hover:translate-x-1">
-                                                        <h3 className="font-black text-[var(--text-primary)] text-xs sm:text-sm md:text-base leading-snug mb-0.5 sm:mb-1 font-display line-clamp-2">
-                                                            {m.name}
-                                                        </h3>
-                                                        <p className="text-[9px] sm:text-[10px] md:text-xs font-bold text-[var(--primary)] uppercase tracking-widest font-sans leading-tight">
-                                                            {m.position}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            ))}
+                                <div className="relative z-10">
+                                    <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 pb-4 border-b-4 border-[var(--mk-ink)] gap-3">
+                                        <div>
+                                            <div className="mk-kicker text-[var(--mk-orange)] mb-2">Struktur Aktif</div>
+                                            <h2 className="mk-display text-3xl sm:text-4xl text-[var(--mk-ink)] uppercase tracking-tight">
+                                                {activeTab === 'Polum' ? 'Polisi Umum (Polum)' : `Bidang ${activeTab}`}
+                                            </h2>
                                         </div>
                                     </div>
-                                )
-                            })
+
+                                    <div className="grid gap-5 sm:gap-6 md:gap-8 grid-cols-2 sm:grid-cols-3 xl:grid-cols-4">
+                                        {activeMembers.map((m, index) => (
+                                            <div key={m.id} className="group/card flex flex-col relative">
+
+                                                {m.isLeader && (
+                                                    <div className="absolute -top-3 -right-3 z-20 bg-[var(--mk-orange)] text-white w-8 h-8 rounded-full flex items-center justify-center border-2 border-[var(--mk-ink)] shadow-[2px_2px_0_var(--mk-ink)]" title="Ketua / Pimpinan">
+                                                        <Star className="w-4 h-4 fill-white" />
+                                                    </div>
+                                                )}
+
+                                                <div className={`relative aspect-[3/4] bg-[var(--mk-ink)] overflow-hidden mb-3 border-2 border-[var(--mk-ink)] transition-all duration-300 group-hover/card:-translate-y-1 ${m.isLeader ? 'shadow-[4px_4px_0_var(--mk-orange)]' : 'shadow-[4px_4px_0_var(--mk-yellow)]'}`}>
+                                                    {m.photo ? (
+                                                        <img
+                                                            src={m.photo}
+                                                            alt={m.name}
+                                                            className="w-full h-full object-cover transition-all duration-500 grayscale-0 md:grayscale group-hover/card:grayscale-0"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-full h-full flex flex-col items-center justify-center p-4 text-center">
+                                                            <Users className="w-8 h-8 text-white/20 mb-2" />
+                                                            <span className="text-[10px] font-bold tracking-widest uppercase font-display text-white/40">No Image</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                <div className={`text-left border-l-4 pl-3 py-1 ${m.isLeader ? 'border-[var(--mk-orange)]' : 'border-[var(--mk-yellow)]'}`}>
+                                                    <h3 className="font-black text-[var(--mk-ink)] text-sm md:text-base leading-tight mb-1 font-display line-clamp-2">
+                                                        {m.name}
+                                                    </h3>
+                                                    <p className={`text-[10px] md:text-xs font-bold uppercase tracking-widest font-sans leading-tight ${m.isLeader ? 'text-[var(--mk-orange)]' : 'text-[var(--mk-maroon)]'}`}>
+                                                        {m.position}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
                         )}
                     </div>
-
                 </div>
             </div>
+
+            <div className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-40 w-[90%] max-w-[300px]">
+                <button
+                    onClick={() => setIsMobileMenuOpen(true)}
+                    className="w-full bg-[var(--mk-yellow)] text-[var(--mk-ink)] border-2 border-[var(--mk-ink)] shadow-[4px_4px_0_var(--mk-ink)] rounded-full px-5 py-3.5 flex items-center justify-between transition-transform active:scale-95"
+                >
+                    <div className="flex items-center gap-2 overflow-hidden">
+                        <Layers className="w-5 h-5 shrink-0 text-[var(--mk-orange)]" />
+                        <span className="font-black font-display uppercase tracking-widest text-xs sm:text-sm truncate">
+                            {activeTab === 'Polum' ? 'Polisi Umum' : activeTab}
+                        </span>
+                    </div>
+                    <ChevronUp className="w-5 h-5 shrink-0 ml-2" />
+                </button>
+            </div>
+
+            {isMobileMenuOpen && (
+                <div className="lg:hidden fixed inset-0 z-50 flex flex-col justify-end">
+                    <div
+                        className="absolute inset-0 bg-[var(--mk-ink)]/70 backdrop-blur-sm transition-opacity"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                    ></div>
+
+                    <div className="relative bg-white border-t-4 border-[var(--mk-ink)] rounded-t-3xl pt-2 pb-8 px-4 flex flex-col max-h-[75vh] animate-in slide-in-from-bottom-full duration-300">
+                        <div className="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-5"></div>
+
+                        <div className="flex items-center justify-between mb-4 px-2">
+                            <h3 className="font-display font-black text-sm uppercase tracking-widest text-[var(--mk-ink)]">Pilih Bidang</h3>
+                            <button onClick={() => setIsMobileMenuOpen(false)} className="p-1 bg-gray-100 rounded-full text-gray-500 hover:text-black">
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        <div className="overflow-y-auto space-y-2 px-2 pb-10">
+                            {divisionOrder.map((divName) => {
+                                const members = grouped[divName]
+                                if (!members || members.length === 0) return null
+                                const isActive = activeTab === divName
+
+                                return (
+                                    <button
+                                        key={divName}
+                                        onClick={() => handleTabChange(divName)}
+                                        className={`w-full flex items-center justify-between px-4 py-3.5 rounded-xl text-xs sm:text-sm font-bold font-display uppercase tracking-wider transition-all text-left border-2 ${
+                                            isActive
+                                                ? 'bg-[var(--mk-yellow)] text-[var(--mk-ink)] border-[var(--mk-ink)] shadow-[2px_2px_0_var(--mk-ink)]'
+                                                : 'bg-white text-gray-500 border-gray-200 active:bg-gray-50'
+                                        }`}
+                                    >
+                                        <span className="truncate pr-2">
+                                            {divName === 'Polum' ? 'Polisi Umum (Polum)' : divName}
+                                        </span>
+                                        <span className={`shrink-0 text-[10px] px-2.5 py-1 rounded-md font-black ${isActive ? 'bg-[var(--mk-ink)] text-white' : 'bg-gray-100 text-gray-400'}`}>
+                                            {members.length}
+                                        </span>
+                                    </button>
+                                )
+                            })}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

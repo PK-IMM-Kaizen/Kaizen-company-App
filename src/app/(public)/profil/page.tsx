@@ -142,14 +142,6 @@ export default function ProfilePage({ onNavigate }: ProfileProps) {
                     </div>
                 </div>
             </div>
-
-            <footer className="relative z-10 flex justify-center pb-8 pt-4">
-                <div className="mk-footer-bar">
-                    <span>@IMM Kaizen UMSURA</span>
-                    <span>Informasi Publik</span>
-                </div>
-            </footer>
-
         </div>
     )
 }
