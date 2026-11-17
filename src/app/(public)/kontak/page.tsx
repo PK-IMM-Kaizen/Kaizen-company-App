@@ -45,27 +45,31 @@ export default function ContactPage() {
     }, [supabase])
 
     const instagramHandle = profile?.instagram || '@imm_kaizen'
-    const whatsappHandle = profile?.whatsapp || '+62 812-3456-7890'
     const emailHandle = profile?.email || 'pkimmkaizen.0@gmail.com'
     const addressText = profile?.address || 'Kompleks Gedung PKM Lt. 1, Fakultas Teknik, Universitas Muhammadiyah Surabaya. Jl. Sutorejo No. 59, Mulyorejo, Surabaya, Jawa Timur 60113.'
 
+    const whatsappHandle = '+62 896-0126-1250'
+
     const kontakChannels = [
         {
-            icon: <InstagramIcon className="w-5 h-5 text-[#E1306C]" />,
+            icon: <InstagramIcon className="w-6 h-6 text-white" />,
+            bgColor: 'bg-[#E1306C]', // Instagram Pink
             platform: 'Instagram',
             handle: instagramHandle,
             desc: 'Ikuti kami untuk update kegiatan & dokumentasi terbaru',
             link: `https://www.instagram.com/${instagramHandle.replace('@', '')}`,
         },
         {
-            icon: <WhatsAppIcon className="w-5 h-5 text-[#25D366]" />,
+            icon: <WhatsAppIcon className="w-6 h-6 text-white" />,
+            bgColor: 'bg-[#25D366]',
             platform: 'WhatsApp',
             handle: whatsappHandle,
             desc: 'Hubungi BPH & Pengurus aktif melalui layanan WhatsApp',
             link: `https://wa.me/${whatsappHandle.replace(/[^0-9]/g, '')}`,
         },
         {
-            icon: <Mail className="w-5 h-5 text-[var(--primary)]" />,
+            icon: <Mail className="w-6 h-6 text-white" />,
+            bgColor: 'bg-[var(--mk-orange)]',
             platform: 'Email Resmi',
             handle: emailHandle,
             desc: 'Kirimkan korespondensi, undangan, atau surat resmi',
@@ -74,132 +78,136 @@ export default function ContactPage() {
     ]
 
     return (
-        <div className="bg-[var(--background)] min-h-screen font-sans selection:bg-[var(--primary)] selection:text-white">
+        <div className="w-full mk-dark mk-bg-dark min-h-screen selection:bg-[var(--mk-yellow)] selection:text-[var(--mk-maroon-deep)] font-sans pb-24 relative overflow-x-hidden">
+            <div className="bg-[var(--mk-maroon-deep)] mk-curve-bottom relative pt-28 pb-20 md:pb-24 overflow-hidden z-10 border-b-4 border-[var(--mk-yellow)]">
+                <div className="mk-decor pointer-events-none">
+                    <div className="mk-halftone mk-halftone--bl opacity-20"></div>
+                    <div className="mk-star mk-star--lg mk-star--spin -right-8 top-10 opacity-30"></div>
+                </div>
 
-            <div className="relative bg-[var(--primary-dark)] pt-28 sm:pt-32 pb-16 sm:pb-20 overflow-hidden">
-                <div
-                    className="absolute top-0 left-0 w-full h-1"
-                    style={{
-                        background: 'linear-gradient(to right, var(--primary), var(--accent), var(--accent-light))'
-                    }}
-                />
-                <div
-                    className="absolute top-0 right-0 w-1/2 h-full opacity-10 pointer-events-none"
-                    style={{
-                        background: 'linear-gradient(to left, var(--primary), transparent)'
-                    }}
-                />
-
-                <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
-                        <div className="w-6 sm:w-8 h-[1px] bg-[var(--accent)]"></div>
-                        <span className="text-[var(--accent)] text-[10px] sm:text-xs md:text-sm font-bold tracking-[0.2em] uppercase font-display">
+                <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 text-center flex flex-col items-center">
+                    <div className="flex items-center justify-center gap-3 mb-5 md:mb-6 w-full">
+                        <div className="w-6 sm:w-10 h-[2px] bg-[var(--mk-orange)] hidden xs:block"></div>
+                        <span className="mk-chip bg-[var(--mk-yellow)] text-[var(--mk-ink)] shadow-none text-[10px] sm:text-xs md:text-sm font-black px-3 py-1.5 uppercase whitespace-nowrap">
                             Hubungi Kami
                         </span>
+                        <div className="w-6 sm:w-10 h-[2px] bg-[var(--mk-orange)] hidden xs:block"></div>
                     </div>
-                    <h1 className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl font-black text-white tracking-tight font-display">
-                        Kontak Resmi
+
+                    <h1 className="mk-sticker-gradient text-[var(--mk-maroon)] text-4xl sm:text-5xl md:text-6xl lg:text-[5rem] xl:text-[5.5rem] tracking-tight relative flex justify-center w-full px-2 sm:px-4">
+                        <span aria-hidden="true" className="mk-sticker-stroke absolute text-transparent text-center leading-tight">Kontak Resmi</span>
+                        <span className="mk-sticker-fill relative text-center leading-tight">Kontak Resmi</span>
                     </h1>
                 </div>
             </div>
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 lg:py-24">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 lg:gap-16 items-start">
-
-                    <div className="lg:col-span-7 space-y-6">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20 relative z-0">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 sm:gap-12 lg:gap-16 items-start">
+                    <div className="lg:col-span-7 space-y-6 sm:space-y-8">
                         <div>
-                            <span className="text-[10px] sm:text-xs font-bold text-[var(--primary)] tracking-[0.2em] uppercase mb-1.5 block font-display">
+                            <span className="text-[10px] sm:text-xs font-black text-[var(--mk-yellow)] tracking-widest uppercase mb-2 block font-display">
                                 Kanal Komunikasi
                             </span>
-                            <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-[var(--text-primary)] mb-6 sm:mb-8 font-display tracking-tight">
-                                Kami Siap Terhubung dengan Anda
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white font-display tracking-tight uppercase">
+                                Terhubung Dengan Kami
                             </h2>
                         </div>
 
-                        <div className="space-y-3.5 sm:space-y-4">
+                        <div className="space-y-4 sm:space-y-5">
                             {kontakChannels.map((item) => (
                                 <a
                                     key={item.platform}
                                     href={item.link}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="group flex items-start gap-3.5 sm:gap-4 p-4 sm:p-5 rounded-2xl bg-[var(--card)] border border-[var(--border)] hover:border-[var(--primary)]/60 transition-all duration-300 shadow-sm hover:shadow-md"
+                                    className="group flex flex-col sm:flex-row items-start sm:items-center gap-4 p-5 sm:p-6 bg-white border-2 border-[var(--mk-ink)] shadow-[4px_4px_0_var(--mk-ink)] hover:shadow-[6px_6px_0_var(--mk-yellow)] hover:-translate-y-1 hover:-translate-x-1 transition-all duration-300 rounded-2xl w-full"
                                 >
-                                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                                    <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-xl ${item.bgColor} border-2 border-[var(--mk-ink)] shadow-[3px_3px_0_var(--mk-ink)] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-300`}>
                                         {item.icon}
                                     </div>
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex items-center gap-2 mb-0.5">
-                                            <h3 className="font-bold text-xs sm:text-sm text-[var(--text-primary)] font-display group-hover:text-[var(--primary)] transition-colors">
+                                    <div className="flex-1 min-w-0 w-full">
+                                        <div className="flex items-center justify-between gap-2 mb-1">
+                                            <h3 className="font-black text-sm sm:text-base text-[var(--mk-ink)] font-display uppercase tracking-wider group-hover:text-[var(--mk-orange)] transition-colors">
                                                 {item.platform}
                                             </h3>
+                                            <ExternalLink className="w-4 h-4 text-[var(--mk-ink)] opacity-40 group-hover:opacity-100 group-hover:text-[var(--mk-orange)] transition-all shrink-0" />
                                         </div>
-                                        <p className="text-xs sm:text-sm font-bold text-[var(--text-primary)] font-display mb-1 truncate">
+                                        <p className="text-sm sm:text-base font-bold text-[var(--mk-ink)] font-sans mb-2 truncate bg-[var(--mk-cream)] px-2 py-0.5 inline-block border border-[var(--mk-ink)] rounded-md">
                                             {item.handle}
                                         </p>
-                                        <p className="text-[11px] sm:text-xs text-[var(--text-muted)] leading-relaxed">
+                                        <p className="text-xs sm:text-sm text-[var(--mk-ink)]/70 font-medium leading-relaxed">
                                             {item.desc}
                                         </p>
                                     </div>
-                                    <ExternalLink className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--primary)] transition-colors mt-1 shrink-0" />
                                 </a>
                             ))}
                         </div>
 
-                        <div className="p-4 sm:p-5 rounded-xl bg-[#FFF8E7] dark:bg-amber-950/20 border border-[#F0E4B0] dark:border-amber-800/30 text-[#7A5C00] dark:text-amber-300 text-xs leading-relaxed">
-                            <strong>Catatan:</strong> Informasi nomor kontak WhatsApp, Instagram, dan Email diperbarui secara berkala sesuai periode kepengurusan yang aktif.
+                        <div className="p-5 sm:p-6 rounded-2xl bg-[var(--mk-yellow)] border-2 border-[var(--mk-ink)] shadow-[4px_4px_0_var(--mk-ink)] flex items-start gap-4">
+                            <div className="w-8 h-8 rounded-full bg-white border-2 border-[var(--mk-ink)] flex items-center justify-center shrink-0 font-black text-[var(--mk-ink)] font-display text-sm">
+                                !
+                            </div>
+                            <p className="text-[var(--mk-ink)] text-xs sm:text-sm font-medium leading-relaxed">
+                                <strong className="font-black">Catatan:</strong> Informasi nomor kontak WhatsApp, Instagram, dan Email diperbarui secara berkala sesuai dengan periode kepengurusan aktif IMM Kaizen.
+                            </p>
                         </div>
                     </div>
 
-                    <div className="lg:col-span-5 space-y-6 pt-4 lg:pt-0">
+                    <div className="lg:col-span-5 space-y-6 sm:space-y-8 lg:pt-0 pt-6">
                         <div>
-                            <span className="text-[10px] sm:text-xs font-bold text-[var(--primary)] tracking-[0.2em] uppercase mb-1.5 block font-display">
+                            <span className="text-[10px] sm:text-xs font-black text-[var(--mk-yellow)] tracking-widest uppercase mb-2 block font-display">
                                 Lokasi Sekretariat
                             </span>
-                            <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-[var(--text-primary)] mb-6 sm:mb-8 font-display tracking-tight">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white font-display tracking-tight uppercase">
                                 Alamat Organisasi
                             </h2>
                         </div>
 
-                        <div className="relative rounded-2xl overflow-hidden border border-[var(--border)] shadow-sm bg-[var(--surface-2)] aspect-[16/10] sm:aspect-[16/9] lg:aspect-[4/3]">
+                        <div className="relative rounded-2xl overflow-hidden border-2 border-[var(--mk-ink)] shadow-[6px_6px_0_var(--mk-yellow)] aspect-[4/3] bg-[var(--mk-ink)] group">
                             <iframe
                                 title="Lokasi Universitas Muhammadiyah Surabaya"
                                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3957.9405628549337!2d112.79326467588079!3d-7.24759907118939!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd7f9ed5d0a68d7%3A0xb35a0937a03fb7a7!2sUniversitas%20Muhammadiyah%20Surabaya!5e0!3m2!1sid!2sid!4v1710000000000!5m2!1sid!2sid"
-                                className="w-full h-full border-0 grayscale opacity-90 hover:grayscale-0 hover:opacity-100 transition-all duration-500"
+                                className="w-full h-full border-0 grayscale group-hover:grayscale-0 opacity-80 group-hover:opacity-100 transition-all duration-700"
                                 allowFullScreen
                                 loading="lazy"
                                 referrerPolicy="no-referrer-when-downgrade"
                             />
+                            <div className="absolute top-3 right-3 bg-[var(--mk-yellow)] text-[var(--mk-ink)] border-2 border-[var(--mk-ink)] px-3 py-1 rounded-lg text-xs font-black uppercase font-display shadow-[2px_2px_0_var(--mk-ink)] pointer-events-none">
+                                Map
+                            </div>
                         </div>
 
-                        <div className="p-5 sm:p-6 rounded-2xl bg-[var(--card)] border border-[var(--border)] space-y-4 shadow-sm">
-                            <div className="flex items-start gap-3">
-                                <MapPin className="w-5 h-5 text-[var(--primary)] shrink-0 mt-0.5" />
+                        <div className="p-5 sm:p-6 md:p-8 rounded-2xl bg-white border-2 border-[var(--mk-ink)] shadow-[6px_6px_0_var(--mk-ink)] space-y-5">
+                            <div className="flex flex-col xs:flex-row items-start gap-4">
+                                <div className="w-10 h-10 rounded-xl bg-[var(--mk-cream)] border-2 border-[var(--mk-ink)] flex items-center justify-center shrink-0">
+                                    <MapPin className="w-5 h-5 text-[var(--mk-orange)]" />
+                                </div>
                                 <div>
-                                    <h3 className="font-bold text-xs sm:text-sm text-[var(--text-primary)] font-display mb-1">
+                                    <h3 className="font-black text-sm sm:text-base text-[var(--mk-ink)] font-display uppercase tracking-wider mb-2">
                                         Sekretariat {profile?.short_name || 'PK IMM Kaizen'}
                                     </h3>
-                                    <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
+                                    <p className="text-xs sm:text-sm text-[var(--mk-ink)]/80 font-medium leading-relaxed">
                                         {addressText}
                                     </p>
                                 </div>
                             </div>
 
-                            <div className="border-t border-[var(--border)] pt-3.5 flex items-center gap-3">
-                                <Clock className="w-5 h-5 text-[var(--accent)] shrink-0" />
+                            <div className="border-t-2 border-dashed border-[var(--mk-ink)]/20 pt-5 flex flex-col xs:flex-row items-start gap-4">
+                                <div className="w-10 h-10 rounded-xl bg-[var(--mk-cream)] border-2 border-[var(--mk-ink)] flex items-center justify-center shrink-0">
+                                    <Clock className="w-5 h-5 text-[var(--mk-orange)]" />
+                                </div>
                                 <div>
-                                    <h4 className="font-bold text-[10px] sm:text-xs text-[var(--text-primary)] font-display uppercase tracking-wider">
+                                    <h4 className="font-black text-xs sm:text-sm text-[var(--mk-ink)] font-display uppercase tracking-wider mb-1.5">
                                         Jam Layanan Kontak
                                     </h4>
-                                    <p className="text-xs text-[var(--text-secondary)] mt-0.5">
+                                    <span className="inline-block bg-[var(--mk-maroon)] text-white text-[11px] sm:text-xs font-bold px-2.5 py-1 rounded-md border border-[var(--mk-ink)]">
                                         Senin – Jumat, 09.00 – 17.00 WIB
-                                    </p>
+                                    </span>
                                 </div>
                             </div>
                         </div>
 
                     </div>
-
                 </div>
             </div>
         </div>
