@@ -14,7 +14,7 @@ export const contacts: { name: string; display: string; wa: string }[] = [
 ]
 
 export const registrationOpen = new Date('2026-11-12T00:00:00+07:00')
-export const registrationClose = new Date('2026-12-03T23:59:59+07:00')
+export const registrationClose = new Date('2026-11-26T23:59:59+07:00')
 
 export const formatDate = (d: Date) =>
     d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' })
