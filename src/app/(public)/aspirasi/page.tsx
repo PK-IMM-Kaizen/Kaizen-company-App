@@ -65,81 +65,102 @@ export default function AspirasiPage() {
 
     if (isSuccess) {
         return (
-            <div className="min-h-screen bg-[var(--background)] flex flex-col justify-between relative overflow-hidden font-sans selection:bg-[var(--primary)] selection:text-white">
-                <header className="p-4 sm:p-6 relative z-10 max-w-7xl mx-auto w-full flex items-center justify-between">
+            <div className="relative flex min-h-screen w-full flex-col justify-between overflow-hidden font-sans mk-light mk-bg-light selection:bg-[var(--mk-yellow)] selection:text-[var(--mk-maroon-deep)]">
+                <header className="relative z-20 mx-auto flex w-full max-w-7xl items-center justify-between p-4 sm:p-6 lg:p-8">
                     <Logo size="md" />
-                    <Link
-                        href="/"
-                        className="text-xs font-bold text-[var(--text-muted)] hover:text-[var(--primary)] flex items-center gap-1.5 font-display transition-colors"
-                    >
-                        <ArrowLeft className="w-4 h-4 text-[var(--primary)]" /> <span className="hidden xs:inline">Kembali ke Website</span>
-                    </Link>
                 </header>
 
-                <main className="flex-1 flex items-center justify-center p-4 sm:p-6 relative z-10 my-auto">
-                    <div className="max-w-lg w-full bg-[var(--card)] border border-[var(--border)] rounded-2xl sm:rounded-[var(--radius)] p-6 sm:p-10 text-center shadow-2xl animate-in fade-in zoom-in-95 duration-300">
-                        <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[var(--success)]/10 rounded-full flex items-center justify-center mx-auto mb-5 sm:mb-6 border border-[var(--success)]/30 text-[var(--success)]">
-                            <CheckCircle2 className="w-8 h-8 sm:w-10 sm:h-10" />
+                <main className="relative z-10 my-auto flex flex-1 items-center justify-center p-4 sm:p-6">
+                    <div className="pointer-events-none absolute inset-0 overflow-hidden mk-decor">
+                        <div className="opacity-10 mk-halftone mk-halftone--tl"></div>
+                        <div className="opacity-10 mk-halftone mk-halftone--br"></div>
+                    </div>
+
+                    <div className="relative z-20 w-full max-w-lg animate-in fade-in zoom-in-95 duration-500 rounded-2xl border-2 border-[var(--mk-ink)] bg-white p-8 text-center shadow-[8px_8px_0_var(--mk-ink)] sm:p-12">
+                        <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full border-2 border-[var(--mk-ink)] bg-[var(--mk-yellow)] text-[var(--mk-ink)] shadow-[4px_4px_0_var(--mk-ink)]">
+                            <CheckCircle2 className="h-10 w-10" />
                         </div>
-                        <h2 className="text-xl sm:text-3xl font-black text-[var(--text-primary)] mb-2.5 sm:mb-3 font-display">
+                        <h2 className="mb-4 font-display text-2xl font-black uppercase tracking-tight text-[var(--mk-ink)] sm:text-3xl">
                             Aspirasi Terkirim!
                         </h2>
-                        <p className="text-[var(--text-secondary)] text-xs sm:text-sm mb-6 sm:mb-8 leading-relaxed">
-                            Terima kasih atas masukan dan evaluasi yang Anda berikan. Suara Anda sangat berharga untuk kemajuan PK IMM Kaizen UMSURA.
+                        <p className="mb-8 text-sm font-medium leading-relaxed text-[var(--mk-ink)]/80 sm:text-base">
+                            Terima kasih atas masukan dan evaluasi yang Anda berikan. Suara Anda sangat berharga untuk kemajuan kepengurusan IMM Kaizen.
                         </p>
                         <Link
                             href="/"
-                            className="btn-primary w-full justify-center py-3.5 text-xs font-bold tracking-widest uppercase font-display flex items-center justify-center rounded-xl shadow-md transition-all hover:-translate-y-0.5"
+                            className="inline-flex w-full items-center justify-center rounded-xl border-2 border-[var(--mk-ink)] bg-[var(--mk-ink)] px-6 py-4 font-display text-sm font-black uppercase tracking-widest text-white shadow-[4px_4px_0_var(--mk-yellow)] transition-all hover:-translate-x-1 hover:-translate-y-1 hover:bg-[var(--mk-maroon)] hover:shadow-[6px_6px_0_var(--mk-yellow)] active:translate-x-1 active:translate-y-1 active:shadow-none sm:text-base"
                         >
                             Kembali ke Beranda
                         </Link>
                     </div>
                 </main>
 
-                <footer className="py-5 sm:py-6 border-t border-[var(--border)] text-center text-[10px] sm:text-xs text-[var(--text-muted)] font-display uppercase tracking-widest relative z-10 px-4">
-                    © 2026 PK IMM Kaizen · Universitas Muhammadiyah Surabaya
+                <footer className="relative z-10 flex justify-center px-4 pb-8 pt-4">
+                    <p className="flex items-center gap-2 rounded-full border-2 border-[var(--mk-ink)] bg-white px-5 py-2.5 font-display text-[10px] font-black uppercase tracking-widest text-[var(--mk-ink)] shadow-[4px_4px_0_var(--mk-ink)] sm:gap-3 sm:text-sm">
+                        <span>@IMM Kaizen UMSURA</span>
+                        <span aria-hidden className="h-4 w-[2px] bg-[var(--mk-ink)]/30" />
+                        <span className="text-[var(--mk-orange)]">Bidang Organisasi</span>
+                    </p>
                 </footer>
             </div>
         )
     }
 
     return (
-        <div className="min-h-screen bg-[var(--background)] flex flex-col justify-between relative overflow-hidden font-sans selection:bg-[var(--primary)] selection:text-white">
+        <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden font-sans mk-light mk-bg-light selection:bg-[var(--mk-yellow)] selection:text-[var(--mk-maroon-deep)]">
+            <div className="relative z-10 border-b-4 border-[var(--mk-yellow)] bg-[var(--mk-maroon-deep)] pb-28 pt-6 sm:pb-36 lg:pb-40 mk-curve-bottom">
 
-            <header className="p-4 sm:p-6 relative z-10 max-w-7xl mx-auto w-full flex items-center justify-between">
-                <Logo size="md" />
-                <Link
-                    href="/"
-                    className="text-xs font-bold text-[var(--text-muted)] hover:text-[var(--primary)] flex items-center gap-1.5 font-display transition-colors"
-                >
-                    <ArrowLeft className="w-4 h-4 text-[var(--primary)]" /> <span className="hidden xs:inline">Kembali ke Website</span>
-                </Link>
-            </header>
+                <header className="relative z-20 mx-auto mb-10 flex w-full max-w-7xl items-center justify-between px-4 sm:mb-16 sm:px-6 lg:px-8">
+                    <Link
+                        href="/"
+                        className="flex items-center gap-2 rounded-full border border-white/10 bg-[var(--mk-ink)]/40 px-4 py-2 font-display text-[10px] font-black uppercase tracking-widest text-white transition-colors hover:text-[var(--mk-yellow)] sm:text-xs"
+                    >
+                        <ArrowLeft className="h-4 w-4" />
+                        <span className="hidden xs:inline">Beranda</span>
+                        <span className="xs:hidden">Kembali</span>
+                    </Link>
+                </header>
 
-            <main className="flex-1 max-w-2xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-10 relative z-10 my-auto">
+                <div className="pointer-events-none mk-decor">
+                    <div className="opacity-20 mk-halftone mk-halftone--bl"></div>
+                    <div className="-right-8 top-20 opacity-30 mk-star mk-star--lg mk-star--spin"></div>
+                </div>
 
-                <div className="text-center mb-8 sm:mb-10">
-                    <h1 className="text-2xl xs:text-3xl sm:text-5xl font-black text-[var(--text-primary)] leading-tight font-display mb-3 tracking-tight">
-                        Suara Mahasiswa
+                <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col items-center px-4 text-center sm:px-6">
+                    <div className="mb-5 flex w-full items-center justify-center gap-3 md:mb-6">
+                        <div className="hidden h-[2px] w-6 bg-[var(--mk-orange)] xs:block sm:w-10"></div>
+                        <span className="whitespace-nowrap bg-[var(--mk-yellow)] px-4 py-1.5 font-display text-[10px] font-black uppercase text-[var(--mk-ink)] sm:text-xs md:text-sm mk-chip shadow-none">
+                            Aspirasi Terbuka
+                        </span>
+                        <div className="hidden h-[2px] w-6 bg-[var(--mk-orange)] xs:block sm:w-10"></div>
+                    </div>
+
+                    <h1 className="relative flex w-full justify-center px-2 text-4xl tracking-tight text-[var(--mk-maroon)] xs:text-5xl sm:text-6xl md:text-7xl lg:text-[5rem] mk-sticker-gradient">
+                        <span aria-hidden="true" className="absolute text-center leading-tight text-transparent mk-sticker-stroke">Suara Mahasiswa</span>
+                        <span className="relative text-center leading-tight mk-sticker-fill">Suara Mahasiswa</span>
                     </h1>
-                    <p className="text-[var(--text-muted)] text-xs sm:text-sm max-w-xl mx-auto leading-relaxed px-2">
+
+                    <p className="mx-auto mt-6 max-w-xl px-2 text-sm font-medium leading-relaxed text-white/90 sm:text-base">
                         Sampaikan kritik, saran, ide, atau aspirasimu untuk Pimpinan Komisariat IMM Kaizen secara terbuka atau anonim.
                     </p>
                 </div>
+            </div>
 
+            <main className="relative z-20 mx-auto -mt-16 flex w-full max-w-3xl flex-1 flex-col px-4 pb-12 sm:-mt-24 sm:px-6 lg:-mt-28">
                 {errorMessage && (
-                    <div className="mb-6 p-3.5 sm:p-4 rounded-xl bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800/40 text-xs font-bold flex items-center gap-2">
-                        <AlertCircle className="w-4 h-4 shrink-0" />
-                        <span>{errorMessage}</span>
+                    <div className="mb-6 flex items-center gap-3 rounded-xl border-2 border-[var(--mk-ink)] bg-white p-4 font-display text-xs font-black uppercase text-[var(--mk-maroon)] shadow-[4px_4px_0_var(--mk-maroon)] sm:text-sm">
+                        <AlertCircle className="h-5 w-5 shrink-0" />
+                        <span className="leading-snug">{errorMessage}</span>
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="bg-[var(--card)] border border-[var(--border)] rounded-2xl sm:rounded-[var(--radius)] p-5 sm:p-8 shadow-xl space-y-5 sm:space-y-6">
-
+                <form onSubmit={handleSubmit} className="space-y-6 rounded-2xl border-2 border-[var(--mk-ink)] bg-white p-5 shadow-[6px_6px_0_var(--mk-ink)] sm:space-y-8 sm:p-8 md:p-10 md:shadow-[8px_8px_0_var(--mk-ink)]">
                     <div>
-                        <div className="flex flex-col xs:flex-row xs:items-center justify-between gap-1 mb-1.5">
-                            <label htmlFor="nama" className="form-label mb-0 text-xs sm:text-sm font-medium">Nama</label>
-                            <span className="text-[10px] uppercase tracking-wider text-[var(--text-muted)] font-bold font-display">
+                        <div className="mb-2.5 flex flex-col justify-between gap-2 xs:flex-row xs:items-center">
+                            <label htmlFor="nama" className="font-display text-xs font-black uppercase tracking-wider text-[var(--mk-ink)] sm:text-sm">
+                                Nama Lengkap
+                            </label>
+                            <span className="w-fit rounded border border-[var(--mk-ink)] bg-[var(--mk-cream)] px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-[var(--mk-ink)] sm:text-[10px]">
                                 Opsional (Boleh Anonim)
                             </span>
                         </div>
@@ -150,21 +171,29 @@ export default function AspirasiPage() {
                             value={formData.nama}
                             onChange={handleChange}
                             placeholder="Samarkan atau kosongkan jika ingin anonim"
-                            className="form-input w-full px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/50 transition-all"
+                            className="w-full rounded-xl border-2 border-[var(--mk-ink)] bg-white px-4 py-3.5 text-sm font-medium text-[var(--mk-ink)] placeholder-[var(--mk-ink)]/40 transition-all duration-300 focus:-translate-x-1 focus:-translate-y-1 focus:shadow-[4px_4px_0_var(--mk-orange)] focus:outline-none sm:text-base"
                         />
                     </div>
 
                     <div>
-                        <label htmlFor="kategori" className="form-label block text-xs sm:text-sm font-medium mb-1.5">Kategori Aspirasi</label>
+                        <label htmlFor="kategori" className="mb-2.5 block font-display text-xs font-black uppercase tracking-wider text-[var(--mk-ink)] sm:text-sm">
+                            Kategori Aspirasi
+                        </label>
                         <select
                             id="kategori"
                             name="kategori"
                             required
                             value={formData.kategori}
                             onChange={handleChange}
-                            className="form-input w-full px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/50 transition-all cursor-pointer"
+                            className="w-full cursor-pointer appearance-none rounded-xl border-2 border-[var(--mk-ink)] bg-white px-4 py-3.5 text-sm font-medium text-[var(--mk-ink)] transition-all duration-300 focus:-translate-x-1 focus:-translate-y-1 focus:shadow-[4px_4px_0_var(--mk-orange)] focus:outline-none sm:text-base"
+                            style={{
+                                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%230f172a'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
+                                backgroundPosition: 'right 1rem center',
+                                backgroundRepeat: 'no-repeat',
+                                backgroundSize: '1.2em 1.2em'
+                            }}
                         >
-                            <option value="" disabled>Pilih Kategori Aspirasi</option>
+                            <option value="" disabled>-- Pilih Kategori --</option>
                             <option value="Kritik & Saran Organisasi">Kritik & Saran Organisasi</option>
                             <option value="Ide Program Kerja">Ide Program Kerja</option>
                             <option value="Fasilitas & Layanan">Fasilitas & Layanan Kemahasiswaan</option>
@@ -174,7 +203,9 @@ export default function AspirasiPage() {
                     </div>
 
                     <div>
-                        <label htmlFor="pesan" className="form-label block text-xs sm:text-sm font-medium mb-1.5">Isi Aspirasi</label>
+                        <label htmlFor="pesan" className="mb-2.5 block font-display text-xs font-black uppercase tracking-wider text-[var(--mk-ink)] sm:text-sm">
+                            Isi Aspirasi
+                        </label>
                         <textarea
                             id="pesan"
                             name="pesan"
@@ -182,39 +213,47 @@ export default function AspirasiPage() {
                             rows={5}
                             value={formData.pesan}
                             onChange={handleChange}
-                            placeholder="Tuliskan pesan, evaluasi, atau ide kamu secara jelas di sini..."
-                            className="form-input w-full px-4 py-3 text-xs sm:text-sm rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/50 transition-all resize-none leading-relaxed"
+                            placeholder="Tuliskan pesan, evaluasi, atau ide kamu secara tajam dan jelas di sini..."
+                            className="w-full resize-none rounded-xl border-2 border-[var(--mk-ink)] bg-white px-4 py-3.5 text-sm font-medium leading-relaxed text-[var(--mk-ink)] placeholder-[var(--mk-ink)]/40 transition-all duration-300 focus:-translate-x-1 focus:-translate-y-1 focus:shadow-[4px_4px_0_var(--mk-orange)] focus:outline-none sm:text-base md:rows-6"
                         ></textarea>
                     </div>
 
-                    <div className="pt-2">
+                    <div className="border-t-2 border-dashed border-[var(--mk-ink)]/20 pt-5 sm:pt-6">
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="btn-primary w-full justify-center py-3.5 sm:py-4 text-xs font-bold tracking-widest uppercase shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 rounded-xl transition-all hover:-translate-y-0.5"
+                            className="group flex w-full items-center justify-center gap-3 rounded-xl border-2 border-[var(--mk-ink)] bg-[var(--mk-yellow)] px-6 py-4 font-display text-xs font-black uppercase tracking-widest text-[var(--mk-ink)] shadow-[4px_4px_0_var(--mk-ink)] transition-all hover:-translate-x-1 hover:-translate-y-1 hover:bg-[var(--mk-orange)] hover:text-white hover:shadow-[6px_6px_0_var(--mk-ink)] active:translate-x-1 active:translate-y-1 active:shadow-none disabled:pointer-events-none disabled:opacity-60 sm:text-sm"
                         >
                             {isSubmitting ? (
                                 <>
-                                    <Loader2 className="w-4 h-4 animate-spin" />
-                                    Mengirim Aspirasi...
+                                    <Loader2 className="h-5 w-5 animate-spin" />
+                                    Mengirim...
                                 </>
                             ) : (
                                 <>
-                                    <Send className="w-4 h-4" /> Kirim Aspirasi Sekarang
+                                    <Send className="h-5 w-5 transition-transform group-hover:-translate-y-1 group-hover:translate-x-1" />
+                                    Kirim Aspirasi Sekarang
                                 </>
                             )}
                         </button>
-                        <p className="text-center text-[10px] sm:text-[11px] text-[var(--text-muted)] mt-3.5 flex items-center justify-center gap-1.5 font-sans leading-normal">
-                            <ShieldCheck className="w-3.5 h-3.5 text-[var(--text-muted)] shrink-0" />
-                            Suara dan identitas Anda dijaga kerahasiaannya.
-                        </p>
+
+                        <div className="mx-auto mt-5 flex max-w-max items-center justify-center gap-2 rounded-lg border border-[var(--mk-ink)] bg-[var(--mk-cream)] px-3 py-2 sm:px-4">
+                            <ShieldCheck className="h-4 w-4 shrink-0 text-[var(--mk-orange)] sm:h-5 sm:w-5" />
+                            <p className="text-center text-[9px] font-bold uppercase tracking-wider text-[var(--mk-ink)] sm:text-[10px] md:text-[11px]">
+                                Suara dan identitas Anda dijaga kerahasiaannya.
+                            </p>
+                        </div>
                     </div>
 
                 </form>
             </main>
 
-            <footer className="py-5 sm:py-6 border-t border-[var(--border)] text-center text-[10px] sm:text-xs text-[var(--text-muted)] font-display uppercase tracking-widest relative z-10 px-4">
-                © 2026 PK IMM Kaizen · Universitas Muhammadiyah Surabaya
+            <footer className="relative z-10 flex justify-center px-4 pb-10 pt-4 sm:pb-12 sm:pt-6">
+                <p className="flex cursor-default items-center gap-2 rounded-full border-2 border-[var(--mk-ink)] bg-white px-4 py-2.5 font-display text-[10px] font-black uppercase tracking-widest text-[var(--mk-ink)] shadow-[4px_4px_0_var(--mk-ink)] transition-transform hover:-translate-y-1 sm:gap-3 sm:px-5 sm:text-xs md:text-sm">
+                    <span>@IMM Kaizen</span>
+                    <span aria-hidden className="h-3 w-[2px] bg-[var(--mk-ink)]/30 sm:h-4" />
+                    <span className="text-[var(--mk-orange)]">Bidang Organisasi</span>
+                </p>
             </footer>
         </div>
     )
