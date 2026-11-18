@@ -9,18 +9,16 @@ import { navItems } from '../../app/lib/data'
 export default function Navbar() {
     const [scrolled, setScrolled] = useState(false)
     const [mobileOpen, setMobileOpen] = useState(false)
-
     const pathname = usePathname()
 
     useEffect(() => {
-        setMobileOpen(false);
-
+        setMobileOpen(false)
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [pathname])
 
     useEffect(() => {
         const onScroll = () => setScrolled(window.scrollY > 20)
-        window.addEventListener('scroll', onScroll)
+        window.addEventListener('scroll', onScroll, { passive: true })
         return () => window.removeEventListener('scroll', onScroll)
     }, [])
 
@@ -37,19 +35,19 @@ export default function Navbar() {
 
     const closeMobile = () => setMobileOpen(false)
 
-    const textColor = scrolled ? '#333' : '#fff'
-    const activeColor = scrolled ? '#C8102E' : '#F5C400'
     const logoVariant = scrolled ? 'default' : 'white'
 
     const getPath = (page: string) => {
-        if (page === 'home') return '/'
-        if (page === 'profile') return '/profil'
-        if (page === 'news') return '/berita'
-        if (page === 'management') return '/kepengurusan'
-        if (page === 'division') return '/bidang'
-        if (page === 'alumni') return '/alumni'
-        if (page === 'kontak') return '/kontak'
-        return `/${page}`
+        const paths: Record<string, string> = {
+            home: '/',
+            profile: '/profil',
+            news: '/berita',
+            management: '/kepengurusan',
+            division: '/bidang',
+            alumni: '/alumni',
+            kontak: '/kontak'
+        }
+        return paths[page] || `/${page}`
     }
 
     return (
@@ -76,14 +74,18 @@ export default function Navbar() {
                                     <Link
                                         key={item.page}
                                         href={itemPath}
-                                        className="relative px-4 py-2 text-[13px] font-semibold rounded-full transition-colors font-montserrat tracking-wide"
-                                        style={{ color: isActive ? activeColor : textColor }}
+                                        className={`relative px-4 py-2 text-[13px] font-semibold rounded-full transition-colors font-montserrat tracking-wide ${
+                                            isActive
+                                                ? (scrolled ? 'text-[#C8102E]' : 'text-[#F5C400]')
+                                                : (scrolled ? 'text-gray-800' : 'text-white')
+                                        }`}
                                     >
                                         {item.label}
                                         {isActive && (
                                             <span
-                                                className="absolute bottom-1.5 left-4 right-4 h-[2px] rounded-full transition-colors"
-                                                style={{ background: activeColor }}
+                                                className={`absolute bottom-1.5 left-4 right-4 h-[2px] rounded-full transition-colors ${
+                                                    scrolled ? 'bg-[#C8102E]' : 'bg-[#F5C400]'
+                                                }`}
                                             />
                                         )}
                                     </Link>
@@ -116,14 +118,14 @@ export default function Navbar() {
                         </div>
 
                         <button
-                            className="lg:hidden p-2 mr-1 rounded-full transition-colors relative z-50"
+                            className="lg:hidden p-2 mr-1 rounded-full transition-colors relative z-50 group"
                             onClick={() => setMobileOpen(!mobileOpen)}
                             aria-label="Menu"
                         >
                             <div className="w-5 flex flex-col gap-1.5">
-                                <span className="block h-0.5 transition-transform origin-center" style={{ background: textColor }} />
-                                <span className="block h-0.5 transition-opacity" style={{ background: textColor }} />
-                                <span className="block h-0.5 transition-transform origin-center" style={{ background: textColor }} />
+                                <span className={`block h-0.5 transition-transform origin-center ${scrolled ? 'bg-gray-800' : 'bg-white'}`} />
+                                <span className={`block h-0.5 transition-opacity ${scrolled ? 'bg-gray-800' : 'bg-white'}`} />
+                                <span className={`block h-0.5 transition-transform origin-center ${scrolled ? 'bg-gray-800' : 'bg-white'}`} />
                             </div>
                         </button>
                     </div>
@@ -151,7 +153,7 @@ export default function Navbar() {
                         <Logo size="sm" variant="default" />
                         <button
                             onClick={closeMobile}
-                            className="p-2 -mr-2 text-gray-400 hover:text-primary transition-colors rounded-full hover:bg-gray-50"
+                            className="p-2 -mr-2 text-gray-400 hover:text-gray-800 transition-colors rounded-full hover:bg-gray-50"
                         >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -168,11 +170,10 @@ export default function Navbar() {
                                 <Link
                                     key={item.page}
                                     href={itemPath}
-                                    className="w-full text-left px-4 py-3.5 rounded-xl text-sm font-semibold transition-all font-montserrat flex items-center justify-between group cursor-pointer"
-                                    style={{
-                                        color: isActive ? '#C8102E' : '#4B5563',
-                                        background: isActive ? '#FEF2F4' : 'transparent',
-                                    }}
+                                    onClick={closeMobile}
+                                    className={`w-full text-left px-4 py-3.5 rounded-xl text-sm font-semibold transition-all font-montserrat flex items-center justify-between group cursor-pointer ${
+                                        isActive ? 'text-[#C8102E] bg-[#FEF2F4]' : 'text-gray-600 hover:bg-gray-50'
+                                    }`}
                                 >
                                     {item.label}
                                     <span className={`text-[10px] transition-transform ${isActive ? 'translate-x-0 opacity-100' : '-translate-x-2 opacity-0 group-hover:translate-x-0 group-hover:opacity-100'}`}>
@@ -186,14 +187,15 @@ export default function Navbar() {
                     <div className="p-5 border-t border-gray-100 bg-gray-50/50 flex flex-col gap-3 relative z-10">
                         <Link
                             href="/daftar-dad"
-                            className="w-full py-3.5 rounded-xl shadow-md shadow-red-900/10 text-white font-bold text-sm transition-all hover:bg-[#9b0d23] hover:shadow-lg active:scale-[0.98] flex justify-center items-center cursor-pointer"
-                            style={{ background: '#C8102E' }}
+                            onClick={closeMobile}
+                            className="w-full py-3.5 rounded-xl shadow-md shadow-red-900/10 text-white font-bold text-sm transition-all bg-[#C8102E] hover:bg-[#9b0d23] hover:shadow-lg active:scale-[0.98] flex justify-center items-center cursor-pointer"
                         >
                             Daftar DAD
                         </Link>
 
                         <Link
                             href="/kaizen-company"
+                            onClick={closeMobile}
                             className="w-full py-3.5 rounded-xl border-2 border-gray-200 text-gray-700 font-semibold text-sm transition-all hover:bg-gray-100 active:scale-[0.98] flex justify-center items-center cursor-pointer"
                         >
                             Kaizen Company
