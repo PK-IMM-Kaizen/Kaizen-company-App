@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import { createBrowserClient } from '@supabase/ssr'
 import {
@@ -53,9 +53,13 @@ export default function DashboardOverviewPage() {
     const [recentNews, setRecentNews] = useState<any[]>([])
     const [recentActivities, setRecentActivities] = useState<any[]>([])
 
-    const supabase = createBrowserClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    const supabase = useMemo(
+        () =>
+            createBrowserClient(
+                process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+            ),
+        []
     )
 
     useEffect(() => {
@@ -89,7 +93,6 @@ export default function DashboardOverviewPage() {
                     supabase.from('pengurus').select('*', { count: 'exact', head: true }),
                     supabase.from('alumni').select('*', { count: 'exact', head: true }),
                     supabase.from('news').select('id, title, category, publish_date, status, created_at').order('created_at', { ascending: false }).limit(5),
-
                     supabase.from('system_logs').select('*').order('created_at', { ascending: false }).limit(3)
                 ])
 
@@ -117,7 +120,7 @@ export default function DashboardOverviewPage() {
 
     const stats = [
         { label: 'Berita Terbit', value: dashboardStats.publishedNews, color: 'var(--primary)', href: '/dashboard/berita', icon: <Newspaper className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--primary)]" /> },
-        { label: 'Draft Berita', value: dashboardStats.draftNews, color: 'var(--accent-dark)', href: '/dashboard/berita', icon: <FileEdit className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--accent-dark)]" /> },
+        { label: 'Draft Berita', value: dashboardStats.draftNews, color: 'var(--accent)', href: '/dashboard/berita', icon: <FileEdit className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--accent)]" /> },
         { label: 'Produk Aktif', value: dashboardStats.availableProducts, color: 'var(--success)', href: '/dashboard/ekowir', icon: <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--success)]" /> },
         { label: 'Pengurus Aktif', value: dashboardStats.activePengurus, color: 'var(--info)', href: '/dashboard/kepengurusan', icon: <Users className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--info)]" /> },
         { label: 'Alumni Terdaftar', value: dashboardStats.totalAlumni, color: '#6B46C1', href: '/dashboard/alumni', icon: <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5 text-[#6B46C1]" /> },
@@ -127,9 +130,9 @@ export default function DashboardOverviewPage() {
     const getActivityIcon = (actionOrType: string) => {
         switch (actionOrType) {
             case 'LOGIN_SUCCESS':
-                return <ShieldCheck className="w-3.5 h-3.5 text-green-500" />
+                return <ShieldCheck className="w-3.5 h-3.5 text-[var(--success)]" />
             case 'LOGIN_FAILED':
-                return <ShieldAlert className="w-3.5 h-3.5 text-red-500" />
+                return <ShieldAlert className="w-3.5 h-3.5 text-[var(--error)]" />
             case 'users':
                 return <Users className="w-3.5 h-3.5 text-[var(--info)]" />
             case 'news':
@@ -137,7 +140,7 @@ export default function DashboardOverviewPage() {
             case 'product':
                 return <Package className="w-3.5 h-3.5 text-[var(--success)]" />
             case 'draft':
-                return <FileEdit className="w-3.5 h-3.5 text-[var(--accent-dark)]" />
+                return <FileEdit className="w-3.5 h-3.5 text-[var(--accent)]" />
             default:
                 return <Activity className="w-3.5 h-3.5 text-[var(--primary)]" />
         }
@@ -156,27 +159,30 @@ export default function DashboardOverviewPage() {
 
     return (
         <div className="space-y-5 sm:space-y-6 font-sans w-full min-w-0">
-
             <div
-                className="rounded-2xl p-5 sm:p-6 lg:p-8 relative overflow-hidden shadow-sm w-full"
+                className="mk-bg-dark rounded-2xl p-5 sm:p-6 lg:p-8 relative overflow-hidden border-2 border-[var(--mk-ink)] shadow-[4px_4px_0_var(--mk-ink)] w-full"
                 style={{
-                    background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)'
+                    backgroundColor: 'var(--primary)'
                 }}
             >
-                <div className="relative z-10 flex items-start justify-between">
+                <div className="mk-decor">
+                    <div className="mk-dots right-6 top-4 opacity-25"></div>
+                    <div className="-right-8 -bottom-10 opacity-20 mk-star mk-star--lg mk-star--spin"></div>
+                </div>
+
+                <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                        <div className="flex items-center gap-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-1 text-white/70 font-display">
-                            Selamat Datang, {role === 'superadmin' ? 'Super Admin' : 'Admin'}
-                        </div>
-                        <h2 className="text-lg xs:text-xl sm:text-3xl font-black text-white font-display tracking-tight">
+                        <span className="mk-chip mb-2.5 shadow-[2px_2px_0_var(--mk-ink)]">
+                            {role === 'superadmin' ? 'Super Admin' : 'Admin'}
+                        </span>
+                        <h2 className="text-xl xs:text-2xl sm:text-3xl font-black text-white font-display tracking-tight uppercase">
                             Panel Admin IMM Kaizen
                         </h2>
-                        <p className="text-xs sm:text-sm mt-1 text-white/80 font-sans">
+                        <p className="text-xs sm:text-sm mt-1 text-white/85 font-sans">
                             Kaizen Company V1 — {currentDate || 'Memuat tanggal...'}
                         </p>
                     </div>
                 </div>
-                <div className="absolute -bottom-10 -right-10 w-36 h-36 sm:w-48 sm:h-48 bg-white/5 rounded-full blur-xl pointer-events-none" />
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 w-full">
@@ -184,36 +190,40 @@ export default function DashboardOverviewPage() {
                     <Link
                         href={s.href}
                         key={s.label}
-                        className="group bg-[var(--card)] rounded-2xl p-3.5 sm:p-4 border border-[var(--border)] shadow-sm hover:border-[var(--primary)] hover:shadow-md transition-all duration-300 block relative overflow-hidden"
+                        className="group bg-[var(--card)] rounded-xl p-3.5 sm:p-4 border border-[var(--border-strong)] shadow-[3px_3px_0_var(--border)] hover:border-[var(--mk-ink)] hover:shadow-[4px_4px_0_var(--accent-light)] hover:-translate-y-0.5 transition-all duration-200 block relative overflow-hidden"
                     >
                         <div className="flex items-center justify-between mb-2 sm:mb-3">
-                            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center group-hover:scale-105 transition-transform duration-300 shrink-0">
+                            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center group-hover:scale-105 transition-transform duration-200 shrink-0">
                                 {s.icon}
                             </div>
                             <span
-                                className="text-xl sm:text-2xl font-black font-display shrink-0"
+                                className="text-xl sm:text-2xl font-black font-display shrink-0 tabular-nums"
                                 style={{ color: s.color }}
                             >
                                 {s.value}
                             </span>
                         </div>
                         <div className="flex items-center justify-between mt-1">
-                            <p className="text-[10px] sm:text-xs font-bold text-[var(--text-muted)] group-hover:text-[var(--text-primary)] font-display uppercase tracking-wider transition-colors truncate">
+                            <p className="text-[10px] sm:text-xs font-bold text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] font-display uppercase tracking-wider transition-colors truncate">
                                 {s.label}
                             </p>
-                            <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[var(--text-muted)] opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 shrink-0 hidden sm:block" />
+                            <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[var(--primary)] opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 shrink-0 hidden sm:block" />
                         </div>
                     </Link>
                 ))}
             </div>
 
             <div className="flex flex-col lg:flex-row gap-5 sm:gap-6 w-full items-start">
+                <div className={`bg-[var(--card)] rounded-2xl border border-[var(--border-strong)] overflow-hidden shadow-[4px_4px_0_var(--surface-2)] flex flex-col w-full min-w-0 ${role === 'superadmin' ? 'lg:w-2/3' : 'lg:w-full'}`}>
+                    <div className="h-1 w-full bg-gradient-to-r from-[var(--primary)] via-[var(--accent)] to-[var(--accent-light)]" />
 
-                <div className={`bg-[var(--card)] rounded-2xl border border-[var(--border)] overflow-hidden shadow-sm flex flex-col w-full min-w-0 ${role === 'superadmin' ? 'lg:w-2/3' : 'lg:w-full'}`}>
                     <div className="px-4 sm:px-5 py-3.5 sm:py-4 border-b border-[var(--border)] bg-[var(--surface)] flex items-center justify-between">
-                        <h3 className="font-black text-xs sm:text-sm text-[var(--text-primary)] font-display uppercase tracking-wider">
-                            Berita Terkini
-                        </h3>
+                        <div className="flex items-center gap-2.5">
+                            <span className="w-1.5 h-4 rounded-full bg-[var(--primary)] inline-block" />
+                            <h3 className="font-black text-xs sm:text-sm text-[var(--text-primary)] font-display uppercase tracking-wider">
+                                Berita Terkini
+                            </h3>
+                        </div>
                         <Link
                             href="/dashboard/berita"
                             className="text-[11px] sm:text-xs font-bold text-[var(--primary)] hover:text-[var(--primary-dark)] flex items-center gap-1 transition-colors uppercase tracking-wider font-display"
@@ -223,39 +233,43 @@ export default function DashboardOverviewPage() {
                     </div>
 
                     <div className="overflow-x-auto w-full scrollbar-none">
-                        <table className="w-full text-left border-collapse min-w-[500px]">
+                        <table className="admin-table min-w-[500px]">
                             <thead>
-                            <tr className="bg-[var(--surface-2)] border-b border-[var(--border)] text-[10px] sm:text-xs text-[var(--text-muted)] uppercase tracking-wider font-display">
-                                <th className="p-3.5 sm:p-4 font-bold">Judul</th>
-                                <th className="p-3.5 sm:p-4 font-bold">Kategori</th>
-                                <th className="p-3.5 sm:p-4 font-bold">Tanggal</th>
-                                <th className="p-3.5 sm:p-4 font-bold">Status</th>
-                                <th className="p-3.5 sm:p-4 font-bold text-right">Aksi</th>
+                            <tr>
+                                <th>Judul</th>
+                                <th>Kategori</th>
+                                <th>Tanggal</th>
+                                <th>Status</th>
+                                <th className="text-right">Aksi</th>
                             </tr>
                             </thead>
                             <tbody>
                             {recentNews.length > 0 ? (
                                 recentNews.map(n => (
-                                    <tr key={n.id} className="border-b border-[var(--border)] hover:bg-[var(--surface)] transition-colors group">
-                                        <td className="p-3.5 sm:p-4">
+                                    <tr key={n.id} className="group">
+                                        <td>
                                             <p className="font-semibold text-xs text-[var(--text-primary)] font-display line-clamp-1">
                                                 {n.title}
                                             </p>
                                         </td>
-                                        <td className="p-3.5 sm:p-4">
+                                        <td>
                                                 <span className="text-[9px] sm:text-[10px] font-bold text-[var(--primary)] font-display bg-[var(--primary)]/10 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md uppercase tracking-wider whitespace-nowrap">
                                                     {n.category || '-'}
                                                 </span>
                                         </td>
-                                        <td className="p-3.5 sm:p-4 text-[11px] sm:text-xs text-[var(--text-muted)] whitespace-nowrap font-medium">
+                                        <td className="text-[11px] sm:text-xs text-[var(--text-muted)] whitespace-nowrap font-medium">
                                             {timeAgo(n.publish_date || n.created_at)}
                                         </td>
-                                        <td className="p-3.5 sm:p-4 whitespace-nowrap">
-                                                <span className={`text-[9px] sm:text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md ${n.status === 'published' ? 'bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-400' : 'bg-gray-100 text-gray-600 dark:bg-gray-500/10 dark:text-gray-400'}`}>
+                                        <td className="whitespace-nowrap">
+                                                <span className={`text-[9px] sm:text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md ${
+                                                    n.status === 'published'
+                                                        ? 'bg-[var(--success)]/15 text-[var(--success)]'
+                                                        : 'bg-[var(--surface-2)] text-[var(--text-secondary)]'
+                                                }`}>
                                                     {n.status === 'published' ? 'Terbit' : 'Draft'}
                                                 </span>
                                         </td>
-                                        <td className="p-3.5 sm:p-4 text-right">
+                                        <td className="text-right">
                                             <Link
                                                 href="/dashboard/berita"
                                                 className="inline-flex items-center justify-center p-1.5 text-[var(--text-muted)] hover:text-[var(--primary)] hover:bg-[var(--primary)]/10 rounded-lg transition-colors"
@@ -279,7 +293,9 @@ export default function DashboardOverviewPage() {
                 </div>
 
                 {role === 'superadmin' && (
-                    <div className="bg-[var(--card)] rounded-2xl border border-[var(--border)] overflow-hidden shadow-sm flex flex-col w-full lg:w-1/3 min-w-0">
+                    <div className="bg-[var(--card)] rounded-2xl border border-[var(--border-strong)] overflow-hidden shadow-[4px_4px_0_var(--surface-2)] flex flex-col w-full lg:w-1/3 min-w-0">
+                        <div className="h-1 w-full bg-gradient-to-r from-[var(--accent-light)] via-[var(--accent)] to-[var(--primary)]" />
+
                         <div className="px-4 sm:px-5 py-3.5 sm:py-4 border-b border-[var(--border)] bg-[var(--surface)] flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <Activity className="w-4 h-4 text-[var(--primary)] shrink-0" />
@@ -287,16 +303,16 @@ export default function DashboardOverviewPage() {
                                     Aktivitas Sistem
                                 </h3>
                             </div>
-                            <span className="text-[10px] font-bold px-2 py-0.5 bg-[var(--primary)]/10 text-[var(--primary)] rounded-full uppercase font-display">
+                            <span className="text-[10px] font-bold px-2.5 py-0.5 bg-[var(--accent-light)] text-[var(--mk-ink)] rounded-full uppercase font-display">
                                 Realtime
                             </span>
                         </div>
 
-                        <div className="p-4 sm:p-5 flex-1 bg-[var(--surface-2)]/30">
+                        <div className="p-4 sm:p-5 flex-1 bg-[var(--surface)]/40">
                             {recentActivities.length > 0 ? (
-                                <div className="space-y-3.5">
+                                <div className="space-y-3">
                                     {recentActivities.map((activity) => (
-                                        <div key={activity.id} className="p-3 rounded-xl border border-[var(--border)] bg-[var(--card)] shadow-sm hover:border-[var(--primary)]/30 transition-colors">
+                                        <div key={activity.id} className="p-3 rounded-xl border border-[var(--border)] bg-[var(--card)] shadow-xs hover:border-[var(--primary)]/40 transition-colors">
                                             <div className="flex items-center justify-between mb-1.5 gap-2">
                                                 <div className="flex items-center gap-1.5 min-w-0">
                                                     <div className="p-1 rounded-md bg-[var(--surface)] border border-[var(--border)] shrink-0">
