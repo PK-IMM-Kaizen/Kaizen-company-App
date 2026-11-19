@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import {
     Search,
     Trash2,
@@ -21,7 +21,8 @@ import {
     IdCard,
     ExternalLink,
     QrCode,
-    Image as ImageIcon
+    Image as ImageIcon,
+    Users
 } from 'lucide-react'
 import { createBrowserClient } from '@supabase/ssr'
 import Swal from 'sweetalert2'
@@ -72,16 +73,21 @@ export default function AdminDaftarDadPage() {
     const [selectedItem, setSelectedItem] = useState<DadRegistrant | null>(null)
     const [idCardItem, setIdCardItem] = useState<DadRegistrant | null>(null)
     const [previewImage, setPreviewImage] = useState<{ url: string; title: string } | null>(null)
+    const [isQrModalOpen, setIsQrModalOpen] = useState<boolean>(false)
 
-    const supabase = createBrowserClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    const supabase = useMemo(
+        () =>
+            createBrowserClient(
+                process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+            ),
+        []
     )
 
     useEffect(() => {
         fetchRegistrants()
         fetchSettings()
-    }, [])
+    }, [supabase])
 
     const fetchSettings = async () => {
         try {
@@ -293,14 +299,12 @@ export default function AdminDaftarDadPage() {
 
     const handleExportCSV = () => {
         const delimiter = ';'
-
         const headerArray = ['ID', 'Nama Lengkap', 'No. WhatsApp/HP', 'NIM', 'Asal', 'Tempat & Tanggal Lahir', 'Alamat Sekarang', 'Prodi', 'Status', 'Tanggal Daftar']
         const headers = headerArray.join(delimiter) + '\n'
 
         const rows = filteredList
             .map(r => {
                 const clean = (text: string) => `"${String(text).replace(/"/g, '""')}"`
-
                 return [
                     clean(r.id),
                     clean(r.namaLengkap),
@@ -337,90 +341,89 @@ export default function AdminDaftarDadPage() {
         fotoUrl: item.fotoUrl
     })
 
-    const [isQrModalOpen, setIsQrModalOpen] = useState<boolean>(false)
-
     return (
-        <div className="space-y-4 sm:space-y-6 font-sans">
-
-            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3 sm:gap-4 bg-[var(--card)] p-4 sm:p-6 rounded-2xl border border-[var(--border)] shadow-sm">
+        <div className="space-y-6 font-sans animate-in fade-in duration-300">
+            <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4 bg-[var(--card)] p-5 sm:p-6 rounded-2xl border-2 border-[var(--border-strong)] shadow-[4px_4px_0_var(--surface-2)] relative overflow-hidden">
+                <div className="h-1 w-full bg-gradient-to-r from-[var(--primary)] via-[var(--accent)] to-[var(--accent-light)] absolute top-0 left-0" />
                 <div>
-                    <h2 className="text-lg sm:text-xl font-black text-[var(--text-primary)] font-display flex items-center gap-2">
-                        Pendaftar DAD <span className="bg-[var(--primary)]/10 text-[var(--primary)] text-xs px-2.5 py-0.5 rounded-md font-bold">{registrants.length} Total</span>
+                    <h2 className="text-lg sm:text-xl font-black text-[var(--text-primary)] font-display uppercase tracking-tight flex items-center gap-2.5">
+                        <Users className="w-5 h-5 text-[var(--primary)] stroke-[2.5px]" />
+                        Pendaftar DAD
+                        <span className="bg-[var(--primary)]/10 border-2 border-[var(--primary)] text-[var(--primary)] text-[10px] px-2.5 py-1 rounded-lg font-black tracking-widest uppercase">
+                            {registrants.length} Total
+                        </span>
                     </h2>
-                    <p className="text-xs sm:text-sm text-[var(--text-muted)] mt-0.5">
+                    <p className="text-xs sm:text-sm text-[var(--text-secondary)] mt-1.5 font-medium ml-7">
                         Kelola data dan verifikasi calon peserta Darul Arqam Dasar
                     </p>
                 </div>
-                <div className="flex flex-wrap gap-2 sm:gap-3 w-full lg:w-auto items-center">
-
-                    <div className="flex items-center gap-2 bg-[var(--surface-2)] border border-[var(--border)] rounded-xl px-3 py-2 shadow-sm shrink-0">
+                <div className="flex flex-wrap gap-3 w-full xl:w-auto items-center">
+                    <div className="flex items-center gap-2 bg-[var(--surface)] border-2 border-[var(--border-strong)] rounded-xl px-3.5 py-2.5 shadow-[2px_2px_0_var(--surface-2)] shrink-0 h-[46px]">
                         {isToggling ? (
-                            <RefreshCw className="w-3.5 h-3.5 text-[var(--text-muted)] animate-spin" />
+                            <RefreshCw className="w-4 h-4 text-[var(--text-muted)] animate-spin stroke-[2.5px]" />
                         ) : (
-                            <Settings className="w-3.5 h-3.5 text-[var(--text-muted)]" />
+                            <Settings className="w-4 h-4 text-[var(--text-muted)] stroke-[2.5px]" />
                         )}
                         <select
                             value={isRegistrationOpen ? 'open' : 'closed'}
                             onChange={handleStatusChange}
                             disabled={isToggling}
-                            className={`text-xs font-bold bg-transparent focus:outline-none cursor-pointer disabled:opacity-50 font-display outline-none ${isRegistrationOpen ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
+                            className={`text-xs font-black bg-transparent focus:outline-none cursor-pointer disabled:opacity-50 font-display uppercase tracking-wider outline-none ${isRegistrationOpen ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
                         >
                             <option value="open" className="text-[var(--text-primary)] bg-[var(--card)]">Buka Pendaftaran</option>
                             <option value="closed" className="text-[var(--text-primary)] bg-[var(--card)]">Tutup Pendaftaran</option>
                         </select>
                     </div>
 
-                    <div className="h-6 w-px bg-[var(--border)] hidden sm:block"></div>
-
                     <button
                         onClick={() => setIsQrModalOpen(true)}
-                        className="flex-1 sm:flex-none py-2 sm:py-2.5 px-3.5 sm:px-4 bg-amber-500/10 border border-amber-500/30 hover:bg-amber-500/20 text-amber-700 dark:text-amber-400 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm font-display cursor-pointer"
+                        className="flex-1 sm:flex-none h-[46px] px-4 bg-amber-500 text-white border-2 border-amber-600 hover:bg-amber-600 text-[10px] sm:text-xs font-black uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2 shadow-[3px_3px_0_rgba(217,119,6,0.3)] hover:shadow-[3px_3px_0_var(--mk-ink)] font-display cursor-pointer hover:-translate-y-0.5"
                     >
-                        <QrCode className="w-3.5 h-3.5" /> Cetak QR Code
+                        <QrCode className="w-4 h-4 stroke-[2.5px]" /> <span className="hidden sm:inline">Cetak</span> QR Code
                     </button>
 
                     <button
                         onClick={handleExportCSV}
-                        className="flex-1 sm:flex-none py-2 sm:py-2.5 px-3.5 sm:px-4 bg-[var(--surface-2)] border border-[var(--border)] hover:bg-[var(--surface)] text-[var(--text-primary)] text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm font-display cursor-pointer"
+                        className="flex-1 sm:flex-none h-[46px] px-4 bg-[var(--surface)] border-2 border-[var(--border-strong)] text-[var(--text-primary)] hover:text-[var(--primary)] hover:border-[var(--primary)] text-[10px] sm:text-xs font-black uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2 shadow-[3px_3px_0_rgba(200,16,46,0.1)] hover:shadow-[3px_3px_0_rgba(200,16,46,0.2)] font-display cursor-pointer hover:-translate-y-0.5"
                     >
-                        <Download className="w-3.5 h-3.5 text-[var(--primary)]" /> Ekspor CSV
+                        <Download className="w-4 h-4 stroke-[2.5px]" /> Ekspor CSV
                     </button>
+
                     <button
                         onClick={fetchRegistrants}
-                        className="p-2 sm:p-2.5 bg-[var(--surface)] border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--primary)] rounded-xl transition-colors cursor-pointer"
+                        className="h-[46px] w-[46px] flex items-center justify-center bg-[var(--surface)] border-2 border-[var(--border-strong)] text-[var(--text-primary)] hover:text-[var(--primary)] hover:border-[var(--primary)] rounded-xl transition-all cursor-pointer shadow-[3px_3px_0_rgba(0,0,0,0.05)] hover:-translate-y-0.5"
                         title="Segarkan Data"
                     >
-                        <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+                        <RefreshCw className={`w-4 h-4 stroke-[2.5px] ${isLoading ? 'animate-spin' : ''}`} />
                     </button>
                 </div>
             </div>
 
-            <div className="bg-[var(--card)] rounded-2xl border border-[var(--border)] overflow-hidden shadow-sm">
-                <div className="p-3.5 sm:p-4 border-b border-[var(--border)] flex flex-col md:flex-row items-start md:items-center justify-between gap-3 sm:gap-4 bg-[var(--surface)]">
-                    <div className="relative w-full md:w-80 group">
-                        <Search className="w-4 h-4 text-[var(--text-muted)] absolute left-3.5 top-1/2 -translate-y-1/2 group-focus-within:text-[var(--primary)] transition-colors" />
+            <div className="bg-[var(--card)] rounded-2xl border-2 border-[var(--border-strong)] overflow-hidden shadow-[4px_4px_0_var(--surface-2)]">
+                <div className="p-4 sm:p-5 border-b-2 border-[var(--border-strong)] flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-[var(--surface)] relative">
+                    <div className="relative w-full md:w-96 group">
+                        <Search className="w-4 h-4 text-[var(--text-muted)] absolute left-4 top-1/2 -translate-y-1/2 group-focus-within:text-[var(--primary)] transition-colors stroke-[2.5px]" />
                         <input
                             type="text"
                             placeholder="Cari nama, NIM, no. HP, prodi..."
                             value={search}
                             onChange={e => setSearch(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 sm:py-2.5 rounded-xl border border-[var(--border)] bg-[var(--background)] text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 transition-all text-xs sm:text-sm"
+                            className="w-full pl-11 pr-4 py-3 rounded-xl border-2 border-[var(--border-strong)] bg-[var(--background)] text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--primary)] focus:shadow-[3px_3px_0_rgba(200,16,46,0.15)] transition-all text-xs sm:text-sm font-bold"
                         />
                     </div>
 
-                    <div className="flex items-center gap-2.5 w-full md:w-auto">
-                        <div className="flex items-center gap-1.5 text-xs text-[var(--text-muted)] shrink-0 font-medium font-display">
-                            <Filter className="w-3.5 h-3.5" /> Filter:
+                    <div className="flex items-center gap-3 w-full md:w-auto">
+                        <div className="flex items-center gap-1.5 text-[10px] text-[var(--text-muted)] shrink-0 font-black uppercase tracking-widest font-display">
+                            <Filter className="w-3.5 h-3.5 stroke-[2.5px]" /> Filter:
                         </div>
-
                         <select
                             value={statusFilter}
                             onChange={e => setStatusFilter(e.target.value)}
-                            className="bg-[var(--background)] border border-[var(--border)] text-xs text-[var(--text-primary)] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 cursor-pointer outline-none font-display w-full sm:w-auto"
+                            className="bg-[var(--background)] border-2 border-[var(--border-strong)] text-xs font-bold text-[var(--text-primary)] rounded-xl px-4 py-3 focus:outline-none focus:border-[var(--primary)] focus:shadow-[3px_3px_0_rgba(200,16,46,0.15)] cursor-pointer outline-none font-display uppercase tracking-wider w-full sm:w-auto transition-all"
                         >
                             <option value="all">Semua Status</option>
-                            <option value="pending">Menunggu Verifikasi</option>
-                            <option value="verified">Lolos Verifikasi</option>
+                            <option value="pending">Menunggu</option>
+                            <option value="verified">Terverifikasi</option>
                             <option value="rejected">Ditolak</option>
                         </select>
                     </div>
@@ -428,115 +431,115 @@ export default function AdminDaftarDadPage() {
 
                 <div className="overflow-x-auto w-full scrollbar-none">
                     {isLoading ? (
-                        <div className="text-center py-12 text-[var(--text-muted)] font-display text-xs font-bold flex items-center justify-center gap-2">
-                            <RefreshCw className="w-4 h-4 animate-spin text-[var(--primary)]" />
+                        <div className="text-center py-16 text-[var(--text-muted)] font-display text-xs font-black uppercase tracking-widest flex flex-col items-center justify-center gap-3">
+                            <RefreshCw className="w-6 h-6 animate-spin text-[var(--primary)] stroke-[2.5px]" />
                             Memuat data pendaftar DAD...
                         </div>
                     ) : filteredList.length === 0 ? (
-                        <div className="text-center py-12">
-                            <p className="text-xs sm:text-sm text-[var(--text-muted)] font-medium">Tidak ada data pendaftar DAD yang ditemukan.</p>
+                        <div className="text-center py-16">
+                            <p className="text-xs sm:text-sm text-[var(--text-muted)] font-black uppercase tracking-widest font-display">Tidak ada data pendaftar DAD yang ditemukan.</p>
                         </div>
                     ) : (
-                        <table className="w-full text-left border-collapse min-w-[750px]">
+                        <table className="w-full text-left border-collapse min-w-[850px]">
                             <thead>
-                            <tr className="bg-[var(--surface-2)] border-b border-[var(--border)] text-[10px] sm:text-xs text-[var(--text-muted)] uppercase tracking-wider font-display">
-                                <th className="p-3.5 sm:p-4 font-bold pl-5 sm:pl-6 w-[28%]">Nama & Kontak</th>
-                                <th className="p-3.5 sm:p-4 font-bold w-[22%]">Kampus & Asal</th>
-                                <th className="p-3.5 sm:p-4 font-bold w-[16%]">Tanggal Daftar</th>
-                                <th className="p-3.5 sm:p-4 font-bold w-[16%]">Status</th>
-                                <th className="p-3.5 sm:p-4 font-bold text-right pr-5 sm:pr-6 w-[18%]">Aksi</th>
+                            <tr className="bg-[var(--surface-2)] border-b-2 border-[var(--border-strong)] text-[10px] sm:text-xs text-[var(--text-primary)] uppercase tracking-widest font-black font-display">
+                                <th className="p-4 sm:p-5 pl-5 sm:pl-6 w-[30%]">Nama & Kontak</th>
+                                <th className="p-4 sm:p-5 w-[22%]">Kampus & Asal</th>
+                                <th className="p-4 sm:p-5 w-[15%]">Tanggal Daftar</th>
+                                <th className="p-4 sm:p-5 w-[15%]">Status</th>
+                                <th className="p-4 sm:p-5 text-right pr-5 sm:pr-6 w-[18%]">Aksi</th>
                             </tr>
                             </thead>
                             <tbody>
                             {filteredList.map(item => (
-                                <tr key={item.id} className="border-b border-[var(--border)] hover:bg-[var(--surface)] transition-colors group">
-                                    <td className="p-3.5 sm:p-4 pl-5 sm:pl-6 align-top">
+                                <tr key={item.id} className="border-b-2 border-dashed border-[var(--border-strong)] hover:bg-[var(--surface)] transition-colors group">
+                                    <td className="p-4 sm:p-5 pl-5 sm:pl-6 align-top">
                                         <div className="flex items-start gap-3">
                                             {item.fotoUrl ? (
                                                 <img
                                                     src={item.fotoUrl}
                                                     alt={item.namaLengkap}
-                                                    className="w-9 h-9 rounded-xl object-cover shrink-0 border border-[var(--border)] shadow-sm"
+                                                    className="w-12 h-12 rounded-xl object-cover shrink-0 border-2 border-[var(--border-strong)] shadow-[2px_2px_0_var(--border-strong)]"
                                                 />
                                             ) : (
-                                                <div className="w-9 h-9 rounded-xl bg-[var(--surface-2)] flex items-center justify-center shrink-0 border border-[var(--border)] text-[var(--text-muted)] font-bold text-xs">
+                                                <div className="w-12 h-12 rounded-xl bg-[var(--surface-2)] flex items-center justify-center shrink-0 border-2 border-[var(--border-strong)] shadow-[2px_2px_0_var(--border-strong)] text-[var(--text-muted)] font-black text-sm uppercase">
                                                     {item.namaLengkap.charAt(0)}
                                                 </div>
                                             )}
                                             <div>
-                                                <span className="text-xs sm:text-sm font-bold text-[var(--text-primary)] font-display block">
-                                                    {item.namaLengkap}
-                                                </span>
+                                                    <span className="text-sm font-black text-[var(--text-primary)] font-display block uppercase">
+                                                        {item.namaLengkap}
+                                                    </span>
                                                 <a
                                                     href={`https://wa.me/${item.nomorHp.replace(/\D/g, '')}`}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="text-[10px] sm:text-[11px] text-green-600 dark:text-green-400 font-semibold hover:underline flex items-center gap-1 mt-0.5"
+                                                    className="inline-flex mt-1.5 px-2 py-1 bg-green-500/10 border-2 border-green-500/30 text-green-700 dark:text-green-400 rounded-md text-[10px] font-black uppercase tracking-widest hover:bg-green-500 hover:text-white hover:border-green-600 transition-colors items-center gap-1.5"
                                                 >
-                                                    <Phone className="w-3 h-3" /> {item.nomorHp}
+                                                    <Phone className="w-3 h-3 stroke-[2.5px]" /> {item.nomorHp}
                                                 </a>
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="p-3.5 sm:p-4 align-top">
-                                        <div className="flex flex-col gap-1 text-[10px] sm:text-[11px]">
-                                            <span className="font-bold text-[var(--text-primary)]">
-                                                NIM: {item.nim}
-                                            </span>
+                                    <td className="p-4 sm:p-5 align-top">
+                                        <div className="flex flex-col gap-1.5 text-[10px] sm:text-[11px] font-bold font-display tracking-wide uppercase">
+                                                <span className="text-[var(--text-primary)]">
+                                                    <span className="text-[var(--text-muted)] mr-1">NIM:</span> {item.nim}
+                                                </span>
                                             <span className="text-[var(--text-secondary)]">
-                                                Prodi: {item.prodi}
-                                            </span>
-                                            <span className="flex items-center gap-1 text-[var(--text-muted)]">
-                                                <Home className="w-3 h-3 shrink-0" /> {item.asal}
-                                            </span>
+                                                    <span className="text-[var(--text-muted)] mr-1">PRODI:</span> {item.prodi}
+                                                </span>
+                                            <span className="flex items-center gap-1 text-[var(--text-secondary)] mt-1">
+                                                    <Home className="w-3.5 h-3.5 shrink-0 stroke-[2.5px]" /> {item.asal}
+                                                </span>
                                         </div>
                                     </td>
-                                    <td className="p-3.5 sm:p-4 text-[11px] sm:text-xs text-[var(--text-muted)] font-medium whitespace-nowrap font-display align-top">
-                                        <span className="flex items-center gap-1.5 mt-0.5">
-                                            <Calendar className="w-3.5 h-3.5 text-[var(--text-muted)] shrink-0" /> {item.createdAt}
-                                        </span>
+                                    <td className="p-4 sm:p-5 text-[11px] sm:text-xs text-[var(--text-primary)] font-bold whitespace-nowrap font-display align-top">
+                                            <span className="flex items-center gap-2 mt-0.5 bg-[var(--surface-2)] px-2.5 py-1.5 rounded-lg border-2 border-[var(--border-strong)] inline-flex">
+                                                <Calendar className="w-3.5 h-3.5 text-[var(--primary)] shrink-0 stroke-[2.5px]" /> {item.createdAt}
+                                            </span>
                                     </td>
-                                    <td className="p-3.5 sm:p-4 whitespace-nowrap align-top">
+                                    <td className="p-4 sm:p-5 whitespace-nowrap align-top">
                                         <div className="mt-0.5">
                                             {item.status === 'pending' && (
-                                                <span className="px-2.5 py-1 rounded-md text-[9px] sm:text-[10px] font-bold uppercase tracking-widest border bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-500/10 dark:text-orange-400 dark:border-orange-500/20 inline-flex items-center gap-1.5">
-                                                    <Clock className="w-3 h-3" /> Menunggu
-                                                </span>
+                                                <span className="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border-2 bg-orange-100 text-orange-800 border-orange-300 dark:bg-orange-500/20 dark:text-orange-400 dark:border-orange-500/40 inline-flex items-center gap-1.5 shadow-[2px_2px_0_rgba(249,115,22,0.2)]">
+                                                        <Clock className="w-3.5 h-3.5 stroke-[2.5px]" /> Menunggu
+                                                    </span>
                                             )}
                                             {item.status === 'verified' && (
-                                                <span className="px-2.5 py-1 rounded-md text-[9px] sm:text-[10px] font-bold uppercase tracking-widest border bg-green-50 text-green-700 border-green-200 dark:bg-green-500/10 dark:text-green-400 dark:border-green-500/20 inline-flex items-center gap-1.5">
-                                                    <CheckCircle2 className="w-3 h-3" /> Terverifikasi
-                                                </span>
+                                                <span className="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border-2 bg-green-100 text-green-800 border-green-300 dark:bg-green-500/20 dark:text-green-400 dark:border-green-500/40 inline-flex items-center gap-1.5 shadow-[2px_2px_0_rgba(34,197,94,0.2)]">
+                                                        <CheckCircle2 className="w-3.5 h-3.5 stroke-[2.5px]" /> Lolos
+                                                    </span>
                                             )}
                                             {item.status === 'rejected' && (
-                                                <span className="px-2.5 py-1 rounded-md text-[9px] sm:text-[10px] font-bold uppercase tracking-widest border bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20 inline-flex items-center gap-1.5">
-                                                    <XCircle className="w-3 h-3" /> Ditolak
-                                                </span>
+                                                <span className="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border-2 bg-red-100 text-red-800 border-red-300 dark:bg-red-500/20 dark:text-red-400 dark:border-red-500/40 inline-flex items-center gap-1.5 shadow-[2px_2px_0_rgba(239,68,68,0.2)]">
+                                                        <XCircle className="w-3.5 h-3.5 stroke-[2.5px]" /> Ditolak
+                                                    </span>
                                             )}
                                         </div>
                                     </td>
-                                    <td className="p-3.5 sm:p-4 pr-5 sm:pr-6 text-right align-top">
-                                        <div className="flex items-center justify-end gap-1">
+                                    <td className="p-4 sm:p-5 pr-5 sm:pr-6 text-right align-top">
+                                        <div className="flex items-center justify-end gap-2">
                                             <button
                                                 onClick={() => setIdCardItem(item)}
-                                                className="p-1.5 sm:p-2 text-[var(--text-muted)] hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-500/10 rounded-lg transition-colors cursor-pointer"
+                                                className="p-2 bg-[var(--surface)] border-2 border-[var(--border-strong)] text-[var(--text-muted)] hover:text-amber-600 hover:border-amber-500 rounded-xl transition-all cursor-pointer shadow-[2px_2px_0_var(--surface-2)] hover:-translate-y-0.5"
                                                 title="Lihat ID Card"
                                             >
-                                                <IdCard className="w-4 h-4" />
+                                                <IdCard className="w-4 h-4 stroke-[2.5px]" />
                                             </button>
                                             <button
                                                 onClick={() => setSelectedItem(item)}
-                                                className="p-1.5 sm:p-2 text-[var(--text-muted)] hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-lg transition-colors cursor-pointer"
+                                                className="p-2 bg-[var(--surface)] border-2 border-[var(--border-strong)] text-[var(--text-muted)] hover:text-blue-600 hover:border-blue-500 rounded-xl transition-all cursor-pointer shadow-[2px_2px_0_var(--surface-2)] hover:-translate-y-0.5"
                                                 title="Detail & Verifikasi"
                                             >
-                                                <Eye className="w-4 h-4" />
+                                                <Eye className="w-4 h-4 stroke-[2.5px]" />
                                             </button>
                                             <button
                                                 onClick={() => handleDelete(item.id, item.namaLengkap)}
-                                                className="p-1.5 sm:p-2 text-[var(--text-muted)] hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors cursor-pointer"
+                                                className="p-2 bg-[var(--surface)] border-2 border-[var(--border-strong)] text-[var(--text-muted)] hover:text-white hover:bg-[var(--primary)] hover:border-[var(--primary)] rounded-xl transition-all cursor-pointer shadow-[2px_2px_0_var(--surface-2)] hover:-translate-y-0.5"
                                                 title="Hapus Data"
                                             >
-                                                <Trash2 className="w-4 h-4" />
+                                                <Trash2 className="w-4 h-4 stroke-[2.5px]" />
                                             </button>
                                         </div>
                                     </td>
@@ -550,142 +553,142 @@ export default function AdminDaftarDadPage() {
 
             {selectedItem && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-                    <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl relative space-y-4 animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto scrollbar-none">
+                    <div className="bg-[var(--card)] border-2 border-[var(--border-strong)] rounded-2xl max-w-lg w-full p-5 sm:p-7 shadow-[8px_8px_0_var(--surface-2)] relative space-y-5 animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto scrollbar-none">
+                        <div className="h-1.5 w-full bg-gradient-to-r from-[var(--primary)] via-[var(--accent)] to-[var(--accent-light)] absolute top-0 left-0" />
 
-                        <div className="flex items-center justify-between pb-3 border-b border-[var(--border)]">
+                        <div className="flex items-center justify-between pb-4 border-b-2 border-dashed border-[var(--border-strong)]">
                             <div>
-                                <h3 className="text-sm sm:text-base font-black text-[var(--text-primary)] font-display uppercase tracking-wider">Detail Calon Peserta DAD</h3>
+                                <h3 className="text-sm sm:text-base font-black text-[var(--text-primary)] font-display uppercase tracking-widest">Detail Calon Peserta</h3>
                             </div>
                             <button
                                 onClick={() => setSelectedItem(null)}
-                                className="p-1.5 text-[var(--text-muted)] hover:text-[var(--text-primary)] rounded-lg hover:bg-[var(--surface-2)] transition-colors cursor-pointer"
+                                className="p-2 text-[var(--text-muted)] hover:text-[var(--text-primary)] border-2 border-transparent hover:border-[var(--border-strong)] rounded-xl hover:bg-[var(--surface)] transition-all cursor-pointer"
                             >
-                                <X className="w-5 h-5" />
+                                <X className="w-5 h-5 stroke-[2.5px]" />
                             </button>
                         </div>
 
-                        <div className="flex items-center gap-4 bg-[var(--surface)] p-3.5 rounded-xl border border-[var(--border)] font-display">
+                        <div className="flex items-center gap-4 bg-[var(--surface)] p-4 rounded-xl border-2 border-[var(--border-strong)] shadow-[3px_3px_0_var(--surface-2)] font-display">
                             {selectedItem.fotoUrl ? (
                                 <img
                                     src={selectedItem.fotoUrl}
                                     alt={selectedItem.namaLengkap}
-                                    className="w-16 h-20 rounded-lg object-cover cursor-pointer border border-[var(--border)] shadow-sm hover:opacity-90"
+                                    className="w-20 h-24 rounded-lg object-cover cursor-pointer border-2 border-[var(--border-strong)] shadow-sm hover:opacity-90 transition-opacity"
                                     onClick={() => setPreviewImage({ url: selectedItem.fotoUrl, title: `Foto ${selectedItem.namaLengkap}` })}
                                 />
                             ) : (
-                                <div className="w-16 h-20 rounded-lg bg-[var(--surface-2)] flex items-center justify-center text-[var(--text-muted)] font-bold">
+                                <div className="w-20 h-24 rounded-lg bg-[var(--surface-2)] border-2 border-[var(--border-strong)] flex items-center justify-center text-[var(--text-muted)] font-black text-xs uppercase tracking-widest text-center">
                                     No Photo
                                 </div>
                             )}
-                            <div className="space-y-1 min-w-0 flex-1">
-                                <span className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider block">Nama Lengkap</span>
-                                <span className="text-sm font-black text-[var(--text-primary)] truncate block">{selectedItem.namaLengkap}</span>
-                                <span className="text-xs font-semibold text-green-600 dark:text-green-400 flex items-center gap-1">
-                                    <Phone className="w-3.5 h-3.5" /> {selectedItem.nomorHp}
+                            <div className="space-y-1.5 min-w-0 flex-1">
+                                <span className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest block">Nama Lengkap</span>
+                                <span className="text-sm sm:text-base font-black text-[var(--text-primary)] truncate block uppercase">{selectedItem.namaLengkap}</span>
+                                <span className="inline-flex mt-1 px-2.5 py-1 bg-green-500/10 border-2 border-green-500/30 text-green-700 dark:text-green-400 rounded-md text-[10px] font-black uppercase tracking-widest items-center gap-1.5">
+                                    <Phone className="w-3 h-3 stroke-[2.5px]" /> {selectedItem.nomorHp}
                                 </span>
                             </div>
                         </div>
 
-                        <div className="space-y-3 font-display">
-                            <div className="bg-[var(--surface)] p-3.5 rounded-xl border border-[var(--border)] space-y-2.5">
-                                <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-4 font-display">
+                            <div className="bg-[var(--surface)] p-4 rounded-xl border-2 border-[var(--border-strong)] shadow-[3px_3px_0_var(--surface-2)] space-y-3">
+                                <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider block">NIM</span>
-                                        <span className="text-xs font-bold text-[var(--text-primary)] mt-0.5 block">{selectedItem.nim}</span>
+                                        <span className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest block mb-1">NIM</span>
+                                        <span className="text-xs font-bold text-[var(--text-primary)] block uppercase">{selectedItem.nim}</span>
                                     </div>
                                     <div>
-                                        <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider block">Program Studi</span>
-                                        <span className="text-xs font-bold text-[var(--text-primary)] mt-0.5 block">{selectedItem.prodi}</span>
+                                        <span className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest block mb-1">Program Studi</span>
+                                        <span className="text-xs font-bold text-[var(--text-primary)] block uppercase">{selectedItem.prodi}</span>
                                     </div>
                                 </div>
-                                <div>
-                                    <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider block">Tempat, Tanggal Lahir</span>
-                                    <span className="text-xs font-bold text-[var(--text-secondary)] mt-0.5 block">{selectedItem.tempatTanggalLahir}</span>
+                                <div className="pt-3 border-t-2 border-dashed border-[var(--border-strong)]">
+                                    <span className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest block mb-1">Tempat, Tanggal Lahir</span>
+                                    <span className="text-xs font-bold text-[var(--text-secondary)] block uppercase">{selectedItem.tempatTanggalLahir}</span>
                                 </div>
                             </div>
 
-                            <div className="bg-[var(--surface)] p-3.5 rounded-xl border border-[var(--border)] space-y-2.5">
+                            <div className="bg-[var(--surface)] p-4 rounded-xl border-2 border-[var(--border-strong)] shadow-[3px_3px_0_var(--surface-2)] space-y-3">
                                 <div>
-                                    <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider block">Asal Daerah</span>
-                                    <span className="text-xs font-bold text-[var(--text-secondary)] mt-0.5 block">{selectedItem.asal}</span>
+                                    <span className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest block mb-1">Asal Daerah</span>
+                                    <span className="text-xs font-bold text-[var(--text-secondary)] block uppercase">{selectedItem.asal}</span>
                                 </div>
-                                <div>
-                                    <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider block">Domisili Saat Ini</span>
-                                    <span className="text-xs font-bold text-[var(--text-secondary)] mt-0.5 block">{selectedItem.alamat_sekarang}</span>
+                                <div className="pt-3 border-t-2 border-dashed border-[var(--border-strong)]">
+                                    <span className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest block mb-1">Domisili Saat Ini</span>
+                                    <span className="text-xs font-bold text-[var(--text-secondary)] block uppercase">{selectedItem.alamat_sekarang}</span>
                                 </div>
                             </div>
 
-                            <div className="bg-[var(--surface)] p-3.5 rounded-xl border border-[var(--border)] space-y-2 font-display">
-                                <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider block">Bukti Pembayaran</span>
+                            <div className="bg-[var(--surface)] p-4 rounded-xl border-2 border-[var(--border-strong)] shadow-[3px_3px_0_var(--surface-2)] space-y-3 font-display">
+                                <span className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest block">Bukti Pembayaran</span>
                                 {selectedItem.buktiPembayaranUrl ? (
-                                    <div className="flex items-center justify-between bg-[var(--background)] p-2.5 rounded-lg border border-[var(--border)]">
-                                        <span className="text-xs font-medium text-[var(--text-primary)] flex items-center gap-2 truncate">
-                                            <FileText className="w-4 h-4 text-amber-500 shrink-0" />
-                                            Bukti Transfer Pembayaran
+                                    <div className="flex items-center justify-between bg-[var(--background)] p-3 rounded-xl border-2 border-[var(--border-strong)]">
+                                        <span className="text-xs font-bold text-[var(--text-primary)] flex items-center gap-2 truncate uppercase">
+                                            <FileText className="w-4 h-4 text-amber-500 shrink-0 stroke-[2.5px]" />
+                                            Bukti Transfer
                                         </span>
                                         <button
                                             type="button"
                                             onClick={() => setPreviewImage({ url: selectedItem.buktiPembayaranUrl!, title: `Bukti Pembayaran - ${selectedItem.namaLengkap}` })}
-                                            className="px-2.5 py-1 bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 text-xs font-bold rounded-md transition-colors flex items-center gap-1 shrink-0 cursor-pointer"
+                                            className="px-3 py-1.5 bg-amber-500 text-white border-2 border-amber-600 hover:bg-amber-600 text-[10px] font-black rounded-lg transition-all flex items-center gap-1.5 shrink-0 cursor-pointer uppercase tracking-widest shadow-[2px_2px_0_rgba(217,119,6,0.3)] hover:-translate-y-0.5"
                                         >
-                                            <ImageIcon className="w-3.5 h-3.5" /> Lihat Bukti
+                                            <ImageIcon className="w-3.5 h-3.5 stroke-[2.5px]" /> Lihat
                                         </button>
                                     </div>
                                 ) : (
-                                    <span className="text-xs text-[var(--text-muted)] italic block">Belum mengunggah bukti pembayaran</span>
+                                    <span className="text-xs text-[var(--text-muted)] italic font-bold block bg-[var(--background)] p-3 rounded-xl border-2 border-dashed border-[var(--border-strong)] text-center">Belum mengunggah bukti pembayaran</span>
                                 )}
                             </div>
                         </div>
 
-                        <div className="pt-2 border-t border-[var(--border)] font-display">
-                            <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase block mb-2 tracking-wide">Verifikasi Kelayakan Peserta:</span>
-                            <div className="flex gap-2">
+                        <div className="pt-4 border-t-2 border-dashed border-[var(--border-strong)] font-display">
+                            <span className="text-[10px] font-black text-[var(--text-muted)] uppercase block mb-3 tracking-widest text-center">Verifikasi Kelayakan Peserta</span>
+                            <div className="flex gap-3">
                                 <button
                                     onClick={() => handleUpdateStatus(selectedItem.id, 'verified')}
                                     disabled={isSaving}
-                                    className={`flex-1 py-2.5 px-3 text-xs font-bold rounded-xl border transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                                    className={`flex-1 py-3 px-3 text-[10px] sm:text-xs font-black uppercase tracking-widest rounded-xl border-2 transition-all cursor-pointer flex items-center justify-center gap-2 hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0 ${
                                         selectedItem.status === 'verified'
-                                            ? 'bg-green-600 text-white border-green-600 shadow-sm'
-                                            : 'bg-[var(--surface-2)] text-[var(--text-primary)] border-[var(--border)] hover:bg-[var(--surface)]'
+                                            ? 'bg-green-600 text-white border-green-700 shadow-[3px_3px_0_var(--mk-ink)]'
+                                            : 'bg-[var(--surface)] text-[var(--text-primary)] border-[var(--border-strong)] hover:border-green-600 hover:text-green-600 shadow-[3px_3px_0_rgba(0,0,0,0.05)]'
                                     }`}
                                 >
-                                    <CheckCircle2 className="w-4 h-4" /> Loloskan
+                                    <CheckCircle2 className="w-4 h-4 stroke-[2.5px]" /> Loloskan
                                 </button>
                                 <button
                                     onClick={() => handleUpdateStatus(selectedItem.id, 'rejected')}
                                     disabled={isSaving}
-                                    className={`flex-1 py-2.5 px-3 text-xs font-bold rounded-xl border transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                                    className={`flex-1 py-3 px-3 text-[10px] sm:text-xs font-black uppercase tracking-widest rounded-xl border-2 transition-all cursor-pointer flex items-center justify-center gap-2 hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0 ${
                                         selectedItem.status === 'rejected'
-                                            ? 'bg-red-600 text-white border-red-600 shadow-sm'
-                                            : 'bg-[var(--surface-2)] text-[var(--text-primary)] border-[var(--border)] hover:bg-[var(--surface)]'
+                                            ? 'bg-red-600 text-white border-red-700 shadow-[3px_3px_0_var(--mk-ink)]'
+                                            : 'bg-[var(--surface)] text-[var(--text-primary)] border-[var(--border-strong)] hover:border-[var(--primary)] hover:text-[var(--primary)] shadow-[3px_3px_0_rgba(0,0,0,0.05)]'
                                     }`}
                                 >
-                                    <XCircle className="w-4 h-4" /> Tolak
+                                    <XCircle className="w-4 h-4 stroke-[2.5px]" /> Tolak
                                 </button>
                             </div>
                         </div>
-
                     </div>
                 </div>
             )}
 
             {idCardItem && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-                    <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl max-w-sm w-full p-5 shadow-2xl relative space-y-4 animate-in fade-in zoom-in-95 duration-200">
-                        <div className="flex items-center justify-between pb-3 border-b border-[var(--border)] font-display">
+                    <div className="bg-[var(--card)] border-2 border-[var(--border-strong)] rounded-2xl max-w-sm w-full p-5 shadow-[8px_8px_0_var(--surface-2)] relative space-y-4 animate-in fade-in zoom-in-95 duration-200">
+                        <div className="h-1.5 w-full bg-gradient-to-r from-[var(--primary)] via-[var(--accent)] to-[var(--accent-light)] absolute top-0 left-0" />
+                        <div className="flex items-center justify-between pb-4 border-b-2 border-dashed border-[var(--border-strong)] font-display">
                             <div>
-                                <h3 className="text-sm font-black text-[var(--text-primary)] uppercase tracking-wider">Pratinjau ID Card Peserta</h3>
-                                <p className="text-[11px] text-[var(--text-muted)] mt-0.5">{idCardItem.namaLengkap}</p>
+                                <h3 className="text-xs sm:text-sm font-black text-[var(--text-primary)] uppercase tracking-widest">Pratinjau ID Card</h3>
+                                <p className="text-[10px] font-bold text-[var(--text-muted)] mt-1 uppercase">{idCardItem.namaLengkap}</p>
                             </div>
                             <button
                                 onClick={() => setIdCardItem(null)}
-                                className="p-1.5 text-[var(--text-muted)] hover:text-[var(--text-primary)] rounded-lg hover:bg-[var(--surface-2)] transition-colors cursor-pointer"
+                                className="p-2 text-[var(--text-muted)] hover:text-[var(--text-primary)] border-2 border-transparent hover:border-[var(--border-strong)] rounded-xl hover:bg-[var(--surface)] transition-all cursor-pointer"
                             >
-                                <X className="w-5 h-5" />
+                                <X className="w-5 h-5 stroke-[2.5px]" />
                             </button>
                         </div>
-
-                        <div className="py-2">
+                        <div className="py-2 flex justify-center">
                             <IdCardResult data={getIdCardData(idCardItem)} />
                         </div>
                     </div>
@@ -693,32 +696,32 @@ export default function AdminDaftarDadPage() {
             )}
 
             {previewImage && (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 backdrop-blur-md p-4 animate-in fade-in duration-200">
                     <div className="relative max-w-2xl w-full flex flex-col items-center">
                         <button
                             onClick={() => setPreviewImage(null)}
-                            className="absolute -top-10 right-0 p-2 text-white/80 hover:text-white transition-colors cursor-pointer"
+                            className="absolute -top-12 right-0 p-2 text-white/70 hover:text-white transition-colors cursor-pointer bg-black/50 rounded-full border-2 border-white/20 hover:border-white"
                         >
-                            <X className="w-6 h-6" />
+                            <X className="w-6 h-6 stroke-[2.5px]" />
                         </button>
-                        <h4 className="text-white text-sm font-bold mb-3 font-display">{previewImage.title}</h4>
+                        <h4 className="text-white text-xs sm:text-sm font-black uppercase tracking-widest mb-4 font-display bg-black/50 px-4 py-2 rounded-xl border-2 border-white/20">{previewImage.title}</h4>
                         <img
                             src={previewImage.url}
                             alt={previewImage.title}
-                            className="max-h-[80vh] w-auto max-w-full rounded-2xl object-contain border border-white/20 shadow-2xl"
+                            className="max-h-[75vh] w-auto max-w-full rounded-2xl object-contain border-4 border-white/20 shadow-2xl"
                         />
                         <a
                             href={previewImage.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="mt-4 px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded-xl transition-colors flex items-center gap-2 font-display"
+                            className="mt-6 px-5 py-3 bg-white text-black hover:bg-gray-200 text-[10px] sm:text-xs font-black uppercase tracking-widest rounded-xl transition-colors flex items-center gap-2 font-display border-2 border-transparent hover:border-gray-400 hover:-translate-y-0.5 shadow-[4px_4px_0_rgba(255,255,255,0.2)]"
                         >
-                            <ExternalLink className="w-4 h-4" /> Buka Ukuran Penuh
+                            <ExternalLink className="w-4 h-4 stroke-[2.5px]" /> Buka Ukuran Penuh
                         </a>
-
                     </div>
                 </div>
             )}
+
             <QrCodeModal
                 isOpen={isQrModalOpen}
                 onClose={() => setIsQrModalOpen(false)}
