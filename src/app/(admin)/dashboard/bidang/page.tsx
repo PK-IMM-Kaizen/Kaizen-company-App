@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Edit2, ArrowLeft, Image as ImageIcon, Search, RefreshCw, Briefcase, Info } from 'lucide-react'
 import { createBrowserClient } from '@supabase/ssr'
+import Swal from 'sweetalert2'
 
 export interface Division {
     id: string
@@ -11,6 +12,18 @@ export interface Division {
     color: string
     photo: string
 }
+
+const Toast = Swal.mixin({
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+        toast.onmouseenter = Swal.stopTimer;
+        toast.onmouseleave = Swal.resumeTimer;
+    }
+});
 
 export default function AdminBidangPage() {
     const [items, setItems] = useState<Division[]>([])
@@ -46,6 +59,10 @@ export default function AdminBidangPage() {
             }
         } catch (error: any) {
             console.error('Gagal mengambil data bidang:', error.message)
+            Toast.fire({
+                icon: 'error',
+                title: 'Gagal memuat data bidang'
+            })
         } finally {
             setIsLoading(false)
         }
@@ -99,10 +116,18 @@ export default function AdminBidangPage() {
 
             await logActivity('memperbarui', `Deskripsi/Foto Bidang: ${editItem.name}`, 'bidang')
 
+            Toast.fire({
+                icon: 'success',
+                title: 'Profil bidang berhasil diperbarui!'
+            })
+
             await fetchDivisions()
             setView('list')
         } catch (error: any) {
-            alert(`Gagal menyimpan perubahan: ${error.message}`)
+            Toast.fire({
+                icon: 'error',
+                title: `Gagal menyimpan: ${error.message}`
+            })
         } finally {
             setIsSaving(false)
         }
@@ -112,44 +137,46 @@ export default function AdminBidangPage() {
 
     if (view === 'edit' && editItem) {
         return (
-            <div className="animate-in fade-in duration-300 space-y-4 sm:space-y-6 font-sans">
-                <div className="flex items-center gap-2.5 sm:gap-3">
+            <div className="animate-in fade-in duration-300 space-y-5 sm:space-y-6 font-sans">
+                <div className="flex items-center gap-3">
                     <button
                         onClick={() => setView('list')}
-                        className="text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--primary)] flex items-center gap-1.5 font-display transition-colors bg-[var(--surface)] px-3 py-1.5 rounded-lg border border-[var(--border)] cursor-pointer"
+                        className="text-xs font-black text-[var(--text-primary)] uppercase tracking-widest hover:border-[var(--mk-ink)] hover:shadow-[2px_2px_0_var(--border)] flex items-center gap-2 font-display transition-all bg-[var(--surface)] px-4 py-2 rounded-xl border-2 border-[var(--border-strong)] cursor-pointer"
                     >
-                        <ArrowLeft className="w-3.5 h-3.5 text-[var(--primary)]" /> Kembali
+                        <ArrowLeft className="w-4 h-4 text-[var(--primary)]" /> Kembali
                     </button>
-                    <span className="text-[var(--border-strong)]">/</span>
-                    <h2 className="text-xs sm:text-sm font-black text-[var(--text-primary)] font-display uppercase tracking-wider truncate">
+                    <span className="text-[var(--border-strong)] font-black text-xl">/</span>
+                    <h2 className="text-sm sm:text-base font-black text-[var(--text-primary)] font-display uppercase tracking-tight truncate">
                         Update Profil Bidang
                     </h2>
                 </div>
 
-                <div className="bg-[var(--card)] rounded-2xl p-4 sm:p-6 md:p-8 border border-[var(--border)] max-w-3xl shadow-sm">
-                    <div className="flex items-center gap-3 sm:gap-4 p-3.5 sm:p-4 mb-4 sm:mb-6 rounded-xl border border-[var(--border)] bg-[var(--surface)]">
-                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-[var(--surface-2)] flex items-center justify-center shrink-0 border border-[var(--border)]">
-                            <Briefcase className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--primary)]" />
+                <div className="bg-[var(--card)] rounded-2xl p-5 sm:p-8 border-2 border-[var(--border-strong)] shadow-[4px_4px_0_var(--surface-2)] flex flex-col relative overflow-hidden">
+                    <div className="h-1 w-full bg-gradient-to-r from-[var(--primary)] via-[var(--accent)] to-[var(--accent-light)] absolute top-0 left-0" />
+
+                    <div className="flex items-center gap-4 p-4 sm:p-5 mb-5 sm:mb-8 rounded-xl border-2 border-[var(--border-strong)] bg-[var(--surface)] shadow-[2px_2px_0_var(--border-strong)] mt-2">
+                        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-[var(--background)] flex items-center justify-center shrink-0 border-2 border-[var(--border-strong)]">
+                            <Briefcase className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--primary)]" />
                         </div>
                         <div>
-                            <p className="text-[9px] sm:text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider mb-0.5 font-display">
+                            <p className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest mb-1 font-display">
                                 Nama Bidang (Paten)
                             </p>
-                            <h3 className="text-base sm:text-lg font-black text-[var(--text-primary)] font-display flex items-center gap-2">
+                            <h3 className="text-lg sm:text-xl font-black text-[var(--text-primary)] font-display flex items-center gap-3">
                                 {editItem.name}
-                                <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full shadow-sm" style={{ backgroundColor: editItem.color }}></div>
+                                <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full border-2 border-[var(--border-strong)] shadow-[1px_1px_0_var(--border-strong)]" style={{ backgroundColor: editItem.color }}></div>
                             </h3>
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-8">
-                        <div className="space-y-4 sm:space-y-5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+                        <div className="space-y-5 sm:space-y-6">
                             <div>
-                                <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1.5 font-display uppercase tracking-wide">
+                                <label className="block text-[10px] font-black text-[var(--text-primary)] mb-2 font-display uppercase tracking-widest">
                                     Deskripsi Bidang
                                 </label>
                                 <textarea
-                                    className="w-full px-3.5 sm:px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/50 transition-all text-xs sm:text-sm leading-relaxed placeholder-[var(--text-muted)]"
+                                    className="w-full px-4 py-3 rounded-xl border-2 border-[var(--border-strong)] bg-[var(--background)] text-[var(--text-primary)] focus:outline-none focus:border-[var(--primary)] focus:shadow-[3px_3px_0_rgba(200,16,46,0.15)] transition-all text-xs sm:text-sm font-medium placeholder-[var(--text-muted)] leading-relaxed"
                                     rows={8}
                                     value={form.description}
                                     onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
@@ -159,13 +186,13 @@ export default function AdminBidangPage() {
                             </div>
                         </div>
 
-                        <div className="space-y-4 sm:space-y-5">
+                        <div className="space-y-5 sm:space-y-6">
                             <div>
-                                <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1.5 font-display uppercase tracking-wide flex items-center gap-1.5">
+                                <label className="block text-[10px] font-black text-[var(--text-primary)] mb-2 font-display uppercase tracking-widest flex items-center gap-1.5">
                                     <ImageIcon className="w-3.5 h-3.5 text-[var(--primary)] shrink-0" /> URL Foto Identitas Bidang
                                 </label>
                                 <textarea
-                                    className="w-full px-3.5 sm:px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/50 transition-all text-xs font-mono placeholder-[var(--text-muted)]"
+                                    className="w-full px-4 py-3 rounded-xl border-2 border-[var(--border-strong)] bg-[var(--background)] text-[var(--text-primary)] focus:outline-none focus:border-[var(--primary)] focus:shadow-[3px_3px_0_rgba(200,16,46,0.15)] transition-all text-xs font-mono font-medium placeholder-[var(--text-muted)]"
                                     rows={3}
                                     value={form.photo}
                                     onChange={e => setForm(f => ({ ...f, photo: e.target.value }))}
@@ -173,17 +200,17 @@ export default function AdminBidangPage() {
                                     style={{ resize: 'vertical' }}
                                 />
                                 {form.photo && (
-                                    <div className="mt-3 relative w-full aspect-video rounded-xl overflow-hidden border border-[var(--border)] bg-[var(--surface)] shadow-sm">
+                                    <div className="mt-4 relative w-full aspect-video rounded-xl overflow-hidden border-2 border-[var(--border-strong)] bg-[var(--surface)] shadow-[3px_3px_0_var(--surface-2)]">
                                         <img src={form.photo} alt="Preview" className="w-full h-full object-cover" onError={(e) => e.currentTarget.style.display = 'none'} />
                                     </div>
                                 )}
                             </div>
 
-                            <div className="pt-3.5 flex gap-3 border-t border-[var(--border)]">
+                            <div className="pt-5 border-t-2 border-dashed border-[var(--border-strong)]">
                                 <button
                                     onClick={handleSave}
                                     disabled={isSaving}
-                                    className="flex-1 py-2.5 sm:py-3 px-4 bg-[var(--primary)] text-white text-xs font-bold tracking-widest uppercase rounded-xl shadow-md shadow-[var(--primary)]/20 hover:bg-[var(--primary-dark)] transition-all flex justify-center items-center gap-2 cursor-pointer font-display disabled:opacity-50"
+                                    className="w-full py-3.5 px-4 bg-[var(--primary)] text-white text-xs font-black tracking-widest uppercase rounded-xl border-2 border-transparent hover:border-[var(--mk-ink)] shadow-[3px_3px_0_rgba(200,16,46,0.2)] hover:shadow-[3px_3px_0_var(--mk-ink)] transition-all flex justify-center items-center gap-2 cursor-pointer font-display hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none"
                                 >
                                     {isSaving ? <RefreshCw className="w-4 h-4 animate-spin" /> : null}
                                     {isSaving ? 'Menyimpan...' : 'Simpan Perubahan'}
@@ -197,21 +224,24 @@ export default function AdminBidangPage() {
     }
 
     return (
-        <div className="space-y-4 sm:space-y-6 font-sans">
-
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 bg-[var(--card)] p-4 sm:p-6 rounded-2xl border border-[var(--border)] shadow-sm">
+        <div className="space-y-6 font-sans">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-[var(--card)] p-5 sm:p-6 rounded-2xl border-2 border-[var(--border-strong)] shadow-[4px_4px_0_var(--surface-2)] relative overflow-hidden">
+                <div className="h-1 w-full bg-gradient-to-r from-[var(--primary)] via-[var(--accent)] to-[var(--accent-light)] absolute top-0 left-0" />
                 <div>
-                    <h2 className="text-lg sm:text-xl font-black text-[var(--text-primary)] font-display flex items-center gap-2">
-                        Kelola Bidang <span className="bg-[var(--primary)]/10 text-[var(--primary)] text-xs px-2.5 py-0.5 rounded-md font-bold">{items.length} Paten</span>
+                    <h2 className="text-lg sm:text-xl font-black text-[var(--text-primary)] font-display flex items-center gap-3">
+                        Kelola Bidang
+                        <span className="bg-[var(--primary)] text-white text-[10px] px-2.5 py-1 rounded-md font-bold uppercase tracking-wider border-2 border-[var(--primary-dark)] shadow-[2px_2px_0_rgba(200,16,46,0.3)]">
+                            {items.length} Paten
+                        </span>
                     </h2>
-                    <p className="text-xs sm:text-sm text-[var(--text-muted)] mt-0.5">
-                        Perbarui deskripsi dan foto visualisasi struktur bidang IMM Kaizen
+                    <p className="text-xs sm:text-sm text-[var(--text-secondary)] mt-1.5 font-medium">
+                        Perbarui deskripsi dan visualisasi struktur bidang
                     </p>
                 </div>
-                <div className="flex gap-2 w-full sm:w-auto">
+                <div className="flex gap-3 w-full sm:w-auto">
                     <button
                         onClick={fetchDivisions}
-                        className="p-2.5 bg-[var(--surface)] border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--primary)] rounded-xl transition-colors cursor-pointer flex items-center gap-2 text-xs font-bold font-display"
+                        className="p-3 bg-[var(--surface)] border-2 border-[var(--border-strong)] text-[var(--text-primary)] hover:text-[var(--primary)] hover:border-[var(--primary)] hover:shadow-[3px_3px_0_rgba(200,16,46,0.15)] rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 text-xs font-black tracking-widest uppercase font-display hover:-translate-y-0.5 w-full sm:w-auto"
                     >
                         <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
                         <span className="hidden sm:inline">Refresh Data</span>
@@ -219,82 +249,87 @@ export default function AdminBidangPage() {
                 </div>
             </div>
 
-            <div className="bg-blue-50/70 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800/30 p-3.5 sm:p-4 rounded-2xl flex gap-3 items-start">
-                <Info className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
-                <p className="text-xs sm:text-sm text-blue-900 dark:text-blue-300 leading-relaxed">
-                    <strong>Struktur Bidang Paten:</strong> Penambahan atau penghapusan bidang dinonaktifkan karena struktur Pimpinan Komisariat bersifat tetap (10 Bidang). Anda hanya dapat mengedit deskripsi tugas dan foto dokumentasi tiap bidang.
+            <div className="bg-blue-50/50 border-2 border-blue-200 shadow-[3px_3px_0_#bfdbfe] p-4 sm:p-5 rounded-2xl flex gap-3.5 items-start">
+                <div className="bg-blue-600 text-white p-1.5 rounded-lg shrink-0 border-2 border-blue-700">
+                    <Info className="w-4 h-4 sm:w-5 sm:h-5" />
+                </div>
+                <p className="text-xs sm:text-sm text-blue-900 leading-relaxed font-medium mt-0.5">
+                    <strong className="font-black uppercase tracking-wider text-blue-950 font-display text-[11px] sm:text-xs block mb-1">Struktur Bidang Paten</strong>
+                    Penambahan atau penghapusan bidang dinonaktifkan karena struktur kepemimpinan bersifat tetap (10 Bidang). Anda hanya dapat mengedit deskripsi tugas dan foto dokumentasi tiap bidang.
                 </p>
             </div>
 
-            <div className="bg-[var(--card)] rounded-2xl border border-[var(--border)] overflow-hidden shadow-sm">
-                <div className="p-3.5 sm:p-4 border-b border-[var(--border)] bg-[var(--surface)]">
+            <div className="bg-[var(--card)] rounded-2xl border-2 border-[var(--border-strong)] overflow-hidden shadow-[4px_4px_0_var(--surface-2)]">
+                <div className="p-4 sm:p-5 border-b-2 border-[var(--border-strong)] bg-[var(--surface)]">
                     <div className="relative w-full sm:w-80 group">
-                        <Search className="w-4 h-4 text-[var(--text-muted)] absolute left-3.5 top-1/2 -translate-y-1/2 group-focus-within:text-[var(--primary)] transition-colors" />
+                        <Search className="w-4 h-4 text-[var(--text-muted)] absolute left-4 top-1/2 -translate-y-1/2 group-focus-within:text-[var(--primary)] transition-colors" />
                         <input
                             type="text"
                             placeholder="Cari nama bidang..."
                             value={search}
                             onChange={e => setSearch(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 sm:py-2.5 rounded-xl border border-[var(--border)] bg-[var(--background)] text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 transition-all text-xs sm:text-sm"
+                            className="w-full pl-11 pr-4 py-3 rounded-xl border-2 border-[var(--border-strong)] bg-[var(--background)] text-[var(--text-primary)] font-bold placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--primary)] focus:shadow-[3px_3px_0_rgba(200,16,46,0.15)] transition-all text-xs sm:text-sm"
                         />
                     </div>
                 </div>
 
                 <div className="overflow-x-auto w-full scrollbar-none">
-                    <table className="w-full text-left border-collapse min-w-[550px]">
+                    <table className="w-full text-left border-collapse min-w-[600px]">
                         <thead>
-                        <tr className="bg-[var(--surface-2)] border-b border-[var(--border)] text-[10px] sm:text-xs text-[var(--text-muted)] uppercase tracking-wider font-display">
-                            <th className="p-3.5 sm:p-4 font-bold pl-5 sm:pl-6">Detail Bidang</th>
-                            <th className="p-3.5 sm:p-4 font-bold hidden md:table-cell">Deskripsi Terkini</th>
-                            <th className="p-3.5 sm:p-4 font-bold text-right pr-5 sm:pr-6">Aksi</th>
+                        <tr className="bg-[var(--surface)] border-b-2 border-[var(--border-strong)] text-[10px] sm:text-xs text-[var(--text-primary)] uppercase tracking-widest font-display">
+                            <th className="p-4 sm:p-5 font-black pl-5 sm:pl-6 min-w-[220px]">Detail Bidang</th>
+                            <th className="p-4 sm:p-5 font-black hidden md:table-cell">Deskripsi Terkini</th>
+                            <th className="p-4 sm:p-5 font-black text-right pr-5 sm:pr-6">Aksi</th>
                         </tr>
                         </thead>
                         <tbody>
                         {isLoading ? (
                             <tr>
-                                <td colSpan={3} className="text-center py-12 text-[var(--text-muted)] font-display text-xs font-bold">
-                                    <RefreshCw className="w-4 h-4 animate-spin text-[var(--primary)] mx-auto mb-2" />
-                                    Memuat data bidang...
+                                <td colSpan={3} className="text-center py-16 text-[var(--text-muted)] font-display text-sm font-black uppercase tracking-widest">
+                                    <div className="flex items-center justify-center gap-3">
+                                        <RefreshCw className="w-5 h-5 animate-spin text-[var(--primary)]" />
+                                        Memuat Data...
+                                    </div>
                                 </td>
                             </tr>
                         ) : filtered.length === 0 ? (
                             <tr>
-                                <td colSpan={3} className="text-center py-12 text-[var(--text-muted)] text-xs sm:text-sm font-medium">
+                                <td colSpan={3} className="text-center py-16 text-[var(--text-muted)] text-sm font-black uppercase tracking-widest">
                                     Data bidang tidak ditemukan.
                                 </td>
                             </tr>
                         ) : (
                             filtered.map(d => (
-                                <tr key={d.id} className="border-b border-[var(--border)] hover:bg-[var(--surface)] transition-colors group">
-                                    <td className="p-3.5 sm:p-4 pl-5 sm:pl-6">
-                                        <div className="flex items-center gap-3.5">
-                                            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[var(--surface-2)] overflow-hidden shrink-0 border border-[var(--border)] relative">
+                                <tr key={d.id} className="border-b-2 border-[var(--border-strong)] last:border-b-0 hover:bg-[var(--surface-2)] transition-colors group">
+                                    <td className="p-4 sm:p-5 pl-5 sm:pl-6">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-[var(--background)] overflow-hidden shrink-0 border-2 border-[var(--border-strong)] shadow-[2px_2px_0_var(--border-strong)] relative flex items-center justify-center">
                                                 {d.photo ? (
                                                     <img src={d.photo} alt={d.name} className="w-full h-full object-cover" />
                                                 ) : (
-                                                    <Briefcase className="w-5 h-5 m-auto mt-2.5 sm:mt-3 text-[var(--text-muted)] opacity-50" />
+                                                    <Briefcase className="w-6 h-6 text-[var(--text-muted)] opacity-50" />
                                                 )}
                                                 <div
-                                                    className="absolute bottom-0 right-0 w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-tl-md"
+                                                    className="absolute bottom-0 right-0 w-3 h-3 sm:w-4 sm:h-4 rounded-tl-lg border-t-2 border-l-2 border-[var(--border-strong)]"
                                                     style={{ background: d.color || 'var(--primary)' }}
                                                 />
                                             </div>
                                             <div>
-                                                    <span className="font-bold text-xs sm:text-sm text-[var(--text-primary)] font-display block">
-                                                        {d.name}
-                                                    </span>
+                                                <span className="font-black text-xs sm:text-sm text-[var(--text-primary)] font-display block uppercase tracking-wide">
+                                                    {d.name}
+                                                </span>
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="p-3.5 sm:p-4 text-xs text-[var(--text-secondary)] leading-relaxed hidden md:table-cell max-w-[400px]">
-                                        <p className="line-clamp-2">{d.description || <span className="italic text-[var(--text-muted)]">Belum ada deskripsi.</span>}</p>
+                                    <td className="p-4 sm:p-5 text-xs text-[var(--text-secondary)] leading-relaxed hidden md:table-cell max-w-[350px] font-medium">
+                                        <p className="line-clamp-2">{d.description || <span className="italic text-[var(--text-muted)]">Belum ada deskripsi yang ditambahkan.</span>}</p>
                                     </td>
-                                    <td className="p-3.5 sm:p-4 pr-5 sm:pr-6 text-right">
+                                    <td className="p-4 sm:p-5 pr-5 sm:pr-6 text-right">
                                         <button
                                             onClick={() => startEdit(d)}
-                                            className="px-2.5 sm:px-3 py-1.5 text-[10px] sm:text-[11px] font-bold font-display uppercase tracking-wider text-[var(--primary)] hover:text-white border border-[var(--primary)] hover:bg-[var(--primary)] rounded-lg transition-all cursor-pointer inline-flex items-center gap-1.5"
+                                            className="px-4 py-2 text-[10px] sm:text-[11px] font-black font-display uppercase tracking-widest text-[var(--primary)] hover:text-white border-2 border-[var(--primary)] hover:bg-[var(--primary)] rounded-xl transition-all cursor-pointer inline-flex items-center gap-2 shadow-[2px_2px_0_rgba(200,16,46,0.2)] hover:shadow-[3px_3px_0_rgba(200,16,46,0.4)] hover:-translate-y-0.5"
                                         >
-                                            <Edit2 className="w-3 h-3" /> Edit Profil
+                                            <Edit2 className="w-3.5 h-3.5 stroke-[3px]" /> Edit
                                         </button>
                                     </td>
                                 </tr>
