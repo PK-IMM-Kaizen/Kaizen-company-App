@@ -16,7 +16,8 @@ import {
     ChevronLeft,
     ChevronRight,
     Shield,
-    UserCheck2
+    UserCheck2,
+    Award
 } from 'lucide-react'
 import { createBrowserClient } from '@supabase/ssr'
 
@@ -33,6 +34,7 @@ export interface Management {
 }
 
 const divisionOptions = [
+    'Polum',
     'BPH',
     'Organisasi',
     'Perkaderan',
@@ -53,8 +55,6 @@ const positionPresets = [
     'Kabid (Ketua Bidang)',
     'Sekretaris Bidang',
     'Anggota Bidang',
-    'Ketua Lembaga',
-    'Anggota Lembaga',
     'Kustom / Lainnya'
 ]
 
@@ -76,7 +76,7 @@ export default function AdminKepengurusanPage() {
         name: '',
         positionPreset: 'Anggota Bidang',
         customPosition: '',
-        division: 'BPH',
+        division: 'Organisasi',
         isLeader: false,
         photo: ''
     })
@@ -107,15 +107,27 @@ export default function AdminKepengurusanPage() {
             if (error) throw error
 
             if (data) {
-                const formattedData: Management[] = data.map((item: any) => ({
-                    id: item.id,
-                    name: item.name,
-                    position: item.position,
-                    division: item.division,
-                    isLeader: item.is_leader,
-                    photo: item.photo,
-                    createdAt: item.created_at
-                }))
+                const polumPositions = ['Ketua Umum', 'Sekretaris Umum', 'Bendahara Umum']
+
+                const formattedData: Management[] = data.map((item: any) => {
+                    let mappedDivision = item.division
+
+                    if (polumPositions.includes(item.position)) {
+                        mappedDivision = 'Polum'
+                    } else if (['Kabid (Ketua Bidang)', 'Sekretaris Bidang'].includes(item.position) && mappedDivision === 'Polum') {
+                        mappedDivision = 'BPH'
+                    }
+
+                    return {
+                        id: item.id,
+                        name: item.name,
+                        position: item.position,
+                        division: mappedDivision,
+                        isLeader: item.is_leader,
+                        photo: item.photo,
+                        createdAt: item.created_at
+                    }
+                })
                 setItems(formattedData)
             }
         } catch (error: any) {
@@ -133,8 +145,19 @@ export default function AdminKepengurusanPage() {
                 m.position.toLowerCase().includes(search.toLowerCase()) ||
                 m.division.toLowerCase().includes(search.toLowerCase())
 
-            const matchesDivision =
-                selectedDivision === 'all' || m.division === selectedDivision
+            let matchesDivision = false
+            const polumPositions = ['Ketua Umum', 'Sekretaris Umum', 'Bendahara Umum']
+            const bphPositions = ['Kabid (Ketua Bidang)', 'Sekretaris Bidang']
+
+            if (selectedDivision === 'all') {
+                matchesDivision = true
+            } else if (selectedDivision === 'Polum') {
+                matchesDivision = m.division === 'Polum' || polumPositions.includes(m.position)
+            } else if (selectedDivision === 'BPH') {
+                matchesDivision = m.division === 'BPH' || bphPositions.includes(m.position)
+            } else {
+                matchesDivision = m.division === selectedDivision
+            }
 
             return matchesSearch && matchesDivision
         })
@@ -143,22 +166,27 @@ export default function AdminKepengurusanPage() {
     const totalPages = Math.ceil(filteredItems.length / itemsPerPage) || 1
 
     const paginatedItems = useMemo(() => {
-        const start = (currentPage - 1) * itemsPerPage;
-        return filteredItems.slice(start, start + itemsPerPage);
-    }, [filteredItems, currentPage]);
+        const start = (currentPage - 1) * itemsPerPage
+        return filteredItems.slice(start, start + itemsPerPage)
+    }, [filteredItems, currentPage])
 
     const stats = useMemo(() => {
-        const bph = items.filter(i => i.division === 'BPH').length;
-        const leaders = items.filter(i => i.isLeader).length;
-        return { total: items.length, bph, leaders, members: items.length - leaders };
-    }, [items]);
+        const polumPositions = ['Ketua Umum', 'Sekretaris Umum', 'Bendahara Umum']
+        const bphPositions = ['Kabid (Ketua Bidang)', 'Sekretaris Bidang']
+
+        const polum = items.filter(i => polumPositions.includes(i.position) || i.division === 'Polum').length
+        const bph = items.filter(i => bphPositions.includes(i.position) || i.division === 'BPH').length
+        const members = items.length - polum - bph
+
+        return { total: items.length, polum, bph, members }
+    }, [items])
 
     const startCreate = () => {
         setForm({
             name: '',
             positionPreset: 'Anggota Bidang',
             customPosition: '',
-            division: 'BPH',
+            division: 'Organisasi',
             isLeader: false,
             photo: ''
         })
@@ -194,10 +222,19 @@ export default function AdminKepengurusanPage() {
 
     const handlePositionChange = (preset: string) => {
         const isAutoLeader = ['Ketua Umum', 'Kabid (Ketua Bidang)', 'Ketua Lembaga'].includes(preset)
+
+        let autoDivision = form.division
+        if (['Ketua Umum', 'Sekretaris Umum', 'Bendahara Umum'].includes(preset)) {
+            autoDivision = 'Polum'
+        } else if (['Kabid (Ketua Bidang)', 'Sekretaris Bidang'].includes(preset)) {
+            if (autoDivision === 'Polum') autoDivision = 'BPH'
+        }
+
         setForm(f => ({
             ...f,
             positionPreset: preset,
-            isLeader: isAutoLeader ? true : f.isLeader
+            isLeader: isAutoLeader ? true : f.isLeader,
+            division: autoDivision
         }))
     }
 
@@ -274,9 +311,15 @@ export default function AdminKepengurusanPage() {
         }
     }
 
+    const getDivisionBadgeStyle = (division: string) => {
+        if (division === 'Polum') return 'bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-500/20'
+        if (division === 'BPH') return 'bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20'
+        return 'bg-[var(--surface-2)] text-[var(--primary)] border-[var(--border)]'
+    }
+
     if (view === 'create' || view === 'edit') {
         return (
-            <div className="animate-in fade-in duration-300">
+            <div className="animate-in fade-in duration-300 p-4 md:p-6">
                 <div className="flex items-center gap-3 mb-6">
                     <button
                         onClick={() => setView('list')}
@@ -290,7 +333,7 @@ export default function AdminKepengurusanPage() {
                     </h2>
                 </div>
 
-                <div className="bg-[var(--card)] rounded-2xl p-6 md:p-8 border border-[var(--border)] shadow-sm">
+                <div className="bg-[var(--card)] rounded-3xl p-6 md:p-8 border border-[var(--border)] shadow-sm">
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         <div className="lg:col-span-2 space-y-5">
                             <div>
@@ -298,7 +341,7 @@ export default function AdminKepengurusanPage() {
                                     Nama Lengkap
                                 </label>
                                 <input
-                                    className="w-full px-4 py-2.5 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/50 transition-all text-sm font-semibold"
+                                    className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/50 transition-all text-sm font-semibold"
                                     value={form.name}
                                     onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                                     placeholder="Masukkan nama lengkap beserta gelar jika ada..."
@@ -311,7 +354,7 @@ export default function AdminKepengurusanPage() {
                                         Jabatan
                                     </label>
                                     <select
-                                        className="w-full px-4 py-2.5 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/50 transition-all text-sm cursor-pointer mb-3"
+                                        className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/50 transition-all text-sm cursor-pointer mb-3"
                                         value={form.positionPreset}
                                         onChange={e => handlePositionChange(e.target.value)}
                                     >
@@ -322,7 +365,7 @@ export default function AdminKepengurusanPage() {
 
                                     {form.positionPreset === 'Kustom / Lainnya' && (
                                         <input
-                                            className="w-full px-4 py-2.5 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/50 transition-all text-sm font-medium animate-in fade-in"
+                                            className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/50 transition-all text-sm font-medium animate-in fade-in"
                                             value={form.customPosition}
                                             onChange={e => setForm(f => ({ ...f, customPosition: e.target.value }))}
                                             placeholder="Tuliskan nama jabatan kustom..."
@@ -335,12 +378,14 @@ export default function AdminKepengurusanPage() {
                                         Bidang / Divisi
                                     </label>
                                     <select
-                                        className="w-full px-4 py-2.5 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/50 transition-all text-sm cursor-pointer"
+                                        className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/50 transition-all text-sm cursor-pointer"
                                         value={form.division}
                                         onChange={e => setForm(f => ({ ...f, division: e.target.value }))}
                                     >
                                         {divisionOptions.map(d => (
-                                            <option key={d} value={d}>{d === 'BPH' ? 'BPH / Pimpinan Harian' : d}</option>
+                                            <option key={d} value={d}>
+                                                {d === 'Polum' ? 'Polum (Polisi Umum)' : d === 'BPH' ? 'BPH (Badan Pimpinan Harian)' : d}
+                                            </option>
                                         ))}
                                     </select>
                                 </div>
@@ -354,13 +399,13 @@ export default function AdminKepengurusanPage() {
                                 </label>
                                 <div className="flex flex-col items-center justify-center">
                                     <div className="relative group cursor-pointer">
-                                        <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-[var(--surface-2)] shadow-md bg-[var(--surface)] flex items-center justify-center relative">
+                                        <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-[var(--surface-2)] shadow-md bg-[var(--surface)] flex items-center justify-center relative transition-transform group-hover:scale-105">
                                             {imagePreview ? (
                                                 <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
                                             ) : (
                                                 <Users className="w-12 h-12 text-[var(--text-muted)]" />
                                             )}
-                                            <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <Camera className="w-6 h-6 text-white mb-1" />
                                                 <span className="text-[10px] text-white font-bold uppercase tracking-wider">Ubah Foto</span>
                                             </div>
@@ -373,27 +418,27 @@ export default function AdminKepengurusanPage() {
                             </div>
 
                             <div
-                                className="p-4 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] flex items-center justify-between cursor-pointer"
+                                className="p-4 rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] flex items-center justify-between cursor-pointer hover:bg-[var(--surface)] transition-colors"
                                 onClick={() => setForm(f => ({ ...f, isLeader: !f.isLeader }))}
                             >
                                 <div>
                                     <h4 className="text-sm font-bold text-[var(--text-primary)] flex items-center gap-1.5">
-                                        Pimpinan Bidang {form.isLeader && <UserCheck className="w-4 h-4 text-[var(--accent)]" />}
+                                        Status Pimpinan {form.isLeader && <Award className="w-4 h-4 text-[var(--accent)]" />}
                                     </h4>
-                                    <p className="text-[10px] text-[var(--text-muted)] mt-0.5 leading-tight max-w-[140px]">
-                                        Tandai jika merupakan Ketua Umum atau Ketua Bidang
+                                    <p className="text-[10px] text-[var(--text-muted)] mt-0.5 leading-relaxed max-w-[140px]">
+                                        Tandai jika merupakan pimpinan kunci.
                                     </p>
                                 </div>
                                 <div className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${form.isLeader ? 'bg-[var(--primary)]' : 'bg-gray-300 dark:bg-gray-700'}`}>
-                                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${form.isLeader ? 'translate-x-6' : 'translate-x-1'}`} />
+                                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform ${form.isLeader ? 'translate-x-6' : 'translate-x-1'}`} />
                                 </div>
                             </div>
 
-                            <div className="pt-4 space-y-3 border-t border-[var(--border)]">
+                            <div className="pt-2 space-y-3">
                                 <button
                                     onClick={handleSave}
                                     disabled={isSaving}
-                                    className="w-full py-3 px-4 bg-[var(--primary)] text-white text-xs font-bold tracking-widest uppercase rounded-xl shadow-md shadow-[var(--primary)]/20 hover:bg-[var(--primary-dark)] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2 cursor-pointer"
+                                    className="w-full py-3.5 px-4 bg-[var(--primary)] text-white text-xs font-bold tracking-widest uppercase rounded-xl shadow-lg shadow-[var(--primary)]/20 hover:bg-[var(--primary-dark)] hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2 cursor-pointer"
                                 >
                                     {isSaving ? <RefreshCw className="w-4 h-4 animate-spin" /> : null}
                                     {isSaving ? 'Menyimpan...' : (view === 'create' ? 'Simpan Pengurus' : 'Simpan Perubahan')}
@@ -401,7 +446,7 @@ export default function AdminKepengurusanPage() {
                                 <button
                                     onClick={() => setView('list')}
                                     disabled={isSaving}
-                                    className="w-full py-3 px-4 bg-transparent border border-[var(--border)] text-[var(--text-primary)] text-xs font-bold tracking-widest uppercase rounded-xl hover:bg-[var(--surface-2)] transition-all cursor-pointer"
+                                    className="w-full py-3.5 px-4 bg-transparent border border-[var(--border)] text-[var(--text-primary)] text-xs font-bold tracking-widest uppercase rounded-xl hover:bg-[var(--surface-2)] transition-all cursor-pointer"
                                 >
                                     Batal
                                 </button>
@@ -414,89 +459,94 @@ export default function AdminKepengurusanPage() {
     }
 
     return (
-        <div className="p-4 md:p-6 space-y-6">
+        <div className="p-4 md:p-6 space-y-6 animate-in fade-in duration-300">
 
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-[var(--card)] p-4 md:p-6 rounded-2xl border border-[var(--border)] shadow-sm">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-[var(--card)] p-5 md:p-6 rounded-3xl border border-[var(--border)] shadow-sm">
                 <div>
                     <h2 className="text-xl font-black text-[var(--text-primary)] font-display flex items-center gap-2">
-                        Struktur Kepengurusan <span className="bg-[var(--primary)]/10 text-[var(--primary)] text-xs px-2.5 py-1 rounded-md font-bold">{items.length} Orang</span>
+                        Struktur Kepengurusan
+                        <span className="bg-[var(--primary)]/10 text-[var(--primary)] text-xs px-2.5 py-1 rounded-md font-bold">
+                            {items.length} Orang
+                        </span>
                     </h2>
-                    <p className="text-sm text-[var(--text-muted)] mt-1">Kelola daftar pimpinan harian dan anggota bidang</p>
+                    <p className="text-sm text-[var(--text-muted)] mt-1">
+                        Kelola data pimpinan harian (Polum), BPH, dan anggota divisi.
+                    </p>
                 </div>
                 <div className="flex gap-2 w-full sm:w-auto">
                     <button
                         onClick={fetchPengurus}
-                        className="p-2.5 bg-[var(--surface)] border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--primary)] rounded-xl transition-colors cursor-pointer"
+                        className="p-3 bg-[var(--surface)] border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--primary)] hover:bg-[var(--surface-2)] rounded-xl transition-all cursor-pointer shadow-sm"
                         title="Segarkan Data"
                     >
                         <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
                     </button>
                     <button
                         onClick={startCreate}
-                        className="flex-1 sm:flex-none py-2.5 px-5 bg-[var(--primary)] text-white text-xs font-bold tracking-widest uppercase rounded-xl shadow-md shadow-[var(--primary)]/20 hover:bg-[var(--primary-dark)] transition-all flex items-center justify-center gap-2 hover:-translate-y-0.5 cursor-pointer"
+                        className="flex-1 sm:flex-none py-3 px-6 bg-[var(--primary)] text-white text-xs font-bold tracking-widest uppercase rounded-xl shadow-md shadow-[var(--primary)]/20 hover:bg-[var(--primary-dark)] transition-all flex items-center justify-center gap-2 hover:-translate-y-0.5 cursor-pointer"
                     >
-                        <Plus className="w-4 h-4" /> Tambah Pengurus
+                        <Plus className="w-4 h-4" /> Tambah Data
                     </button>
                 </div>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className="bg-[var(--card)] p-3.5 rounded-xl border border-[var(--border)] shadow-sm flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-[var(--primary)]/10 text-[var(--primary)] flex items-center justify-center shrink-0">
-                        <Users className="w-5 h-5" />
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="bg-[var(--card)] p-4 rounded-2xl border border-[var(--border)] shadow-sm flex items-center gap-4 hover:border-[var(--primary)]/50 transition-colors">
+                    <div className="w-12 h-12 rounded-xl bg-[var(--primary)]/10 text-[var(--primary)] flex items-center justify-center shrink-0">
+                        <Users className="w-6 h-6" />
                     </div>
                     <div>
                         <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider block font-display">Total Pengurus</span>
-                        <span className="text-lg font-black text-[var(--text-primary)] font-display">{stats.total}</span>
+                        <span className="text-2xl font-black text-[var(--text-primary)] font-display leading-none">{stats.total}</span>
                     </div>
                 </div>
 
-                <div className="bg-[var(--card)] p-3.5 rounded-xl border border-[var(--border)] shadow-sm flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-amber-500/10 text-amber-600 flex items-center justify-center shrink-0">
-                        <Shield className="w-5 h-5" />
+                <div className="bg-[var(--card)] p-4 rounded-2xl border border-[var(--border)] shadow-sm flex items-center gap-4 hover:border-purple-500/50 transition-colors">
+                    <div className="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-600 flex items-center justify-center shrink-0">
+                        <Shield className="w-6 h-6" />
                     </div>
                     <div>
-                        <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider block font-display">BPH Harian</span>
-                        <span className="text-lg font-black text-[var(--text-primary)] font-display">{stats.bph}</span>
+                        <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider block font-display" title="Polisi Umum (Ketum, Sekum, Bendum)">Polum</span>
+                        <span className="text-2xl font-black text-[var(--text-primary)] font-display leading-none">{stats.polum}</span>
                     </div>
                 </div>
 
-                <div className="bg-[var(--card)] p-3.5 rounded-xl border border-[var(--border)] shadow-sm flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0">
-                        <UserCheck2 className="w-5 h-5" />
+                <div className="bg-[var(--card)] p-4 rounded-2xl border border-[var(--border)] shadow-sm flex items-center gap-4 hover:border-amber-500/50 transition-colors">
+                    <div className="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center shrink-0">
+                        <Award className="w-6 h-6" />
                     </div>
                     <div>
-                        <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider block font-display">Ketua Bidang</span>
-                        <span className="text-lg font-black text-[var(--text-primary)] font-display">{stats.leaders}</span>
+                        <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider block font-display" title="Badan Pimpinan Harian (Kabid, Sekbid)">BPH</span>
+                        <span className="text-2xl font-black text-[var(--text-primary)] font-display leading-none">{stats.bph}</span>
                     </div>
                 </div>
 
-                <div className="bg-[var(--card)] p-3.5 rounded-xl border border-[var(--border)] shadow-sm flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-blue-500/10 text-blue-600 flex items-center justify-center shrink-0">
-                        <Users className="w-5 h-5" />
+                <div className="bg-[var(--card)] p-4 rounded-2xl border border-[var(--border)] shadow-sm flex items-center gap-4 hover:border-blue-500/50 transition-colors">
+                    <div className="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center shrink-0">
+                        <UserCheck2 className="w-6 h-6" />
                     </div>
                     <div>
                         <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider block font-display">Anggota</span>
-                        <span className="text-lg font-black text-[var(--text-primary)] font-display">{stats.members}</span>
+                        <span className="text-2xl font-black text-[var(--text-primary)] font-display leading-none">{stats.members}</span>
                     </div>
                 </div>
             </div>
 
             {deleteId !== null && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
-                    <div className="bg-[var(--card)] rounded-2xl p-6 md:p-8 max-w-sm w-full border border-[var(--border)] shadow-2xl animate-in fade-in zoom-in-95 duration-200">
-                        <div className="w-12 h-12 rounded-full bg-red-100/10 border border-red-500/20 flex items-center justify-center mb-4">
-                            <AlertTriangle className="w-6 h-6 text-red-500" />
+                    <div className="bg-[var(--card)] rounded-3xl p-6 md:p-8 max-w-sm w-full border border-[var(--border)] shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+                        <div className="w-14 h-14 rounded-full bg-red-100/10 border border-red-500/20 flex items-center justify-center mb-5">
+                            <AlertTriangle className="w-7 h-7 text-red-500" />
                         </div>
-                        <h3 className="font-black text-lg font-display text-[var(--text-primary)] mb-2">Hapus Pengurus?</h3>
+                        <h3 className="font-black text-xl font-display text-[var(--text-primary)] mb-2">Hapus Pengurus?</h3>
                         <p className="text-sm text-[var(--text-secondary)] leading-relaxed mb-8">
-                            Data pengurus ini akan dihapus secara permanen dari struktur organisasi.
+                            Data pengurus ini akan dihapus secara permanen dari struktur organisasi dan tidak dapat dikembalikan.
                         </p>
                         <div className="flex gap-3">
-                            <button onClick={() => setDeleteId(null)} className="flex-1 py-3 bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text-primary)] text-xs font-bold tracking-widest uppercase rounded-xl hover:bg-[var(--surface)] transition-all cursor-pointer">
+                            <button onClick={() => setDeleteId(null)} className="flex-1 py-3.5 bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text-primary)] text-xs font-bold tracking-widest uppercase rounded-xl hover:bg-[var(--surface)] transition-all cursor-pointer">
                                 Batal
                             </button>
-                            <button onClick={() => handleDelete(deleteId)} className="flex-1 py-3 bg-red-600 text-white text-xs font-bold tracking-widest uppercase rounded-xl hover:bg-red-700 transition-all cursor-pointer">
+                            <button onClick={() => handleDelete(deleteId)} className="flex-1 py-3.5 bg-red-600 text-white text-xs font-bold tracking-widest uppercase rounded-xl hover:bg-red-700 transition-all cursor-pointer shadow-lg shadow-red-600/20">
                                 Hapus
                             </button>
                         </div>
@@ -504,7 +554,7 @@ export default function AdminKepengurusanPage() {
                 </div>
             )}
 
-            <div className="bg-[var(--card)] rounded-2xl border border-[var(--border)] overflow-hidden shadow-sm">
+            <div className="bg-[var(--card)] rounded-3xl border border-[var(--border)] overflow-hidden shadow-sm">
 
                 <div className="px-5 py-4 border-b border-[var(--border)] flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-[var(--surface)]">
                     <div className="relative w-full md:w-80 group">
@@ -514,22 +564,24 @@ export default function AdminKepengurusanPage() {
                             placeholder="Cari nama atau jabatan..."
                             value={search}
                             onChange={e => setSearch(e.target.value)}
-                            className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--background)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 transition-all text-sm"
+                            className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--background)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 transition-all text-sm font-medium"
                         />
                     </div>
 
                     <div className="flex items-center gap-3 w-full md:w-auto">
-                        <div className="flex items-center gap-1.5 text-xs text-[var(--text-muted)] shrink-0 font-medium font-display">
-                            <Filter className="w-3.5 h-3.5" /> Filter Bidang:
+                        <div className="flex items-center gap-1.5 text-xs text-[var(--text-muted)] shrink-0 font-bold font-display uppercase tracking-wider">
+                            <Filter className="w-3.5 h-3.5" /> Filter:
                         </div>
                         <select
                             value={selectedDivision}
                             onChange={e => setSelectedDivision(e.target.value)}
-                            className="bg-[var(--background)] border border-[var(--border)] text-xs text-[var(--text-primary)] rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 cursor-pointer w-full md:w-auto truncate"
+                            className="bg-[var(--background)] border border-[var(--border)] text-xs font-semibold text-[var(--text-primary)] rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 cursor-pointer w-full md:w-auto truncate hover:bg-[var(--surface-2)] transition-colors"
                         >
                             <option value="all">Semua Bidang ({items.length})</option>
                             {divisionOptions.map(d => (
-                                <option key={d} value={d}>{d}</option>
+                                <option key={d} value={d}>
+                                    {d === 'Polum' ? 'Polum (Ketum/Sekum/Bendum)' : d === 'BPH' ? 'BPH (Kabid/Sekbid)' : d}
+                                </option>
                             ))}
                         </select>
                     </div>
@@ -537,14 +589,14 @@ export default function AdminKepengurusanPage() {
 
                 <div className="overflow-x-auto">
                     {isLoading ? (
-                        <div className="text-center py-16 text-[var(--text-muted)] font-display text-xs font-bold flex items-center justify-center gap-2">
-                            <RefreshCw className="w-4 h-4 animate-spin text-[var(--primary)]" />
-                            Memuat data pengurus dari Supabase...
+                        <div className="text-center py-20 text-[var(--text-muted)] font-display text-sm font-bold flex flex-col items-center justify-center gap-3">
+                            <RefreshCw className="w-6 h-6 animate-spin text-[var(--primary)]" />
+                            Memuat data pengurus dari database...
                         </div>
                     ) : (
                         <table className="w-full text-left border-collapse">
                             <thead>
-                            <tr className="bg-[var(--surface-2)] border-b border-[var(--border)] text-xs text-[var(--text-muted)] uppercase tracking-wider font-display">
+                            <tr className="bg-[var(--surface-2)]/50 border-b border-[var(--border)] text-[10px] text-[var(--text-muted)] uppercase tracking-widest font-display">
                                 <th className="p-4 font-bold pl-6">Profil Pengurus</th>
                                 <th className="p-4 font-bold">Jabatan</th>
                                 <th className="p-4 font-bold">Bidang</th>
@@ -554,8 +606,11 @@ export default function AdminKepengurusanPage() {
                             <tbody>
                             {paginatedItems.length === 0 ? (
                                 <tr>
-                                    <td colSpan={4} className="text-center py-16 text-[var(--text-muted)] text-sm font-medium">
-                                        Tidak ada data pengurus yang ditemukan.
+                                    <td colSpan={4} className="text-center py-20 text-[var(--text-muted)]">
+                                        <div className="flex flex-col items-center justify-center gap-2">
+                                            <Users className="w-8 h-8 text-[var(--border-strong)]" />
+                                            <span className="text-sm font-medium">Tidak ada data pengurus yang ditemukan.</span>
+                                        </div>
                                     </td>
                                 </tr>
                             ) : (
@@ -563,7 +618,7 @@ export default function AdminKepengurusanPage() {
                                     <tr key={m.id} className="border-b border-[var(--border)] hover:bg-[var(--surface)] transition-colors group">
                                         <td className="p-4 pl-6">
                                             <div className="flex items-center gap-4">
-                                                <div className="w-11 h-11 rounded-full bg-[var(--surface-2)] overflow-hidden flex-shrink-0 border-2 border-[var(--border)] p-0.5 shadow-sm">
+                                                <div className="w-12 h-12 rounded-full bg-[var(--surface-2)] overflow-hidden flex-shrink-0 border-2 border-[var(--border)] p-0.5 shadow-sm group-hover:border-[var(--primary)]/50 transition-colors">
                                                     <img
                                                         src={m.photo || '/img/profile/imm.jpeg'}
                                                         alt={m.name}
@@ -574,32 +629,39 @@ export default function AdminKepengurusanPage() {
                                                     <span className="font-bold text-sm text-[var(--text-primary)] font-display flex items-center gap-1.5">
                                                         {m.name}
                                                         {(m.isLeader ?? false) && (
-                                                            <span title="Pimpinan / Ketua Bidang" className="bg-[var(--accent)]/10 text-[var(--accent)] p-1 rounded-full">
-                                                                <UserCheck className="w-3.5 h-3.5" />
+                                                            <span title="Pimpinan Kunci" className="bg-[var(--accent)]/10 text-[var(--accent)] p-1 rounded-full">
+                                                                <Award className="w-3.5 h-3.5" />
                                                             </span>
                                                         )}
+                                                    </span>
+                                                    <span className="text-[11px] text-[var(--text-muted)] font-medium mt-0.5 block md:hidden">
+                                                        {m.position}
                                                     </span>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="p-4 text-xs font-semibold text-[var(--text-primary)] font-display">
+                                        <td className="p-4 text-xs font-semibold text-[var(--text-secondary)] font-display hidden md:table-cell">
                                             {m.position}
                                         </td>
                                         <td className="p-4">
-                                            <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md border whitespace-nowrap ${
-                                                m.division === 'BPH'
-                                                    ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20'
-                                                    : 'bg-[var(--surface-2)] text-[var(--primary)] border-[var(--border)]'
-                                            }`}>
+                                            <span className={`text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg border whitespace-nowrap ${getDivisionBadgeStyle(m.division)}`}>
                                                 {m.division}
                                             </span>
                                         </td>
                                         <td className="p-4 pr-6 text-right">
-                                            <div className="flex items-center justify-end gap-2">
-                                                <button onClick={() => startEdit(m)} className="p-2 text-[var(--text-muted)] hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-lg transition-colors cursor-pointer" title="Edit Pengurus">
+                                            <div className="flex items-center justify-end gap-1.5">
+                                                <button
+                                                    onClick={() => startEdit(m)}
+                                                    className="p-2 text-[var(--text-secondary)] hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-lg transition-colors cursor-pointer"
+                                                    title="Edit Pengurus"
+                                                >
                                                     <Edit2 className="w-4 h-4" />
                                                 </button>
-                                                <button onClick={() => setDeleteId(m.id)} className="p-2 text-[var(--text-muted)] hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors cursor-pointer" title="Hapus Pengurus">
+                                                <button
+                                                    onClick={() => setDeleteId(m.id)}
+                                                    className="p-2 text-[var(--text-secondary)] hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors cursor-pointer"
+                                                    title="Hapus Pengurus"
+                                                >
                                                     <Trash2 className="w-4 h-4" />
                                                 </button>
                                             </div>
@@ -613,28 +675,28 @@ export default function AdminKepengurusanPage() {
                 </div>
 
                 {!isLoading && filteredItems.length > 0 && (
-                    <div className="px-5 py-3.5 border-t border-[var(--border)] bg-[var(--surface)] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[var(--text-muted)] font-display">
+                    <div className="px-5 py-4 border-t border-[var(--border)] bg-[var(--surface)] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[var(--text-muted)] font-medium">
                         <span>
                             Menampilkan <strong className="text-[var(--text-primary)]">{(currentPage - 1) * itemsPerPage + 1}</strong> - <strong className="text-[var(--text-primary)]">{Math.min(currentPage * itemsPerPage, filteredItems.length)}</strong> dari <strong className="text-[var(--text-primary)]">{filteredItems.length}</strong> data
                         </span>
 
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-2">
                             <button
                                 onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
                                 disabled={currentPage === 1}
-                                className="p-1.5 rounded-lg border border-[var(--border)] bg-[var(--background)] hover:bg-[var(--surface-2)] disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
+                                className="p-2 rounded-xl border border-[var(--border)] bg-[var(--background)] hover:bg-[var(--surface-2)] hover:text-[var(--primary)] disabled:opacity-40 disabled:hover:bg-[var(--background)] disabled:hover:text-[var(--text-muted)] disabled:cursor-not-allowed transition-all cursor-pointer shadow-sm"
                             >
                                 <ChevronLeft className="w-4 h-4" />
                             </button>
 
-                            <span className="px-3 font-bold text-[var(--text-primary)]">
-                                {currentPage} / {totalPages}
+                            <span className="px-2 font-bold text-[var(--text-primary)] font-display text-sm">
+                                {currentPage} <span className="text-[var(--text-muted)] font-normal mx-1">/</span> {totalPages}
                             </span>
 
                             <button
                                 onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
                                 disabled={currentPage === totalPages}
-                                className="p-1.5 rounded-lg border border-[var(--border)] bg-[var(--background)] hover:bg-[var(--surface-2)] disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
+                                className="p-2 rounded-xl border border-[var(--border)] bg-[var(--background)] hover:bg-[var(--surface-2)] hover:text-[var(--primary)] disabled:opacity-40 disabled:hover:bg-[var(--background)] disabled:hover:text-[var(--text-muted)] disabled:cursor-not-allowed transition-all cursor-pointer shadow-sm"
                             >
                                 <ChevronRight className="w-4 h-4" />
                             </button>
